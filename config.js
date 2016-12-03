@@ -8,6 +8,7 @@ module.exports = {
   //DB stuffs
   dbHost: 'localhost',
   dbName: 'jirclemud',
-  dbUser: 'root',
-  dbPass: 'Tinroad81!',
+  dbUser: 'jirclemud',
+  dbPass: 'ch33s3',
+  dbPort: '/Applications/MAMP/tmp/mysql/mysql.sock'
 }

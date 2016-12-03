@@ -4,25 +4,29 @@ var session = require('./session');
 var config = require('./config');
 var user = require('./user');
 var commands = require('./commands');
-console.log(config);
+
 var sockets = [];
 
 var connection = mysql.createConnection({
   host: config.dbHost,
   user: config.dbUser,
   password: config.dbPass,
+  database: config.dbName,
+  port: config.dbPort
 });
 
-//connection.connect();
+connection.connect();
 
 function newSocket(socket) {
-  socket.playerSession = new session();
+  socket.playerSession = new session(socket, user);
 
   sockets.push(socket);
 
   socket.write('Welcome to ' + config.mudName + "\n");
   // display splash screen
-  socket.write("[L]ogin or [C]reate a character\n");
+  socket.playerSession.mode = 'start';
+  socket.playerSession.prompt("[L]ogin or [C]reate a character\n", 'start');
+
 
   socket.on('data', function (data) {
     parseData(socket, data);
@@ -36,18 +40,6 @@ function newSocket(socket) {
 // Initialize service and set listening port
 var server = net.createServer(newSocket);
 server.listen(config.port);
-
-function loginHandler(socket, input) {
-  user.login(socket, input);
-}
-
-function characterCreationHandler(socket, input) {
-  socket.write('character mode initiated');
-  console.log(socket.playerSession);
-  user.create(socket, input);
-}
-
-
 
 function commandHandler(socket, inputRaw) {
   var commandSegments = inputRaw.split(' ');
@@ -69,36 +61,20 @@ function parseData(socket, data) {
   var input = cleanInput(data);
   switch (socket.playerSession.mode) {
     case 'login':
-      loginHandler(socket, input);
+      user.login(socket, input);
       break;
     case 'character':
-      characterCreationHandler(socket, input);
+      user.create(socket, connection, input);
       break;
     case 'command':
       commandHandler(socket, input);
       break;
     default:
-      modeSelect(socket, input);
+      socket.playerSession.modeSelect(input);
       break;
   }
 }
 
-function modeSelect(socket, input) {
-  if (socket.playerSession.mode === false) {
-    if (input === 'l') {
-      socket.playerSession.mode = 'login';
-      loginHandler(socket, true);
-    }
-    else if  (input === 'c') {
-      socket.playerSession.mode = 'character';
-      characterCreationHandler(socket, true);
-    }
-    else {
-      socket.write(input + ' is not a valid option\n');
-      socket.write("[L]ogin or [C]reate a character\n");
-    }
-  }
-}
 
 /*
  * Cleans the input of carriage return, newline
@@ -109,7 +85,7 @@ function cleanInput(data) {
 
 function closeSocket(socket) {
   var i = sockets.indexOf(socket);
-  if (i != -1) {
+  if (i !== -1) {
     sockets.splice(i, 1);
   }
 }
