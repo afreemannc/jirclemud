@@ -5,7 +5,8 @@ var config = require('./config');
 var commands = require('./commands');
 var user = require('./user');
 var rooms = require('./room');
-var sockets = [];
+global.sockets = [];
+global.user = user;
 
 var connection = mysql.createConnection({
   host: config.dbHost,
@@ -41,7 +42,7 @@ function parseData(socket, data) {
   switch (socket.playerSession.inputContext) {
     case 'prompt':
       // certain prompts require collection of multi-line inputs so raw data is provided here.
-      socket.playerSession.prompt.promptHandler(input, connection);
+      socket.playerSession.prompt.promptHandler(data, connection);
       break;
     case 'command':
       // commands should only every be single line so data is sanitized to remove newline characters.

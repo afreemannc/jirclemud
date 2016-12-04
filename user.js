@@ -5,57 +5,62 @@ var config = require('./config');
 var prompt = require('./prompt');
 // Session mode handler for login
 
-var user = function() {};
+var user = function() {
 
-user.prototype.start = function(socket) {
+  this.start = function(socket) {
   var message = 'Welcome to ' + config.mudName + "\n";
   // TODO: display splash screen.
-  message.concat("[L]ogin or [C]reate a character\n");
+  message += "[L]ogin or [C]reate a character\n";
   var startPrompt = prompt.new(socket);
   var startField = {
-    startfield: true,
+    name: 'start',
+    startField: true,
     inputCacheName: 'start',
     promptMessage: message,
     validationCallback: 'validateStartPrompt'
   }
-  startPrompt.addField('start', startField);
+  startPrompt.addField(startField);
   startPrompt.context = 'user';
   socket.playerSession.prompt = startPrompt;
   startPrompt.start();
 }
 
-user.prototype.validateStartPrompt = function(socket, input) {
+
+  this.validateStartPrompt = function(socket, data) {
+  input = data.toString().replace(/(\r\n|\n|\r)/gm,"");
   if (input === 'l' || input === 'L') {
-    this.login(this.socket, input);
+    this.login(socket);
   }
   else if  (input === 'c' || input === 'C') {
     this.create(socket, true);
   }
   else {
     var message = input + ' is not a valid option\n';
-    message.concat("[L]og in or [C]reate a character\n");
+    message += "[L]og in or [C]reate a character\n";
     socket.write(message);
   }
 }
+};
 
 user.prototype.login = function(socket) {
   var loginPrompt = prompt.new(socket);
   var loginField = {
+    name: 'username',
     startField: true,
     inputCacheName: 'username',
     promptMessage: 'Character Name:\n',
-    validationCallback: '',
     nextField: 'password',
   }
-  loginPrompt.addField('username', loginField);
+  loginPrompt.addField(loginField);
 
   var passwordField = {
+    name: 'password',
     inputCacheName: 'password',
     promptMessage: 'Password:\n',
     validationCallback: 'loginAuthenticate',
     nextField: false,
   }
-  loginPrompt.addField('password', passwordField);
+  loginPrompt.addField(passwordField);
   socket.playerSession.prompt = loginPrompt;
   loginPrompt.start();
 }
@@ -65,6 +70,8 @@ user.prototype.loginAuthenticate = function(socket, connection) {
   var passwword = socket.playerSession.prompt.fields.password.value;
   // TODO: authenticate
   socket.write('Welcome back ' + username + '\n');
+  socket.playerSession.inputContext = 'command';
+  delete socket.playerSession.prompt;
 }
 
 
