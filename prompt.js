@@ -1,47 +1,66 @@
-function prompt(socket) {
+function prompt(socket, completionCallback) {
   this.socket = socket;
   this.fields = [];
   this.currentField = false;
+  this.completionCallback = completionCallback;
 }
 
-prompt.prototype.promptHandler = function(input, connection) {
+/**
+ * Primary input handler for prompt system
+ *
+ * @param input
+ *   User input fresh from the socket.
+ *
+ * @return none
+ *
+ */
+prompt.prototype.promptHandler = function(input) {
   var currentPrompt = this.socket.playerSession.prompt;
   if (typeof currentPrompt.currentField !== 'undefined') {
     var currentField = currentPrompt.currentField;
     console.log(currentField);
-    if (typeof currentField.validationCallback !== 'undefined') {
-      switch (currentPrompt.context) {
-        case 'user':
-          console.log(global.user);
-          validationCallback = currentField.validationCallback;
-          console.log('validation callback:' + validationCallback + ':');
-          global.user[validationCallback](this.socket, input);
-          break;
-      }
+    // If the current field has a validation callback
+    // invoke it before input is cached. This callback
+    // will be responsible for returning execution to this
+    // function to complete caching input if needed.
+    if (currentField.validationCallback !== false) {
+      console.log('running validation callback');
+      currentField.validationCallback(this.socket, input);
     }
     else {
       this.cacheInput(input);
-      if (typeof currentField.nextField !== 'undefined') {
-        var fields = this.socket.playerSession.prompt.fields;
-        for (i = 0; i < fields.length; ++i) {
-          var field = fields[i];
-          if (field.name === currentField.nextField) {
-            this.socket.playerSession.prompt.currentField = field;
-            this.socket.write(field.promptMessage);
-          }
+      fieldIndex = currentPrompt.getFieldIndex(currentField.name);
+      if (fieldIndex < currentPrompt.fields.length - 1) {
+        ++fieldIndex;
+        var field = currentPrompt.fields[fieldIndex];
+        this.socket.playerSession.prompt.currentField = field;
+        this.socket.write(field.promptMessage);
+      }
+      else {
+        if (currentPrompt.completionCallback !== false) {
+           var fieldValues = {};
+           for (i = 0; i < currentPrompt.fields.length; ++i) {
+             fieldValues[currentPrompt.fields[i].name] = currentPrompt.fields[i].value;
+           }
+           currentPrompt.completionCallback(this.socket, fieldValues);
         }
       }
     }
-
   }
 }
 
+prompt.prototype.setActivePrompt = function(newPrompt) {
+  this.socket.playerSession.prompt = newPrompt;
+  this.start();
+}
+
 prompt.prototype.cacheInput = function(inputRaw) {
-    var currentPrompt = this.socket.playerSession.prompt;
     var currentField = this.socket.playerSession.prompt.currentField;
     index = this.getFieldIndex(currentField['name']);
-
-    if (typeof currentField.value === 'undefined') {
+    console.log('index:' + index);
+    console.log('fields:');
+    console.log(this.socket.playerSession.prompt.fields);
+    if (currentField.value === false) {
       this.socket.playerSession.prompt.fields[index].value = inputRaw;
     }
     else {
@@ -49,17 +68,19 @@ prompt.prototype.cacheInput = function(inputRaw) {
     }
 }
 
+prompt.prototype.newField = function() {
+  return new Field();
+}
+
 prompt.prototype.addField = function(field) {
     this.fields.push(field);
 }
 
+// Get index of field by name
 prompt.prototype.getFieldIndex = function(name) {
-  fields = this.fields;
-  console.log('index fields:');
-  console.log(fields);
-  console.log('name:' + name);
-  for (i = 0; i < fields.lenth; ++i) {
-    if (fields[i].name === 'name') {
+  fields = this.socket.playerSession.prompt.fields;
+  for (i = 0; i < fields.length; ++i) {
+    if (fields[i].name === name) {
       return i;
     }
   }
@@ -73,11 +94,29 @@ prompt.prototype.start = function() {
     field = fields[i];
     if (typeof field.startField !== 'undefined' && field.startField === true) {
       this.socket.playerSession.prompt.currentField = field;
-      this.socket.write(field.promptMessage);
+      switch(field.type) {
+        case 'multi':
+          var message = ' @@ to end:\n'
+          this.socket.write(field.promptMessage + message);
+          break;
+        default:
+          this.socket.write(field.promptMessage);
+          break;
+      }
     }
   }
 }
 
-module.exports.new = function(socket) {
-  return new prompt(socket);
+module.exports.new = function(socket, completionCallback) {
+  return new prompt(socket, completionCallback);
+}
+
+function Field() {
+    this.name = '';
+    this.type = '';
+    this.value = false;
+    this.startField = false;
+    this.inputCacheName = '';
+    this.promptMessage = '';
+    this.validationCallback = false;
 }

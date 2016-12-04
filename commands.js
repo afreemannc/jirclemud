@@ -9,7 +9,7 @@ module.exports.commandHandler = function(socket, inputRaw, connection) {
   console.log('length:' + commandSegments.length);
   console.log(commandSegments);
   socket.write('Command received:' + inputRaw);
-  if (typeof commands[command]  === 'function') {
+  if (typeof this[command]  === 'function') {
     if (command === 'create') {
       console.log('create detected');
       var args = connection;
@@ -18,7 +18,7 @@ module.exports.commandHandler = function(socket, inputRaw, connection) {
       console.log('not create');
       var args = false;
     }
-    commands[command](socket, commandSegments, args);
+    this[command](socket, commandSegments, args);
   }
   else {
      socket.write('wut\n');

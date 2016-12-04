@@ -8,19 +8,16 @@ var rooms = require('./room');
 global.sockets = [];
 global.user = user;
 
-var connection = mysql.createConnection({
-  host: config.dbHost,
-  user: config.dbUser,
-  password: config.dbPass,
-  database: config.dbName,
-  port: config.dbPort
-});
-
-connection.connect();
 
 function newSocket(socket) {
   socket.playerSession = new session(socket);
-
+  socket.connection = mysql.createConnection({
+    host: config.dbHost,
+    user: config.dbUser,
+    password: config.dbPass,
+    database: config.dbName,
+    port: config.dbPort
+  });
   sockets.push(socket);
   user.start(socket);
 
@@ -42,12 +39,12 @@ function parseData(socket, data) {
   switch (socket.playerSession.inputContext) {
     case 'prompt':
       // certain prompts require collection of multi-line inputs so raw data is provided here.
-      socket.playerSession.prompt.promptHandler(data, connection);
+      socket.playerSession.prompt.promptHandler(data);
       break;
     case 'command':
       // commands should only every be single line so data is sanitized to remove newline characters.
       var input = cleanInput(data);
-      command.commandHandler(socket, input);
+      commands.commandHandler(socket, input);
       break;
   }
 }
