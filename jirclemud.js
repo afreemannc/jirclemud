@@ -2,9 +2,9 @@ var net = require('net');
 var mysql = require('mysql');
 var session = require('./session');
 var config = require('./config');
-var user = require('./user');
 var commands = require('./commands');
-
+var user = require('./user');
+var rooms = require('./room');
 var sockets = [];
 
 var connection = mysql.createConnection({
@@ -18,15 +18,10 @@ var connection = mysql.createConnection({
 connection.connect();
 
 function newSocket(socket) {
-  socket.playerSession = new session(socket, user);
+  socket.playerSession = new session(socket);
 
   sockets.push(socket);
-
-  socket.write('Welcome to ' + config.mudName + "\n");
-  // display splash screen
-  socket.playerSession.mode = 'start';
-  socket.playerSession.prompt("[L]ogin or [C]reate a character\n", 'start');
-
+  user.start(socket);
 
   socket.on('data', function (data) {
     parseData(socket, data);
@@ -40,37 +35,18 @@ function newSocket(socket) {
 // Initialize service and set listening port
 var server = net.createServer(newSocket);
 server.listen(config.port);
-
-function commandHandler(socket, inputRaw) {
-  var commandSegments = inputRaw.split(' ');
-  var command = commandSegments[0];
-  commandSegments.splice(0, 1);
-  console.log(typeof commandSegments);
-  console.log('length:' + commandSegments.length);
-  console.log(commandSegments);
-  socket.write('Command received:' + inputRaw);
-  if (typeof commands[command]  === 'function') {
-    commands[command](socket, commandSegments);
-  }
-  else {
-     socket.write('wut\n');
-  }
-}
-
+// TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(socket, data) {
-  var input = cleanInput(data);
-  switch (socket.playerSession.mode) {
-    case 'login':
-      user.login(socket, input);
-      break;
-    case 'character':
-      user.create(socket, connection, input);
+  inputContext = socket.playerSession.getInputContext();
+  switch (socket.playerSession.inputContext) {
+    case 'prompt':
+      // certain prompts require collection of multi-line inputs so raw data is provided here.
+      socket.playerSession.prompt.promptHandler(input, connection);
       break;
     case 'command':
-      commandHandler(socket, input);
-      break;
-    default:
-      socket.playerSession.modeSelect(input);
+      // commands should only every be single line so data is sanitized to remove newline characters.
+      var input = cleanInput(data);
+      command.commandHandler(socket, input);
       break;
   }
 }
