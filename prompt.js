@@ -18,13 +18,11 @@ prompt.prototype.promptHandler = function(input) {
   var currentPrompt = this.socket.playerSession.prompt;
   if (typeof currentPrompt.currentField !== 'undefined') {
     var currentField = currentPrompt.currentField;
-    console.log(currentField);
     // If the current field has a validation callback
     // invoke it before input is cached. This callback
     // will be responsible for returning execution to this
     // function to complete caching input if needed.
     if (currentField.validationCallback !== false) {
-      console.log('running validation callback');
       currentField.validationCallback(this.socket, input);
     }
     else {
@@ -40,7 +38,7 @@ prompt.prototype.promptHandler = function(input) {
         if (currentPrompt.completionCallback !== false) {
            var fieldValues = {};
            for (i = 0; i < currentPrompt.fields.length; ++i) {
-             fieldValues[currentPrompt.fields[i].name] = currentPrompt.fields[i].value;
+             fieldValues[currentPrompt.fields[i].name] = this.socket.playerSession.prompt.fields[i].value;
            }
            currentPrompt.completionCallback(this.socket, fieldValues);
         }
@@ -56,15 +54,18 @@ prompt.prototype.setActivePrompt = function(newPrompt) {
 
 prompt.prototype.cacheInput = function(inputRaw) {
     var currentField = this.socket.playerSession.prompt.currentField;
-    index = this.getFieldIndex(currentField['name']);
-    console.log('index:' + index);
-    console.log('fields:');
-    console.log(this.socket.playerSession.prompt.fields);
-    if (currentField.value === false) {
-      this.socket.playerSession.prompt.fields[index].value = inputRaw;
+    if (currentField.type === 'text') {
+      input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
     }
     else {
-      this.socket.playerSession.prompt.fields[index].value += inputRaw;
+      input = inputRaw;
+    }
+    index = this.getFieldIndex(currentField['name']);
+    if (currentField.value === false) {
+      this.socket.playerSession.prompt.fields[index].value = input;
+    }
+    else {
+      this.socket.playerSession.prompt.fields[index].value += input;
     }
 }
 

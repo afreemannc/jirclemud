@@ -24,24 +24,38 @@ user.prototype.start = function(socket) {
 }
 
 
-
+/**
+ * Start screen prompt callback
+ *
+ * Switches between login and character creation modes based
+ * on user input on the start screen.
+ *
+ * @param socket
+ *   Socket object for the current user.
+ *
+ * @param fieldValues
+ *   user-submitted values for the start prompt
+ *
+ */
 user.prototype.startSwitch = function(socket, fieldValues) {
   input = fieldValues.start.toString().replace(/(\r\n|\n|\r)/gm,"");
   if (input === 'l' || input === 'L') {
-    console.log(this);
     global.user.login(socket);
   }
   else if  (input === 'c' || input === 'C') {
     global.user.create(socket, true);
   }
   else {
+    // TODO: move this to a validation callback
     var message = input + ' is not a valid option\n';
     message += "[L]og in or [C]reate a character\n";
     socket.write(message);
   }
 }
 
-
+/**
+ * Login screen prompt.
+ */
 user.prototype.login = function(socket) {
   var loginPrompt = prompt.new(socket, this.loginAuthenticate);
   var loginField = loginPrompt.newField();
@@ -62,14 +76,50 @@ user.prototype.login = function(socket) {
   loginPrompt.setActivePrompt(loginPrompt);
 }
 
-
+/**
+ * Login prompt completion handler.
+ */
 user.prototype.loginAuthenticate = function(socket, fieldValues) {
-  console.log(socket.playerSession.prompt);
-  var username = fieldValues.username;
-  var passwword = fieldValues.password;;
+  var userName = fieldValues.username;
+  // This is getting rammed through a hashing function so there is no need to escape.
+  var password = fieldValues.password;
   // TODO: authenticate
-  socket.write('Welcome back ' + username + '\n');
-  socket.playerSession.inputContext = 'command';
+  var sql = "SELECT salt FROM ?? WHERE ?? = ?";
+  var inserts = ['characters', 'name', fieldValues.username];
+  sql = global.mysql.format(sql, inserts);
+  socket.connection.query(sql, function(err, results, fields) {
+   //console.log('error code:' + err.code);
+    if (results.length !== 0) {
+      var salt = results[0].salt;
+      var passwordHash = global.user.passHash(salt, password);
+      console.log('passwordHash:' + passwordHash);
+      var sql = "SELECT * FROM ?? WHERE ?? = ? AND ?? = ?";
+      var inserts = ['characters', 'name', userName, 'pass', passwordHash];
+      sql = global.mysql.format(sql, inserts);
+      socket.connection.query(sql, function(err, results, fields) {
+        if (results.length !== 0) {
+          var character = results[0];
+          console.log('character:');
+          console.log(character);
+          socket.playerSession.character = character;
+          socket.write('Welcome back ' + character.name + '\n');
+          socket.playerSession.inputContext = 'command';
+          // load additional character properties (inventory, class details, stats, etc)
+        }
+        else {
+          // authentication failed, throw error and reset prompt. (add reset method to prompt class)
+        }
+      });
+    }
+    else {
+      // TODO: throw error and reset prompt. (add reset method to prompt class)
+    }
+  });
+  //socket.write('Welcome back ' + username + '\n');
+  //socket.playerSession.inputContext = 'command';
+}
+
+user.prototype.loadCharacter = function(socket, id) {
 }
 
 user.prototype.createCharacter = function(socket, input) {
@@ -95,9 +145,9 @@ user.prototype.createCharacter = function(socket, input) {
 
 }
 
-user.prototype.passHash = function(password) {
+user.prototype.passHash = function(salt, password) {
     var hash = crypto.createHmac('sha512', salt);
-    hash.update(socket.playerSession.pass);
+    hash.update(password);
     return hash.digest('hex');
 
   }

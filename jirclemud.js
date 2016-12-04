@@ -7,7 +7,7 @@ var user = require('./user');
 var rooms = require('./room');
 global.sockets = [];
 global.user = user;
-
+global.mysql = mysql;
 
 function newSocket(socket) {
   socket.playerSession = new session(socket);
