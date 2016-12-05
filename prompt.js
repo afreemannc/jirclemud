@@ -26,21 +26,25 @@ prompt.prototype.promptHandler = function(input) {
       currentField.validationCallback(this.socket, input);
     }
     else {
-      this.cacheInput(input);
-      fieldIndex = currentPrompt.getFieldIndex(currentField.name);
-      if (fieldIndex < currentPrompt.fields.length - 1) {
-        ++fieldIndex;
-        var field = currentPrompt.fields[fieldIndex];
-        this.socket.playerSession.prompt.currentField = field;
-        this.socket.write(field.promptMessage);
-      }
-      else {
-        if (currentPrompt.completionCallback !== false) {
-           var fieldValues = {};
-           for (i = 0; i < currentPrompt.fields.length; ++i) {
-             fieldValues[currentPrompt.fields[i].name] = this.socket.playerSession.prompt.fields[i].value;
-           }
-           currentPrompt.completionCallback(this.socket, fieldValues);
+      // Process the next field. If we are on the last field run the
+      // completion callback function. For multi-line fields this gets
+      // skipped until the input end sequence @@ is received.
+      if (this.cacheInput(input) === true) {
+        fieldIndex = currentPrompt.getFieldIndex(currentField.name);
+        if (fieldIndex < currentPrompt.fields.length - 1) {
+          ++fieldIndex;
+          var field = currentPrompt.fields[fieldIndex];
+          this.socket.playerSession.prompt.currentField = field;
+          this.socket.write(field.promptMessage);
+        }
+        else {
+          if (currentPrompt.completionCallback !== false) {
+             var fieldValues = {};
+             for (i = 0; i < currentPrompt.fields.length; ++i) {
+               fieldValues[currentPrompt.fields[i].name] = this.socket.playerSession.prompt.fields[i].value;
+             }
+            currentPrompt.completionCallback(this.socket, fieldValues);
+          }
         }
       }
     }
@@ -58,13 +62,17 @@ prompt.prototype.setActivePrompt = function(newPrompt) {
 prompt.prototype.cacheInput = function(inputRaw) {
   var currentField = this.socket.playerSession.prompt.currentField;
   var index = this.getFieldIndex(currentField['name']);
+  var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
   if (currentField.type === 'text') {
-    var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
     this.socket.playerSession.prompt.fields[index].value = input;
+    return true;
   }
-  else if(currentField.type === 'multi') {
-    var input = inputRaw;
-    this.socket.playerSession.prompt.fields[index].value += input;
+  else if(currentField.type === 'multi' && input !== '@@') {
+    this.socket.playerSession.prompt.fields[index].value += inputRaw;
+    return false;
+  }
+  else if (input === '@@') {
+    return true;
   }
 }
 

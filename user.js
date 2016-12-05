@@ -3,13 +3,14 @@
 var crypto = require('crypto');
 var config = require('./config');
 var prompt = require('./prompt');
+var colors = require('colors/safe');
 // Session mode handler for login
 
 var user = function(){};
 
 
 user.prototype.start = function(socket) {
-  var message = 'Welcome to ' + config.mudName + "\n";
+  var message = colors.green('Welcome to ' + config.mudName + "\n");
   // TODO: display splash screen.
   message += "[L]ogin or [C]reate a character\n";
   var startPrompt = prompt.new(socket, global.user.startSwitch);
