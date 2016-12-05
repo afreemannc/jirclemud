@@ -43,7 +43,7 @@ user.prototype.startSwitch = function(socket, fieldValues) {
     global.user.login(socket);
   }
   else if  (input === 'c' || input === 'C') {
-    global.user.create(socket, true);
+    global.user.createCharacter(socket);
   }
   else {
     // TODO: move this to a validation callback
@@ -122,7 +122,7 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
 user.prototype.loadCharacter = function(socket, id) {
 }
 
-user.prototype.createCharacter = function(socket, input) {
+user.prototype.createCharacter = function(socket) {
     var createCharacterPrompt = prompt.new(socket, this.saveCharacter);
 
     var characterNameField = createCharacterPrompt.newField();
@@ -141,7 +141,7 @@ user.prototype.createCharacter = function(socket, input) {
     passwordField.promptMessage = 'Password:\n';
     createCharacterPrompt.addField(passwordField);
 
-    createCharacterPrompt.setActivePrompt(loginPrompt);
+    createCharacterPrompt.setActivePrompt(createCharacterPrompt);
 
 }
 
@@ -165,7 +165,16 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
       status: 1
     };
     console.log(values);
-    socket.connection.query('INSERT INTO characters SET ?', values, function (error, result) {});
+    socket.connection.query('INSERT INTO characters SET ?', values, function (error, result) {
+      characterId = result.insertId;
+      console.log('character id:' + characterId);
+      // TODO: update session with character
+      // TODO: generate default inventory
+      // TODO: set default room number
+      socket.write('Welcome ' + values.name + '\n');
+      socket.playerSession.inputContext = 'command';
+      // TODO: run "look"
+    });
 }
 
  // Validate character name input
