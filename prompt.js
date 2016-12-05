@@ -52,21 +52,20 @@ prompt.prototype.setActivePrompt = function(newPrompt) {
   this.start();
 }
 
+/**
+ * Save user input in the value property of the current prompt field.
+ */
 prompt.prototype.cacheInput = function(inputRaw) {
-    var currentField = this.socket.playerSession.prompt.currentField;
-    if (currentField.type === 'text') {
-      input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
-    }
-    else {
-      input = inputRaw;
-    }
-    index = this.getFieldIndex(currentField['name']);
-    if (currentField.value === false) {
-      this.socket.playerSession.prompt.fields[index].value = input;
-    }
-    else {
-      this.socket.playerSession.prompt.fields[index].value += input;
-    }
+  var currentField = this.socket.playerSession.prompt.currentField;
+  var index = this.getFieldIndex(currentField['name']);
+  if (currentField.type === 'text') {
+    var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
+    this.socket.playerSession.prompt.fields[index].value = input;
+  }
+  else if(currentField.type === 'multi') {
+    var input = inputRaw;
+    this.socket.playerSession.prompt.fields[index].value += input;
+  }
 }
 
 prompt.prototype.newField = function() {

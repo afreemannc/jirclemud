@@ -10,15 +10,7 @@ module.exports.commandHandler = function(socket, inputRaw, connection) {
   console.log(commandSegments);
   socket.write('Command received:' + inputRaw);
   if (typeof this[command]  === 'function') {
-    if (command === 'create') {
-      console.log('create detected');
-      var args = connection;
-    }
-    else {
-      console.log('not create');
-      var args = false;
-    }
-    this[command](socket, commandSegments, args);
+    this[command](socket, commandSegments);
   }
   else {
      socket.write('wut\n');
@@ -56,17 +48,15 @@ module.exports.get = function(socket, input) {
     }
 }
 
-module.exports.create = function(socket, context, connection) {
+module.exports.create = function(socket, context) {
   if (context.length === 0) {
     socket.write("Create what??\n");
   }
   else {
-    console.log('create input:' + input + ':');
-    switch (context) {
+    switch (context[0]) {
         case 'room':
           console.log('create room triggered\n');
-          socket.playerSession.expectedInput = 'name';
-          rooms.createRoom(socket, connection);
+          rooms.createRoom(socket);
           break;
         default:
           console.log('Create what??\n');

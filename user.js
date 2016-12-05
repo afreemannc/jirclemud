@@ -15,6 +15,7 @@ user.prototype.start = function(socket) {
   var startPrompt = prompt.new(socket, global.user.startSwitch);
   var startField = startPrompt.newField();
   startField.name = 'start';
+  startField.type = 'text';
   startField.startField = true;
   startField.inputCacheName = 'start';
   startField.promptMessage = message;
