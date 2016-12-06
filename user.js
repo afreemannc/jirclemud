@@ -4,6 +4,7 @@ var crypto = require('crypto');
 var config = require('./config');
 var prompt = require('./prompt');
 var colors = require('colors/safe');
+var classes = require('./classes');
 // Session mode handler for login
 
 var user = function(){};
@@ -49,8 +50,8 @@ user.prototype.startSwitch = function(socket, fieldValues) {
   }
   else {
     // TODO: move this to a validation callback
-    var message = input + ' is not a valid option\n';
-    message += "[L]og in or [C]reate a character\n";
+    var message = color.red(input + ' is not a valid option\n');
+    message += '[' + color.yellow('L') + ']og in or [' + color.yellow('C') + ']reate a character\n';
     socket.write(message);
   }
 }
@@ -143,6 +144,15 @@ user.prototype.createCharacter = function(socket) {
     passwordField.promptMessage = 'Password:\n';
     createCharacterPrompt.addField(passwordField);
 
+    var classField = createCharacterPrompt.newField();
+    classField.name = 'characterclass';
+    classField.type = 'text';
+    classField.inputCacheName = 'characterclass';
+    classField.validationCallback = classes.validateSelection;
+    classField.promptMessage = classes.selectionPrompt();
+    createCharacterPrompt.addField(classField);
+    console.log('prompt:');
+    console.log(createCharacterPrompt);
     createCharacterPrompt.setActivePrompt(createCharacterPrompt);
 
 }
@@ -186,18 +196,15 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
     }
     socket.connection.query('SELECT id FROM characters WHERE name = ?', [name],
       function(error, results, fields) {
+        console.log('results:');
         console.log(results);
         if (results.length !== 0) {
-          socket.playerSession.user = false;
           var message = name + ' is already in use. Please select a different character name.\n';
-          message = message + 'Character Name:\n'
-          socket.playerSession.prompt(message, 'name');
+          socket.playerSession.prompt.validationError(message);
           return;
         }
         else {
-          socket.write('Password:\n');
-          socket.playerSession.expectedInput = 'pass';
-          return;
+          socket.playerSession.prompt.validationSuccess('name', name);
         }
       }
     );

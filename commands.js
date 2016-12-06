@@ -1,4 +1,5 @@
 var rooms = require('./room');
+var colors = require('colors/safe');
 
 module.exports.commandHandler = function(socket, inputRaw, connection) {
   var commandSegments = inputRaw.split(' ');
@@ -47,6 +48,22 @@ module.exports.get = function(socket, input) {
     socket.write('You pick up ' + input);
     }
 }
+
+module.exports.teleport = function(socket, input) {
+  // TODO: confirm current user has GOD or DEMI flag
+  if (input.length === 0) {
+    socket.write(colors.red("Teleport where??\n"));
+  }
+  else {
+    // validate room name/number
+
+      // update user room #
+      // fire "look"
+    // error on bs location
+  }
+}
+
+
 
 module.exports.create = function(socket, context) {
   if (context.length === 0) {
