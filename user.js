@@ -1,17 +1,14 @@
 // user stuff
 
 var crypto = require('crypto');
-var config = require('./config');
 var prompt = require('./prompt');
-var colors = require('colors/safe');
-var classes = require('./classes');
 // Session mode handler for login
 
 var user = function(){};
 
 
 user.prototype.start = function(socket) {
-  var message = colors.green('Welcome to ' + config.mudName + "\n");
+  var message = colors.green('Welcome to ' + global.config.mudName + "\n");
   // TODO: display splash screen.
   message += "[::1::]ogin or [::2::]reate a character\n";
   var startPrompt = prompt.new(socket, global.user.startSwitch);
@@ -43,7 +40,6 @@ user.prototype.start = function(socket) {
  */
 user.prototype.startSwitch = function(socket, fieldValues) {
   input = fieldValues.start;
-  console.log('input start:' + input);
   if (input === 'l' || input === 'L') {
     global.user.login(socket);
   }
@@ -82,24 +78,19 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
   var userName = fieldValues.username;
   // This is getting rammed through a hashing function so there is no need to escape.
   var password = fieldValues.password;
-  // TODO: authenticate
   var sql = "SELECT salt FROM ?? WHERE ?? = ?";
   var inserts = ['characters', 'name', fieldValues.username];
   sql = global.mysql.format(sql, inserts);
   socket.connection.query(sql, function(err, results, fields) {
-   //console.log('error code:' + err.code);
     if (results.length !== 0) {
       var salt = results[0].salt;
       var passwordHash = global.user.passHash(salt, password);
-      console.log('passwordHash:' + passwordHash);
       var sql = "SELECT * FROM ?? WHERE ?? = ? AND ?? = ?";
       var inserts = ['characters', 'name', userName, 'pass', passwordHash];
       sql = global.mysql.format(sql, inserts);
       socket.connection.query(sql, function(err, results, fields) {
         if (results.length !== 0) {
           var character = results[0];
-          console.log('character:');
-          console.log(character);
           socket.playerSession.character = character;
           socket.write('Welcome back ' + character.name + '\n');
           socket.playerSession.inputContext = 'command';
@@ -142,13 +133,11 @@ user.prototype.createCharacter = function(socket) {
 
     var classField = createCharacterPrompt.newField();
     classField.name = 'characterclass';
-    classField.type = 'text';
+    classField.type = 'select';
+    classField.options = global.classes.selectionOptions();
     classField.inputCacheName = 'characterclass';
-    classField.validationCallback = classes.validateSelection;
-    classField.promptMessage = classes.selectionPrompt();
+    classField.promptMessage = global.classes.selectionPrompt();
     createCharacterPrompt.addField(classField);
-    console.log('prompt:');
-    console.log(createCharacterPrompt);
     createCharacterPrompt.setActivePrompt(createCharacterPrompt);
 
 }
@@ -163,19 +152,19 @@ user.prototype.passHash = function(salt, password) {
 // Save character record.
 user.prototype.saveCharacter = function(socket, fieldValues) {
     var salt = crypto.randomBytes(Math.ceil(4)).toString('hex').slice(0, 8);
-    var hashedPassword = this.passHash(salt, fieldValues.password);
-    console.log(hashedPassword);
+    // I do not currently understand why this.passHash doesn't work
+    var hashedPassword = global.user.passHash(salt, fieldValues.password);
     var values = {
       name: fieldValues.name,
       pass: hashedPassword,
       salt: salt,
       last_login: 0,
-      status: 1
+      status: 1,
+      properties: global.user.startProperties(fieldValues.characterclass)
     };
     console.log(values);
     socket.connection.query('INSERT INTO characters SET ?', values, function (error, result) {
       characterId = result.insertId;
-      console.log('character id:' + characterId);
       // TODO: update session with character
       // TODO: generate default inventory
       // TODO: set default room number
@@ -185,6 +174,20 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
     });
 }
 
+user.prototype.startProperties = function(characterClass) {
+  var characterClass = global.classes.classFromSelection(characterClass);
+  // TODO: add con bonus once stats are implemented.
+  var startingHP = global.dice.roll(characterClass.hitDice);
+  var properties = {
+    class: characterClass.name,
+    class_level: 1,
+    hp: startingHP,
+  }
+  console.log('properties:');
+  console.log(properties);
+  return JSON.stringify(properties);
+}
+
  // Validate character name input
  user.prototype.validateCharacterName = function(socket, name) {
     if (name.length === 0) {
@@ -192,8 +195,6 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
     }
     socket.connection.query('SELECT id FROM characters WHERE name = ?', [name],
       function(error, results, fields) {
-        console.log('results:');
-        console.log(results);
         if (results.length !== 0) {
           var message = name + ' is already in use. Please select a different character name.\n';
           socket.playerSession.prompt.validationError(message);

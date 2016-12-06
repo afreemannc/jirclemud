@@ -2,7 +2,6 @@
 var user = require('./user');
 
 function session(socket) {
-  console.log(user);
   this.inputContext = 'start';
   this.socket = socket;
   this.mode = false;

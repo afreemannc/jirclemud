@@ -1,16 +1,21 @@
 var net = require('net');
 var mysql = require('mysql');
 var colors = require('colors/safe');
-
 var session = require('./session');
 var config = require('./config');
 var commands = require('./commands');
 var user = require('./user');
 var rooms = require('./room');
+var classes = require('./classes');
+var dice = require('./dice');
+
 global.sockets = [];
+global.config = config;
 global.user = user;
 global.mysql = mysql;
 global.colors = colors;
+global.dice = dice;
+global.classes = classes;
 
 function newSocket(socket) {
   socket.playerSession = new session(socket);

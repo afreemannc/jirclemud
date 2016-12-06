@@ -38,30 +38,22 @@ function prompt(socket, completionCallback) {
  *
  */
 prompt.prototype.promptHandler = function(input) {
-  console.log('prompt handler invoked with input:' + input);
   var currentPrompt = this.socket.playerSession.prompt;
   if (typeof currentPrompt.currentField !== 'undefined') {
     var currentField = currentPrompt.currentField;
-    console.log('current field:');
-    console.log(currentField);
     // If the current field has a validation callback
     // invoke it before input is cached. This callback
     // will be responsible for returning execution to this
     // function to complete caching input if needed.
     if (currentField.validationCallback !== false && currentField.validated === false) {
-      console.log('invoking validation callback');
       currentField.validationCallback(this.socket, input);
     }
     else {
-      console.log('moving to next field');
       // Process the next field. If we are on the last field run the
       // completion callback function. For multi-line fields this gets
       // skipped until the input end sequence @@ is received.
-      console.log('input:' + input);
       if (this.cacheInput(input) === true) {
-        console.log('execution continues');
         fieldIndex = currentPrompt.getFieldIndex(currentField.name);
-        console.log('field index:' + fieldIndex);
         if (fieldIndex < currentPrompt.fields.length - 1) {
           ++fieldIndex;
           var field = currentPrompt.fields[fieldIndex];
@@ -69,15 +61,11 @@ prompt.prototype.promptHandler = function(input) {
           this.socket.playerSession.prompt.promptUser(field);
         }
         else {
-          console.log('doing more things');
           if (currentPrompt.completionCallback !== false) {
-             console.log('packing field values in preparation to run completion callback');
              var fieldValues = {};
              for (i = 0; i < currentPrompt.fields.length; ++i) {
                fieldValues[currentPrompt.fields[i].name] = this.socket.playerSession.prompt.fields[i].value;
              }
-             console.log('field values:');
-             console.log(fieldValues);
              currentPrompt.completionCallback(this.socket, fieldValues);
           }
         }
@@ -91,8 +79,6 @@ prompt.prototype.promptHandler = function(input) {
 
 prompt.prototype.validationError = function(error) {
   this.socket.write(color.red(error));
-  console.log('error field:');
-  console.log(this.currentField);
   this.promptUser(this.currentField);
 }
 
@@ -108,7 +94,6 @@ prompt.prototype.validationSuccess = function(fieldName, input) {
  * Set active prompt and begin prompting user for input.
  */
 prompt.prototype.setActivePrompt = function(newPrompt) {
-  console.log('set active invoked');
   this.socket.playerSession.prompt = newPrompt;
   this.start();
 }
@@ -118,21 +103,16 @@ prompt.prototype.setActivePrompt = function(newPrompt) {
  */
 prompt.prototype.cacheInput = function(inputRaw) {
   var currentField = this.socket.playerSession.prompt.currentField;
-  console.log(currentField);
   var index = this.getFieldIndex(currentField['name']);
-  console.log('field index:' + index);
   var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
   switch (currentField.type) {
     case 'text':
       this.socket.playerSession.prompt.fields[index].value = input;
       return true;
     case 'select':
-      console.log('processing select');
       input = input.toLowerCase();
       var stuff = currentField.options.indexOf(input);
-      console.log('index of option:' + stuff);
       if (currentField.options.indexOf(input) !== -1) {
-        console.log('setting value, returning true');
         this.socket.playerSession.prompt.fields[index].value = input;
         return true;
       }
@@ -173,7 +153,6 @@ prompt.prototype.getFieldIndex = function(name) {
 }
 
 prompt.prototype.start = function() {
-  console.log('start invoked');
   this.socket.playerSession.inputContext = 'prompt';
   var fields = this.socket.playerSession.prompt.fields;
   for (i = 0; i < fields.length; ++i) {
@@ -185,30 +164,6 @@ prompt.prototype.start = function() {
     }
   }
 }
-/*
-module.exports.promptUser = function(field) {
-  switch (field.type) {
-    case 'text':
-      this.socket.write(field.promptMessage);
-      break;
-    case 'multi':
-      this.socket.write(field.promptMessage + ' (@@ to end)');
-      break;
-    case 'select':
-      var promptMessage = field.promptMessage;
-      for (i = 0; i < field.options.length; ++i) {
-        option = field.options[i];
-        pattern = '::' + i + '::';
-        replacement = color.yellow(option.toUpperCase());
-        promptMessage.replace(pattern, replacement);
-      }
-      this.socket.write(promptMessage);
-      break;
-
-    default:
-     this.socket.write('I have no idea what to do here.');
-  }
-}*/
 
 module.exports.new = function(socket, completionCallback) {
   return new prompt(socket, completionCallback);
