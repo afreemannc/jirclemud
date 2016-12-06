@@ -91,9 +91,12 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
       socket.connection.query(sql, function(err, results, fields) {
         if (results.length !== 0) {
           var character = results[0];
+          character.properties = JSON.parse(character.properties);
+          console.log(character);
           socket.playerSession.character = character;
           socket.write('Welcome back ' + character.name + '\n');
           socket.playerSession.inputContext = 'command';
+          global.user.changeRoom(socket, character.properties.room);
           // load additional character properties (inventory, class details, stats, etc)
         }
         else {
@@ -170,6 +173,7 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
       // TODO: set default room number
       socket.write('Welcome ' + values.name + '\n');
       socket.playerSession.inputContext = 'command';
+      global.user.changeRoom(socket, global.config.startRoom);
       // TODO: run "look"
     });
 }
@@ -182,6 +186,7 @@ user.prototype.startProperties = function(characterClass) {
     class: characterClass.name,
     class_level: 1,
     hp: startingHP,
+    room: global.config.startRoom
   }
   console.log('properties:');
   console.log(properties);
@@ -206,4 +211,9 @@ user.prototype.startProperties = function(characterClass) {
       }
     );
 }
+
+user.prototype.changeRoom = function(socket, roomId) {
+  global.rooms.loadRoom(socket, roomId, global.commands.look);
+}
+
 module.exports = new user();

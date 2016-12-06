@@ -10,11 +10,6 @@ function session(socket) {
   this.characterId = '';
   this.roomId = '';
 
-  this.print = function(message, property) {
-    this.socket.write(message);
-    this.expectedInput = property;
-  }
-
   this.getInputContext = function() {
     var context = this.inputContext.split(':');
     if (context.length === 1) {

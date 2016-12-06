@@ -2,8 +2,16 @@ var prompt = require('./prompt');
 
 var room = function(){};
 
-room.prototype.loadRoom = function(rid) {
-
+room.prototype.loadRoom = function(socket, roomId, callback) {
+  var sql = "SELECT * FROM ?? WHERE ?? = ?";
+  var inserts = ['rooms', 'rid', roomId];
+  sql = global.mysql.format(sql, inserts);
+  socket.connection.query(sql, function(err, results, fields) {
+    socket.playerSession.room = results[0];
+    if (typeof callback === 'function') {
+      callback(socket, results[0]);
+    }
+  });
 }
 
 room.prototype.createRoom = function(socket) {

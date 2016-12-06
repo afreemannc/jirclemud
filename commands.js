@@ -22,16 +22,10 @@ module.exports.quit = function(socket) {
    socket.end('Goodbye!\n');
 }
 
-module.exports.look = function(socket, input) {
+module.exports.look = function(socket) {
     // Room look
-    if (input.length === 0) {
-      socket.write('room desc');
-    }
-    else {
-      // does thing exist?
-      // if so retrieve description and print
-      socket.write('item desc');
-    }
+    socket.write(socket.playerSession.room.full_description);
+  // TODO: implement item look
 }
 
 module.exports.get = function(socket, input) {

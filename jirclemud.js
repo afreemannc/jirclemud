@@ -16,8 +16,12 @@ global.mysql = mysql;
 global.colors = colors;
 global.dice = dice;
 global.classes = classes;
+global.rooms = rooms;
+global.commands = commands;
 
 function newSocket(socket) {
+  console.log('socket:');
+  console.log(socket);
   socket.playerSession = new session(socket);
   socket.connection = mysql.createConnection({
     host: config.dbHost,
