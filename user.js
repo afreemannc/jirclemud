@@ -13,11 +13,12 @@ var user = function(){};
 user.prototype.start = function(socket) {
   var message = colors.green('Welcome to ' + config.mudName + "\n");
   // TODO: display splash screen.
-  message += "[L]ogin or [C]reate a character\n";
+  message += "[::1::]ogin or [::2::]reate a character\n";
   var startPrompt = prompt.new(socket, global.user.startSwitch);
   var startField = startPrompt.newField();
   startField.name = 'start';
-  startField.type = 'text';
+  startField.type = 'select';
+  startField.options = ['l','c'];
   startField.startField = true;
   startField.inputCacheName = 'start';
   startField.promptMessage = message;
@@ -41,18 +42,13 @@ user.prototype.start = function(socket) {
  *
  */
 user.prototype.startSwitch = function(socket, fieldValues) {
-  input = fieldValues.start.toString().replace(/(\r\n|\n|\r)/gm,"");
+  input = fieldValues.start;
+  console.log('input start:' + input);
   if (input === 'l' || input === 'L') {
     global.user.login(socket);
   }
   else if  (input === 'c' || input === 'C') {
     global.user.createCharacter(socket);
-  }
-  else {
-    // TODO: move this to a validation callback
-    var message = color.red(input + ' is not a valid option\n');
-    message += '[' + color.yellow('L') + ']og in or [' + color.yellow('C') + ']reate a character\n';
-    socket.write(message);
   }
 }
 
