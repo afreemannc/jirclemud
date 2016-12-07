@@ -182,11 +182,17 @@ user.prototype.startProperties = function(characterClass) {
   var characterClass = global.classes.classFromSelection(characterClass);
   // TODO: add con bonus once stats are implemented.
   var startingHP = global.dice.roll(characterClass.hitDice);
+  var startingMana = 10; //TODO: implement some mana thing once casters are in.
   var properties = {
     class: characterClass.name,
     class_level: 1,
-    hp: startingHP,
-    room: global.config.startRoom
+    maxhp: startingHP,
+    currenthp: startingHP,
+    maxmana: startingMana,
+    currentmana: startingMana,
+    room: global.config.startRoom,
+    skills:[],
+    spells:[]
   }
   console.log('properties:');
   console.log(properties);

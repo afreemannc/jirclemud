@@ -21,6 +21,27 @@ function session(socket) {
       return {context: primary, params: context};
     }
   }
+
+  this.characterPrompt = function() {
+    var hp = this.character.properties.currenthp;
+    var mana = this.character.properties.currentmana;
+    var prompt = global.color.red('H:' + hp);
+    prompt += ' | ';
+    prompt += global.color.blue('M:' + mana);
+    prompt += ' >\n';
+
+    return "\n" + prompt;
+  }
+
+  this.write = function(message){
+    this.socket.write(message);
+    this.socket.write(this.characterPrompt());
+  }
+
+  this.error = function(message) {
+    this.socket.write(global.color.red(message));
+    this.socket.write(this.characterPrompt());
+  }
 }
 
 

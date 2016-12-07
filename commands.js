@@ -6,31 +6,51 @@ module.exports.commandHandler = function(socket, inputRaw, connection) {
   var command = commandSegments[0];
   console.log('command:' + command + ':');
   commandSegments.splice(0, 1);
+  var arg = commandSegments.join(' ');
   console.log(typeof commandSegments);
   console.log('length:' + commandSegments.length);
   console.log(commandSegments);
-  socket.write('Command received:' + inputRaw);
   if (typeof this[command]  === 'function') {
-    this[command](socket, commandSegments);
+    this[command](socket, arg);
   }
   else {
      socket.write('wut\n');
   }
 }
 
-module.exports.quit = function(socket) {
+module.exports.quit = function(socket, input) {
    socket.end('Goodbye!\n');
+}
+
+module.exports.say = function(socket, input) {
+  roomId = socket.playerSession.room.id;
+  name = socket.playerSession.character.name;
+  characterID = socket.playerSession.character.id;
+
+  for (i = 0; i < global.sockets.length; ++i) {
+    if (global.sockets[i].playerSession.room.id === roomId) {
+      if (global.sockets[i].playerSession.character.id === characterID) {
+        message = "You say:";
+      }
+      else {
+        message = name + " says:";
+      }
+      output = message + input + "\n";
+      global.sockets[i].playerSession.write(global.color.magenta(output));
+    }
+  }
 }
 
 module.exports.look = function(socket) {
     // Room look
-    socket.write(socket.playerSession.room.full_description);
+    socket.write(global.colors.bold(socket.playerSession.room.name) + "\n\n");
+    socket.playerSession.write(socket.playerSession.room.full_description + "\n\n");
   // TODO: implement item look
 }
 
 module.exports.get = function(socket, input) {
     if (input.length === 0) {
-      socket.write('Get what??\n');
+      socket.playerSession.error('Get what??\n');
     }
     else {
     // does thing exist?
@@ -39,14 +59,14 @@ module.exports.get = function(socket, input) {
        // Weight vs character lift?
        // Room in carry inventory?
     // if so transfer item from current location to carry inventory
-    socket.write('You pick up ' + input);
+    socket.playerSession.write('You pick up ' + input);
     }
 }
 
 module.exports.teleport = function(socket, input) {
   // TODO: confirm current user has GOD or DEMI flag
   if (input.length === 0) {
-    socket.write(colors.red("Teleport where??\n"));
+    socket.playerSession.error("Teleport where??\n");
   }
   else {
     // validate room name/number
