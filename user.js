@@ -10,12 +10,12 @@ var user = function(){};
 user.prototype.start = function(socket) {
   var message = colors.green('Welcome to ' + global.config.mudName + "\n");
   // TODO: display splash screen.
-  message += "[::1::]ogin or [::2::]reate a character\n";
+  message += "[::1::]ogin, [::2::]reate a character or [::3::]uit.\n";
   var startPrompt = prompt.new(socket, global.user.startSwitch);
   var startField = startPrompt.newField();
   startField.name = 'start';
   startField.type = 'select';
-  startField.options = ['l','c'];
+  startField.options = ['l','c','q'];
   startField.startField = true;
   startField.inputCacheName = 'start';
   startField.promptMessage = message;
@@ -45,6 +45,9 @@ user.prototype.startSwitch = function(socket, fieldValues) {
   }
   else if  (input === 'c' || input === 'C') {
     global.user.createCharacter(socket);
+  }
+  else if (input === 'q' || input === 'Q') {
+    global.commands.quit(socket, false);
   }
 }
 
