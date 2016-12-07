@@ -78,7 +78,6 @@ module.exports.teleport = function(socket, input) {
 }
 
 
-
 module.exports.create = function(socket, context) {
   if (context.length === 0) {
     socket.write("Create what??\n");
@@ -86,11 +85,25 @@ module.exports.create = function(socket, context) {
   else {
     switch (context[0]) {
         case 'room':
-          console.log('create room triggered\n');
           rooms.createRoom(socket);
           break;
         default:
           console.log('Create what??\n');
     }
+  }
+}
+
+module.exports.dig = function(socket, direction) {
+  if (direction.length === 0) {
+    socket.playerSession.error('Dig where??\n');
+  }
+  else {
+    fieldValues = {
+      name: 'Empty space',
+      short_description: 'Nothing to see here.',
+      full_description: 'Empty space just waiting to be filled. Remind you of Prom night?'
+    }
+    console.log('dig triggered, invoking new room creation');
+    global.rooms.saveRoom(socket, fieldValues, global.rooms.createPlaceholderExit, direction);
   }
 }

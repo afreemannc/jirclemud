@@ -50,16 +50,63 @@ room.prototype.deleteRoom = function(connection) {
 
 }
 
-room.prototype.saveRoom = function(socket, fieldValues) {
+room.prototype.createPlaceholderExit = function(socket, target_rid, label) {
+  console.log('made it to placeholder exit creation');
+  console.log('target_rid:' + target_rid);
+  console.log('label:' + label);
+  console.log('session:');
+  console.log(socket.playerSession);
+  fieldValues = {
+    rid: socket.playerSession.room.rid,
+    target_rid: target_rid,
+    lable: label,
+    description: 'Nothing to see here.',
+    properties: [],
+  }
+  global.rooms.saveExit(socket, fieldValues, global.user.changeRoom, target_rid);
+}
+
+room.prototype.saveExit = function(socket, fieldValues, callback, callbackArgs) {
+  console.log('made it to exit save');
+  console.log(fieldValues);
+
+  properties = fieldValues.properties;
+  values = {
+    rid: fieldValues.rid,
+    target_rid:fieldValues.target_rid,
+    label:fieldValues.label,
+    description: fieldValues.description,
+    properties: JSON.stringify(properties) // TODO: implement exit properties?
+  }
+  socket.connection.query('INSERT INTO room_exits SET ?', values, function (error, result) {
+    socket.playerSession.write('Exit saved.');
+    socket.playerSession.inputContext = 'command';
+    if (typeof callback === 'function') {
+      if (callbackArgs === false) {
+        console.log('no callback args');
+        callback(socket, results.insertId);
+      }
+      else {
+        console.log('callback args');
+        callback(socket, callbackArgs);
+      }
+    }
+  });
+}
+
+room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) {
   console.log(fieldValues);
   values = {
     name:fieldValues.name,
     short_description:fieldValues.short_description,
     full_description:fieldValues.full_description
   }
-  socket.connection.query('INSERT INTO rooms SET ?', values, function (error, result) {
-    socket.write('Room saved.');
+  socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
+    socket.playerSession.write('Room saved.');
     socket.playerSession.inputContext = 'command';
+    if (typeof callback === 'function') {
+      callback(socket, results.insertId, callbackArgs);
+    }
   });
 }
 

@@ -66,7 +66,7 @@ prompt.prototype.promptHandler = function(input) {
              for (i = 0; i < currentPrompt.fields.length; ++i) {
                fieldValues[currentPrompt.fields[i].name] = this.socket.playerSession.prompt.fields[i].value;
              }
-             currentPrompt.completionCallback(this.socket, fieldValues);
+             currentPrompt.completionCallback(this.socket, fieldValues, false, false);
           }
         }
       }
