@@ -10,6 +10,9 @@ module.exports.commandHandler = function(socket, inputRaw, connection) {
   console.log(typeof commandSegments);
   console.log('length:' + commandSegments.length);
   console.log(commandSegments);
+  // If input matches an exit label for the current room treat as move.
+  global.rooms.inputIsExit(socket, inputRaw);
+
   if (typeof this[command]  === 'function') {
     this[command](socket, arg);
   }
@@ -43,8 +46,18 @@ module.exports.say = function(socket, input) {
 
 module.exports.look = function(socket) {
     // Room look
+    console.log('look invoked');
+    console.log(socket.playerSession.room);
     socket.write(global.colors.bold(socket.playerSession.room.name) + "\n\n");
-    socket.playerSession.write(socket.playerSession.room.full_description + "\n\n");
+    socket.write(socket.playerSession.room.full_description + "\n");
+    var exits = '';
+    for (i = 0; i < socket.playerSession.room.exits.length; ++i) {
+      exit = socket.playerSession.room.exits[i];
+      console.log('exit:');
+      console.log(exit);
+      exits += global.colors.yellow(exit.label + ' ');
+    }
+    socket.playerSession.write('Exits: [ ' + exits + ' ]\n');
   // TODO: implement item look
 }
 
