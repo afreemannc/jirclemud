@@ -2,29 +2,64 @@ var prompt = require('./prompt');
 
 var room = function(){};
 
-room.prototype.inputIsExit = function(socket, inputRaw) {
-  console.log('is exit input:' + inputRaw);
-  var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
-  var currentExits = socket.playerSession.room.exits;
-  for (i = 0; i < currentExits.length; ++i) {
-    console.log(currentExits[i]);
-    if (currentExits[i].label === input) {
-      console.log('we move!');
-      global.rooms.loadRoom(socket, currentExits[i].target_rid);
+room.prototype.message = function(socket, roomId, message, skipCharacter) {
+  console.log('room message roomId:' + roomId);
+  console.log('room message message:' + message);
+
+  for (i = 0; i < global.sockets.length; ++i) {
+    playerSession = global.sockets[i].playerSession;
+    // They ain't here.
+    if (playerSession.room.rid !== roomId) {
+      return;
+    }
+    if (playerSession.character.id === socket.playerSession.character.id && skipCharacter === true) {
+      return;
+    }
+    else {
+      playerSession.write(message);
     }
   }
 }
 
+room.prototype.inputIsExit = function(socket, inputRaw) {
+  console.log('is exit input:' + inputRaw);
+  var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
+  var currentExits = socket.playerSession.room.exits;
+  var roomId = socket.playerSession.room.id;
+  var characterId = socket.playerSession.character.id;
+  var name = socket.playerSession.character.name;
+  for (i = 0; i < currentExits.length; ++i) {
+    currentExit = currentExits[i];
+    if (currentExit.label === input) {
+      console.log('input Is Exit input:' + input);
+      global.rooms.loadRoom(socket, currentExit.target_rid, input);
+      return true;
+    }
+  }
+  return false;
+}
+
 //TODO: extend this so it can be used for edit form instead of just
 // the login/change room workflow.
-room.prototype.loadRoom = function(socket, roomId) {
+room.prototype.loadRoom = function(socket, roomId, input) {
+  console.log('loadroom input:' + input);
   var sql = "SELECT * FROM ?? WHERE ?? = ?";
   var inserts = ['rooms', 'rid', roomId];
   sql = global.mysql.format(sql, inserts);
   socket.connection.query(sql, function(err, results, fields) {
     socket.playerSession.room = results[0];
+    if (input !== false) {
+      global.rooms.exitMessage(socket, input);
+    }
+    socket.playerSession.character.current_room = roomId;
     global.rooms.loadExits(socket, roomId);
   });
+}
+
+room.prototype.exitMessage = function(socket, input) {
+  var currentRoomId = socket.playerSession.character.current_room;
+  var name = socket.playerSession.character.name;
+  global.rooms.message(socket, currentRoomId, name + " leaves heading " + input, true);
 }
 
 room.prototype.loadExits = function(socket, roomId) {
@@ -32,11 +67,7 @@ room.prototype.loadExits = function(socket, roomId) {
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
   socket.connection.query(sql, inserts, function(err, results, fields) {
-    console.log('results:');
-    console.log(results);
     socket.playerSession.room.exits = results;
-    console.log('room:');
-    console.log(socket.playerSession.room);
     global.commands.look(socket);
   });
 }
@@ -86,7 +117,7 @@ room.prototype.createPlaceholderExit = function(socket, target_rid, label) {
   fieldValues = {
     rid: socket.playerSession.room.rid,
     target_rid: target_rid,
-    lable: label,
+    label: label,
     description: 'Nothing to see here.',
     properties: [],
   }
@@ -103,7 +134,7 @@ room.prototype.createReciprocalExit = function(socket, args) {
   fieldValues = {
     rid: rid,
     target_rid: socket.playerSession.room.rid,
-    lable: global.rooms.invertExitLabel(label),
+    label: global.rooms.invertExitLabel(label),
     description: 'Nothing to see here.',
     properties: [],
   }
@@ -127,7 +158,7 @@ room.prototype.invertExitLabel = function(label) {
      output = 's';
      break;
     case 'u':
-     outpuy = 'f';
+     output = 'd';
      break;
     default:
       output = label;

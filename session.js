@@ -42,6 +42,7 @@ function session(socket) {
     this.socket.write(global.color.red(message));
     this.socket.write(this.characterPrompt());
   }
+
 }
 
 

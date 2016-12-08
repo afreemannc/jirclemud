@@ -8,6 +8,8 @@ var user = require('./user');
 var rooms = require('./room');
 var classes = require('./classes');
 var dice = require('./dice');
+var items = require('./items');
+var prompt = require('./prompt');
 
 global.sockets = [];
 global.config = config;
@@ -18,6 +20,8 @@ global.dice = dice;
 global.classes = classes;
 global.rooms = rooms;
 global.commands = commands;
+global.items = items;
+global.prompt = prompt;
 
 function newSocket(socket) {
   console.log('socket:');

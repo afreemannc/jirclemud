@@ -11,7 +11,9 @@ module.exports.commandHandler = function(socket, inputRaw, connection) {
   console.log('length:' + commandSegments.length);
   console.log(commandSegments);
   // If input matches an exit label for the current room treat as move.
-  global.rooms.inputIsExit(socket, inputRaw);
+  if (global.rooms.inputIsExit(socket, inputRaw) === true) {
+    return;
+  }
 
   if (typeof this[command]  === 'function') {
     this[command](socket, arg);
@@ -26,10 +28,14 @@ module.exports.quit = function(socket, input) {
 }
 
 module.exports.say = function(socket, input) {
-  roomId = socket.playerSession.room.id;
+  roomId = socket.playerSession.room.rid;
   name = socket.playerSession.character.name;
   characterID = socket.playerSession.character.id;
-
+  var playerMessage = "You say:" + input + "\n";
+  var roomMessage = name + " says:" + input + "\n";
+  global.rooms.message(socket, roomId, roomMessage, true);
+  socket.playerSession.write(playerMessage);
+  /*
   for (i = 0; i < global.sockets.length; ++i) {
     if (global.sockets[i].playerSession.room.id === roomId) {
       if (global.sockets[i].playerSession.character.id === characterID) {
@@ -41,23 +47,20 @@ module.exports.say = function(socket, input) {
       output = message + input + "\n";
       global.sockets[i].playerSession.write(global.color.magenta(output));
     }
-  }
+  }*/
 }
 
 module.exports.look = function(socket) {
     // Room look
     console.log('look invoked');
-    console.log(socket.playerSession.room);
     socket.write(global.colors.bold(socket.playerSession.room.name) + "\n\n");
     socket.write(socket.playerSession.room.full_description + "\n");
-    var exits = '';
+    var exits = [];
     for (i = 0; i < socket.playerSession.room.exits.length; ++i) {
       exit = socket.playerSession.room.exits[i];
-      console.log('exit:');
-      console.log(exit);
-      exits += global.colors.yellow(exit.label + ' ');
+      exits.push(global.colors.yellow(exit.label));
     }
-    socket.playerSession.write('Exits: [ ' + exits + ' ]\n');
+    socket.playerSession.write('Exits: [ ' + exits.join(' ') + ' ]\n');
   // TODO: implement item look
 }
 
@@ -92,16 +95,21 @@ module.exports.teleport = function(socket, input) {
 
 
 module.exports.create = function(socket, context) {
+  console.log('context:');
+  console.log(context);
   if (context.length === 0) {
     socket.write("Create what??\n");
   }
   else {
-    switch (context[0]) {
+    switch (context) {
         case 'room':
-          rooms.createRoom(socket);
+          global.rooms.createRoom(socket);
+          break;
+        case 'item':
+          global.items.createItem(socket);
           break;
         default:
-          console.log('Create what??\n');
+          socket.playerSession.error('Create what??\n');
     }
   }
 }

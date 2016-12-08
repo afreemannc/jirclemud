@@ -99,16 +99,18 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
           socket.playerSession.character = character;
           socket.write('Welcome back ' + character.name + '\n');
           socket.playerSession.inputContext = 'command';
-          global.user.changeRoom(socket, character.properties.room);
+          global.rooms.loadRoom(socket, character.properties.room, false);
           // load additional character properties (inventory, class details, stats, etc)
         }
         else {
           // authentication failed, throw error and reset prompt. (add reset method to prompt class)
+          socket.playerSession.prompt.completionError(socket, 'Login incorrect.\n');
         }
       });
     }
     else {
       // TODO: throw error and reset prompt. (add reset method to prompt class)
+      socket.playerSession.prompt.completionError(socket, 'Login incorrect.\n');
     }
   });
   //socket.write('Welcome back ' + username + '\n');
@@ -219,10 +221,6 @@ user.prototype.startProperties = function(characterClass) {
         }
       }
     );
-}
-
-user.prototype.changeRoom = function(socket, roomId) {
-  global.rooms.loadRoom(socket, roomId, global.commands.look);
 }
 
 module.exports = new user();

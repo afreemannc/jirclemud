@@ -77,6 +77,26 @@ prompt.prototype.promptHandler = function(input) {
   }
 }
 
+/**
+ * Reset prompt to beginning without saving input.
+ */
+prompt.prototype.resetPrompt = function(socket) {
+  var fields = socket.playerSession.prompt.fields;
+  for (i = 0; i < fields.length; ++i) {
+    fields[i].value = false;
+    if (fields[i].startField === true) {
+      socket.playerSession.prompt.currentField = fields[i];
+    }
+  }
+  socket.playerSession.prompt.fields = fields;
+}
+
+prompt.prototype.completionError = function(socket, error) {
+  socket.playerSession.prompt.resetPrompt(socket);
+  socket.write(color.red(error));
+  socket.playerSession.prompt.start();
+}
+
 prompt.prototype.validationError = function(error) {
   this.socket.write(color.red(error));
   this.promptUser(this.currentField);
