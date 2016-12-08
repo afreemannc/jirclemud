@@ -64,6 +64,39 @@ item.prototype.createItem = function(socket) {
   typeField.promptMessage = global.items.createMessage();
   itemPrompt.addField(typeField);
 
+  // TODO: implement length limitation on text fields.
+  var nameField = itemPrompt.newField();
+  nameField.name = 'name',
+  nameField.type = 'text',
+  nameField.inputCacheName = 'name',
+  nameField.promptMessage = 'What do you want to name it? Note the name is what is displayed in personal inventory or when equipped.',
+  itemPrompt.addField(nameField);
+
+  var roomDescriptionField = itemPrompt.newField();
+  roomDescriptionField.name = 'room_description',
+  roomDescriptionField.type = 'text',
+  roomDescriptionField.inputCacheName = 'room_description',
+  roomDescriptionField.promptMessage = 'Provide a short description of the item that will be shown when it is sitting out in a room.',
+  itemPrompt.addField(roomDescriptionField);
+
+  var fullDescriptionField = itemPrompt.newField();
+  fullDescriptionField.name = 'full_description',
+  fullDescriptionField.type = 'multi',
+  fullDescriptionField.inputCacheName = 'full_description',
+  fullDescriptionField.promptMessage = 'Provide a thorough description. This is what will be displayed if this item is examined.',
+  itemPrompt.addField(fullDescriptionField);
+
+  var createItemField = itemPrompt.newField();
+  createItemField.name = 'create',
+  createItemField.type = 'select',
+  createItemField.options = ['y','n'],
+  createItemField.inputCacheName = 'create',
+  createItemField.promptMessage = ':: [::1::]es or [::2::]o ::';
+  itemPrompt.addField(createItemField);
+  // TO DO: start working on properties
+  // helper function should switch on type to build out valid additional fields
+  // ex. weapon needs dam dice, container needs capacity (weight, size), etc
+
   itemPrompt.setActivePrompt(itemPrompt);
 }
 
@@ -91,8 +124,46 @@ item.prototype.createMessage = function() {
   return prompt + '\n';
 }
 
-item.prototype.saveItem = function(socket, fieldValues, callback, args) {
+item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) {
+  console.log(fieldValues);
+  var properties = {};
+  values = {
+    name:fieldValues.name,
+    type:fieldValues.type,
+    room_description:fieldValues.room_description,
+    full_description:fieldValues.full_description,
+    properties: JSON.stringify(properties)
+  }
+  if (fieldValues.create === 'y') {
+    callback = global.items.saveItemInstance;
+    callbackArgs = false;
+  }
+  socket.connection.query('INSERT INTO items SET ?', values, function (error, results) {
+    socket.playerSession.write('Room saved.');
+    socket.playerSession.inputContext = 'command';
+    if (typeof callback === 'function') {
+      callback(socket, results.insertId, callbackArgs);
+    }
+  });
+}
 
+
+item.prototype.saveItemInstance = function(socket, itemId, callback, args) {
+  console.log(fieldValues);
+  // TODO: this is where the TWEAK happens.
+  var properties = {};
+  values = {
+    item_id:itemId,
+    properties: JSON.stringify()
+  }
+  socket.connection.query('INSERT INTO item_instance SET ?', values, function (error, results) {
+    socket.playerSession.write('Item created.');
+    // TODO: room message
+    socket.playerSession.inputContext = 'command';
+    if (typeof callback === 'function') {
+      callback(socket, results.insertId, callbackArgs);
+    }
+  });
 }
 
 module.exports = new item();
