@@ -95,11 +95,20 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
         if (results.length !== 0) {
           var character = results[0];
           character.properties = JSON.parse(character.properties);
-          console.log(character);
+          character.inventory = {};
           socket.playerSession.character = character;
           socket.write('Welcome back ' + character.name + '\n');
           socket.playerSession.inputContext = 'command';
           global.rooms.loadRoom(socket, character.properties.room, false);
+          var inventoryValues = {
+            targetInventory: socket.playerSession.character.inventory,
+            containerType: 'player_inventory',
+            parentId: character.id
+          }
+          console.log('character id:' + character.id);
+          console.log('inventory values:');
+          console.log(inventoryValues);
+          global.items.loadCharacterInventory(socket, inventoryValues);
           // load additional character properties (inventory, class details, stats, etc)
         }
         else {

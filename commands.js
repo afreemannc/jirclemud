@@ -128,3 +128,11 @@ module.exports.dig = function(socket, direction) {
     global.rooms.saveRoom(socket, fieldValues, global.rooms.createPlaceholderExit, direction);
   }
 }
+
+module.exports.inv = function(socket) {
+  console.log('charactr in inv');
+  console.log(socket.playerSession.character);
+  var display = global.items.inventoryDisplay(socket, socket.playerSession.character.inventory);
+  var output = 'You are carrying:\n' + display + '\n';
+  socket.playerSession.write(output);
+}

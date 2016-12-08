@@ -148,22 +148,77 @@ item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) 
 }
 
 
-item.prototype.saveItemInstance = function(socket, itemId, callback, args) {
+item.prototype.saveItemInstance = function(socket, itemId, callback, callbackArgs) {
   console.log(fieldValues);
   // TODO: this is where the TWEAK happens.
   var properties = {};
   values = {
-    item_id:itemId,
+    iid:itemId,
     properties: JSON.stringify()
   }
   socket.connection.query('INSERT INTO item_instance SET ?', values, function (error, results) {
     socket.playerSession.write('Item created.');
-    // TODO: room message
-    socket.playerSession.inputContext = 'command';
+    var fieldValues = {
+      containerId: socket.playerSession.character.inventory.id,
+      instanceId:results.insertId
+    }
+
+    global.items.saveItemToInventory(socket, fieldValues, callback, callbackArgs);
+  });
+}
+
+item.prototype.saveItemToInventory = function(socket, fieldValues, callback, callbackArgs) {
+  values = {
+    cid:fieldValues.containerId,
+    instance_id:fieldValues.instanceId
+  }
+  socket.connection.query('INSERT INTO container_inventory SET ?', values, function (error, results) {
+    socket.playerSession.write('Item created.');
     if (typeof callback === 'function') {
       callback(socket, results.insertId, callbackArgs);
     }
   });
+}
+
+item.prototype.loadCharacterInventory = function(socket, fieldValues) {
+  console.log('field values:');
+  console.log(fieldValues);
+  var inserts = [fieldValues.containerType, fieldValues.parentId];
+  console.log('inserts:' + inserts);
+  var sql = `
+    SELECT
+      ii.instance_id,
+      i.name,
+      i.type,
+      i.room_description,
+      i.full_description,
+      i.properties
+    FROM item_instance ii
+    INNER JOIN items i
+      ON i.iid = ii.iid
+    INNER JOIN container_inventory ci
+      ON ci.instance_id = ii.instance_id
+    INNER JOIN containers c
+      ON c.cid = ci.cid
+    WHERE
+      container_type = ?
+      AND parent_id = ?`;
+
+  sql = global.mysql.format(sql, inserts);
+  console.log('sql:' + sql);
+  socket.connection.query(sql, function(err, results, fields) {
+     socket.playerSession.character.inventory = results;
+  });
+}
+
+item.prototype.inventoryDisplay = function(socket, inventory) {
+  console.log('inv:');
+  console.log(inventory);
+  var output = '';
+  for (i = 0; i < inventory.length; ++i) {
+    output += inventory[i].name + "\n";
+  }
+  return output;
 }
 
 module.exports = new item();
