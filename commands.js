@@ -63,6 +63,22 @@ module.exports.get = function(socket, input) {
     }
 }
 
+module.exports.drop = function(socket, input) {
+  console.log('drop invoked with input:' + input);
+  var index = global.items.searchInventory(input, 'name', socket.playerSession.character.inventory, true);
+  console.log('index:' + index);
+  if (index !== false) {
+    var fieldValues = {
+      transferType: 'character-to-room',
+      item: socket.playerSession.character.inventory[index]
+    }
+    global.items.transferItemInstance(socket, fieldValues, socket.playerSession.write, 'dropped item');
+  }
+  else {
+    socket.playerSession.error('Drop what??\n');
+  }
+}
+
 module.exports.teleport = function(socket, input) {
   // TODO: confirm current user has GOD or DEMI flag
   if (input.length === 0) {
