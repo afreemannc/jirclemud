@@ -21,6 +21,7 @@ room.prototype.message = function(socket, roomId, message, skipCharacter) {
 }
 
 room.prototype.inputIsExit = function(socket, inputRaw) {
+  console.log('checking for move event:' + inputRaw);
   var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
   var roomId = socket.playerSession.character.currentRoom;
   var characterId = socket.playerSession.character.id;
@@ -29,6 +30,7 @@ room.prototype.inputIsExit = function(socket, inputRaw) {
   for (i = 0; i < currentExits.length; ++i) {
     currentExit = currentExits[i];
     if (currentExit.label === input) {
+      console.log('move event triggered:' + input);
       global.rooms.loadRoom(socket, currentExit.target_rid, input);
       return true;
     }
@@ -39,6 +41,7 @@ room.prototype.inputIsExit = function(socket, inputRaw) {
 //TODO: extend this so it can be used for edit form instead of just
 // the login/change room workflow.
 room.prototype.loadRoom = function(socket, roomId, input) {
+  console.log('loadRoom invoked for roomId:' + roomId);
   var sql = "SELECT * FROM ?? WHERE ?? = ?";
   var inserts = ['rooms', 'rid', roomId];
   // Only trigger room load if the target room isn't already loaded.
@@ -46,7 +49,8 @@ room.prototype.loadRoom = function(socket, roomId, input) {
     sql = global.mysql.format(sql, inserts);
     socket.connection.query(sql, function(err, results, fields) {
       var roomId = results[0].rid;
-      socket.playerSession.character.currenRoom = roomId;
+      socket.playerSession.character.currentRoom = roomId;
+      console.log('updated character room location');
       global.rooms.room[roomId] = results[0];
       global.rooms.room[roomId].inventory = {}; // initialize with empty inventory
       if (input !== false) {
@@ -76,6 +80,7 @@ room.prototype.exitMessage = function(socket, input) {
 }
 
 room.prototype.loadExits = function(socket, roomId, callback, callbackArgs) {
+  console.log('load exits invoked for room:' + roomId);
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
   socket.connection.query(sql, inserts, function(err, results, fields) {

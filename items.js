@@ -179,7 +179,7 @@ item.prototype.saveItemToInventory = function(socket, fieldValues, callback, cal
 }
 
 item.prototype.loadInventory = function(socket, fieldValues, callback, callbackArgs) {
-
+  console.log('loadInventory invoked');
   var inserts = [fieldValues.containerType, fieldValues.parentId];
   var sql = `
     SELECT
@@ -217,7 +217,11 @@ item.prototype.loadInventory = function(socket, fieldValues, callback, callbackA
         break;
     }
     if (typeof callback === 'function') {
+      console.log('triggering callback for loadInventory');
       callback(socket, callbackArgs);
+    }
+    else {
+      console.log('No callback defined for loadInventory');
     }
   });
 }
