@@ -178,6 +178,53 @@ item.prototype.saveItemToInventory = function(socket, fieldValues, callback, cal
   });
 }
 
+item.prototype.transferItemInstance = function(socket, fieldValues, callback, callbackArgs) {
+  // Inventory alterations to containers, rooms, and players must be syncronous to prevent
+  // race conditions and item duping.
+  switch (fieldValues.transferType) {
+    case 'character-to-room':
+      // get current room id
+      var currentRoom = socket.playerSession.character.currentRoom;
+      var item = fieldValues.item;
+      // get index of target item in character inventory
+      var itemIndex = global.items.searchInventory(item.instance_id, 'instance_id', socket.playerSession.character.inventory, false);
+      // delete inventory[index] from character inventory
+      delete socket.playerSession.character.inventory[itemIndex];
+      // add item to room[room id].inventory
+      global.rooms.room[currentRoom].inventory.push(item);
+      break;
+
+    case 'room-to-character':
+
+      break;
+
+    case 'character-to-character':
+
+      break;
+
+    case 'room-to-room':
+
+      break;
+
+    case 'container-to-character':
+
+      break;
+
+    case 'character-to-container':
+
+      break;
+
+    default:
+      break;
+  }
+  /*
+  var sql = 'UPDATE container_inventory set cid = ? WHERE instance_id = ?';
+  var inserts = [fieldValues.newCid, fieldValues.instanceId];
+  socket.connection.query(sql, inserts, function(err, results, fields) {
+  });
+  */
+}
+
 item.prototype.loadInventory = function(socket, fieldValues, callback, callbackArgs) {
   console.log('loadInventory invoked');
   var inserts = [fieldValues.containerType, fieldValues.parentId];
@@ -227,11 +274,34 @@ item.prototype.loadInventory = function(socket, fieldValues, callback, callbackA
 }
 
 item.prototype.inventoryDisplay = function(socket, inventory) {
+  if (inventory.length === 0) {
+   return '';
+  }
   var output = '';
   for (i = 0; i < inventory.length; ++i) {
-    output += inventory[i].name + "\n";
+    if (typeof inventory[i] === 'object') {
+      output += inventory[i].name + "\n";
+    }
   }
   return output;
+}
+
+item.prototype.searchInventory = function(input, field, inventory, like) {
+
+  for (i = 0; i < inventory.length; ++i) {
+    item = inventory[i];
+    if (like === true) {
+      if (item[field].includes(input)  === true) {
+        return i;
+      }
+    }
+    else {
+      if (item[field] === input) {
+        return i;
+      }
+    }
+  }
+  return false;
 }
 
 module.exports = new item();
