@@ -95,6 +95,7 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
         if (results.length !== 0) {
           var character = results[0];
           socket.playerSession.character = character;
+          socket.playerSession.character.currentRoom = character.current_room;
           global.user.loadCharacterDetails(socket);
         }
         else {
@@ -177,6 +178,7 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
       salt: salt,
       last_login: 0,
       status: 1,
+      current_room: global.config.startRoomId,
       properties: global.user.startProperties(fieldValues.characterclass)
     };
     console.log(values);

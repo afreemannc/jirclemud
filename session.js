@@ -8,7 +8,6 @@ function session(socket) {
   this.user = false;
   this.pass = false;
   this.characterId = '';
-  this.roomId = '';
 
   this.getInputContext = function() {
     var context = this.inputContext.split(':');

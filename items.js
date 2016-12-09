@@ -125,9 +125,9 @@ item.prototype.createMessage = function() {
 }
 
 item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) {
-  console.log(fieldValues);
+
   var properties = {};
-  values = {
+  var values = {
     name:fieldValues.name,
     type:fieldValues.type,
     room_description:fieldValues.room_description,
@@ -149,7 +149,6 @@ item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) 
 
 
 item.prototype.saveItemInstance = function(socket, itemId, callback, callbackArgs) {
-  console.log(fieldValues);
   // TODO: this is where the TWEAK happens.
   var properties = {};
   values = {
@@ -162,13 +161,12 @@ item.prototype.saveItemInstance = function(socket, itemId, callback, callbackArg
       containerId: socket.playerSession.character.inventory.id,
       instanceId:results.insertId
     }
-
     global.items.saveItemToInventory(socket, fieldValues, callback, callbackArgs);
   });
 }
 
 item.prototype.saveItemToInventory = function(socket, fieldValues, callback, callbackArgs) {
-  values = {
+  var values = {
     cid:fieldValues.containerId,
     instance_id:fieldValues.instanceId
   }
@@ -181,10 +179,8 @@ item.prototype.saveItemToInventory = function(socket, fieldValues, callback, cal
 }
 
 item.prototype.loadInventory = function(socket, fieldValues, callback, callbackArgs) {
-  console.log('field values:');
-  console.log(fieldValues);
+
   var inserts = [fieldValues.containerType, fieldValues.parentId];
-  console.log('inserts:' + inserts);
   var sql = `
     SELECT
       ii.instance_id,
@@ -205,14 +201,17 @@ item.prototype.loadInventory = function(socket, fieldValues, callback, callbackA
       AND parent_id = ?`;
 
   sql = global.mysql.format(sql, inserts);
-  console.log('sql:' + sql);
+
   socket.connection.query(sql, function(err, results, fields) {
     switch(fieldValues.containerType) {
       case 'player_inventory':
         socket.playerSession.character.inventory = results;
         break;
       case 'room_inventory':
-        socket.playerSession.room.inventory = results;
+        console.log(global.rooms.room);
+        var roomId = socket.playerSession.character.currentRoom;
+        console.log('current player room:' + roomId);
+        global.rooms.room[roomId].inventory = results;
         break;
       default:
         break;
@@ -224,8 +223,6 @@ item.prototype.loadInventory = function(socket, fieldValues, callback, callbackA
 }
 
 item.prototype.inventoryDisplay = function(socket, inventory) {
-  console.log('inv:');
-  console.log(inventory);
   var output = '';
   for (i = 0; i < inventory.length; ++i) {
     output += inventory[i].name + "\n";

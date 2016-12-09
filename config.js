@@ -13,5 +13,5 @@ module.exports = {
   dbPort: '/Applications/MAMP/tmp/mysql/mysql.sock',
 
   // mud stuffs
-  startRoom: 1 // room new characters get dropped in
+  startRoomId: 1 // room new characters get dropped in
 }

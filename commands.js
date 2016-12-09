@@ -1,15 +1,9 @@
-var rooms = require('./room');
-var colors = require('colors/safe');
 
 module.exports.commandHandler = function(socket, inputRaw, connection) {
   var commandSegments = inputRaw.split(' ');
   var command = commandSegments[0];
-  console.log('command:' + command + ':');
   commandSegments.splice(0, 1);
   var arg = commandSegments.join(' ');
-  console.log(typeof commandSegments);
-  console.log('length:' + commandSegments.length);
-  console.log(commandSegments);
   // If input matches an exit label for the current room treat as move.
   if (global.rooms.inputIsExit(socket, inputRaw) === true) {
     return;
@@ -28,7 +22,7 @@ module.exports.quit = function(socket, input) {
 }
 
 module.exports.say = function(socket, input) {
-  roomId = socket.playerSession.room.rid;
+  roomId = socket.playerSession.currentRoom;
   name = socket.playerSession.character.name;
   characterID = socket.playerSession.character.id;
   var playerMessage = "You say:" + input + "\n";
@@ -39,19 +33,19 @@ module.exports.say = function(socket, input) {
 
 module.exports.look = function(socket) {
     // Room look
-    console.log('look invoked');
-    socket.write(global.colors.bold(socket.playerSession.room.name) + "\n\n");
-    socket.write(socket.playerSession.room.full_description + "\n\n");
+    var roomId = socket.playerSession.character.currentRoom;
+    socket.write(global.colors.bold(global.rooms.room[roomId].name) + "\n\n");
+    socket.write(global.rooms.room[roomId].full_description + "\n\n");
     // display room inventory
-    var display = global.items.inventoryDisplay(socket, socket.playerSession.room.inventory);
+    var display = global.items.inventoryDisplay(socket, global.rooms.room[roomId].inventory);
     socket.write(display + "\n\n");
     var exits = [];
-    for (i = 0; i < socket.playerSession.room.exits.length; ++i) {
-      exit = socket.playerSession.room.exits[i];
+    for (i = 0; i < global.rooms.room[roomId].exits.length; ++i) {
+      exit = global.rooms.room[roomId].exits[i];
       exits.push(global.colors.yellow(exit.label));
     }
     socket.playerSession.write('Exits: [ ' + exits.join(' ') + ' ]\n');
-  // TODO: implement item look
+  // TODO: implement item loo`k
 }
 
 module.exports.get = function(socket, input) {
@@ -85,10 +79,8 @@ module.exports.teleport = function(socket, input) {
 
 
 module.exports.create = function(socket, context) {
-  console.log('context:');
-  console.log(context);
   if (context.length === 0) {
-    socket.write("Create what??\n");
+    socket.playerSession.error("Create what??\n");
   }
   else {
     switch (context) {
@@ -114,14 +106,11 @@ module.exports.dig = function(socket, direction) {
       short_description: 'Nothing to see here.',
       full_description: 'Empty space just waiting to be filled. Remind you of Prom night?'
     }
-    console.log('dig triggered, invoking new room creation');
     global.rooms.saveRoom(socket, fieldValues, global.rooms.createPlaceholderExit, direction);
   }
 }
 
 module.exports.inv = function(socket) {
-  console.log('charactr in inv');
-  console.log(socket.playerSession.character);
   var display = global.items.inventoryDisplay(socket, socket.playerSession.character.inventory);
   var output = 'You are carrying:\n' + display + '\n';
   socket.playerSession.write(output);
