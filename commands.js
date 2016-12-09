@@ -35,26 +35,16 @@ module.exports.say = function(socket, input) {
   var roomMessage = name + " says:" + input + "\n";
   global.rooms.message(socket, roomId, roomMessage, true);
   socket.playerSession.write(playerMessage);
-  /*
-  for (i = 0; i < global.sockets.length; ++i) {
-    if (global.sockets[i].playerSession.room.id === roomId) {
-      if (global.sockets[i].playerSession.character.id === characterID) {
-        message = "You say:";
-      }
-      else {
-        message = name + " says:";
-      }
-      output = message + input + "\n";
-      global.sockets[i].playerSession.write(global.color.magenta(output));
-    }
-  }*/
 }
 
 module.exports.look = function(socket) {
     // Room look
     console.log('look invoked');
     socket.write(global.colors.bold(socket.playerSession.room.name) + "\n\n");
-    socket.write(socket.playerSession.room.full_description + "\n");
+    socket.write(socket.playerSession.room.full_description + "\n\n");
+    // display room inventory
+    var display = global.items.inventoryDisplay(socket, socket.playerSession.room.inventory);
+    socket.write(display + "\n\n");
     var exits = [];
     for (i = 0; i < socket.playerSession.room.exits.length; ++i) {
       exit = socket.playerSession.room.exits[i];

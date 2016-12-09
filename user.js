@@ -40,13 +40,13 @@ user.prototype.start = function(socket) {
  */
 user.prototype.startSwitch = function(socket, fieldValues) {
   input = fieldValues.start;
-  if (input === 'l' || input === 'L') {
+  if (input === 'l') {
     global.user.login(socket);
   }
-  else if  (input === 'c' || input === 'C') {
+  else if  (input === 'c') {
     global.user.createCharacter(socket);
   }
-  else if (input === 'q' || input === 'Q') {
+  else if (input === 'q') {
     global.commands.quit(socket, false);
   }
 }
@@ -94,22 +94,8 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
       socket.connection.query(sql, function(err, results, fields) {
         if (results.length !== 0) {
           var character = results[0];
-          character.properties = JSON.parse(character.properties);
-          character.inventory = {};
           socket.playerSession.character = character;
-          socket.write('Welcome back ' + character.name + '\n');
-          socket.playerSession.inputContext = 'command';
-          global.rooms.loadRoom(socket, character.properties.room, false);
-          var inventoryValues = {
-            targetInventory: socket.playerSession.character.inventory,
-            containerType: 'player_inventory',
-            parentId: character.id
-          }
-          console.log('character id:' + character.id);
-          console.log('inventory values:');
-          console.log(inventoryValues);
-          global.items.loadCharacterInventory(socket, inventoryValues);
-          // load additional character properties (inventory, class details, stats, etc)
+          global.user.loadCharacterDetails(socket);
         }
         else {
           // authentication failed, throw error and reset prompt. (add reset method to prompt class)
@@ -126,7 +112,21 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
   //socket.playerSession.inputContext = 'command';
 }
 
-user.prototype.loadCharacter = function(socket, id) {
+user.prototype.loadCharacterDetails = function(socket) {
+  var character = socket.playerSession.character;
+  // Unpack stored properties
+  socket.playerSession.character.properties = JSON.parse(character.properties);
+  // Initialize empty inventory and then load
+  socket.playerSession.character.inventory = {};
+  var values = {
+    containerType: 'player_inventory',
+    parentId: character.id
+  }
+  global.items.loadInventory(socket, values);
+  // Load current character room if needed.
+  global.rooms.loadRoom(socket, character.properties.room, false);
+  socket.write('Welcome back ' + character.name + '\n');
+  socket.playerSession.inputContext = 'command';
 }
 
 user.prototype.createCharacter = function(socket) {

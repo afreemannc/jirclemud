@@ -51,8 +51,13 @@ room.prototype.loadRoom = function(socket, roomId, input) {
     if (input !== false) {
       global.rooms.exitMessage(socket, input);
     }
+    // TODO: find where this is used and refactor it out of existence.
     socket.playerSession.character.current_room = roomId;
-    global.rooms.loadExits(socket, roomId);
+    var values = {
+      containerType: 'room_inventory',
+      parentId: roomId
+    }
+    global.rooms.loadExits(socket, roomId, global.items.loadInventory, values);
   });
 }
 
@@ -62,13 +67,15 @@ room.prototype.exitMessage = function(socket, input) {
   global.rooms.message(socket, currentRoomId, name + " leaves heading " + input, true);
 }
 
-room.prototype.loadExits = function(socket, roomId) {
+room.prototype.loadExits = function(socket, roomId, callback, callbackArgs) {
   console.log('loading exits for room:' + roomId);
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
   socket.connection.query(sql, inserts, function(err, results, fields) {
     socket.playerSession.room.exits = results;
-    global.commands.look(socket);
+    if (typeof callback === 'function') {
+      callback(socket, callbackArgs, global.commands.look, socket);
+    }
   });
 }
 

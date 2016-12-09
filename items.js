@@ -180,7 +180,7 @@ item.prototype.saveItemToInventory = function(socket, fieldValues, callback, cal
   });
 }
 
-item.prototype.loadCharacterInventory = function(socket, fieldValues) {
+item.prototype.loadInventory = function(socket, fieldValues, callback, callbackArgs) {
   console.log('field values:');
   console.log(fieldValues);
   var inserts = [fieldValues.containerType, fieldValues.parentId];
@@ -207,7 +207,19 @@ item.prototype.loadCharacterInventory = function(socket, fieldValues) {
   sql = global.mysql.format(sql, inserts);
   console.log('sql:' + sql);
   socket.connection.query(sql, function(err, results, fields) {
-     socket.playerSession.character.inventory = results;
+    switch(fieldValues.containerType) {
+      case 'player_inventory':
+        socket.playerSession.character.inventory = results;
+        break;
+      case 'room_inventory':
+        socket.playerSession.room.inventory = results;
+        break;
+      default:
+        break;
+    }
+    if (typeof callback === 'function') {
+      callback(socket, callbackArgs);
+    }
   });
 }
 
