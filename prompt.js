@@ -13,8 +13,9 @@ function prompt(socket, completionCallback) {
       break;
     case 'select':
       var promptMessage = field.promptMessage;
-      for (i = 0; i < field.options.length; ++i) {
-        option = field.options[i];
+      keys = Object.keys(field.options);
+      for (i = 0; i < keys.length; ++i) {
+        option = keys[i];//field.options[keys[i]];
         pattern = '::' + (i + 1) + '::';
         replacement = color.yellow(option.toUpperCase());
         promptMessage = promptMessage.replace(pattern, replacement);
@@ -131,9 +132,8 @@ prompt.prototype.cacheInput = function(inputRaw) {
       return true;
     case 'select':
       input = input.toLowerCase();
-      var stuff = currentField.options.indexOf(input);
-      if (currentField.options.indexOf(input) !== -1) {
-        this.socket.playerSession.prompt.fields[index].value = input;
+      if (typeof currentField.options[input] !== 'undefined') {
+        this.socket.playerSession.prompt.fields[index].value = currentField.options[input];
         return true;
       }
       else {

@@ -15,7 +15,7 @@ user.prototype.start = function(socket) {
   var startField = startPrompt.newField();
   startField.name = 'start';
   startField.type = 'select';
-  startField.options = ['l','c','q'];
+  startField.options = {l:'l', c:'c', q:'q'};
   startField.startField = true;
   startField.inputCacheName = 'start';
   startField.promptMessage = message;
@@ -116,7 +116,8 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
 user.prototype.loadCharacterDetails = function(socket) {
   var character = socket.playerSession.character;
   // Unpack stored properties
-  socket.playerSession.character.properties = JSON.parse(character.properties);
+  socket.playerSession.character.stats = JSON.parse(character.stats);
+  socket.playerSession.character.affects = JSON.parse(character.affects);
   // Initialize empty inventory and then load
   socket.playerSession.character.inventory = {};
   var values = {
@@ -125,7 +126,7 @@ user.prototype.loadCharacterDetails = function(socket) {
   }
   global.items.loadInventory(socket, values);
   // Load current character room if needed.
-  global.rooms.loadRoom(socket, character.properties.room, false);
+  global.rooms.loadRoom(socket, character.current_room, false);
   socket.write('Welcome back ' + character.name + '\n');
   socket.playerSession.inputContext = 'command';
 }
@@ -179,7 +180,8 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
       last_login: 0,
       status: 1,
       current_room: global.config.startRoomId,
-      properties: global.user.startProperties(fieldValues.characterclass)
+      stats: global.user.startProperties(fieldValues.characterclass),
+      affects: global.user.startAffects,
     };
     console.log(values);
     socket.connection.query('INSERT INTO characters SET ?', values, function (error, result) {
@@ -206,13 +208,17 @@ user.prototype.startProperties = function(characterClass) {
     currenthp: startingHP,
     maxmana: startingMana,
     currentmana: startingMana,
-    room: global.config.startRoom,
-    skills:[],
-    spells:[]
+    current_room: global.config.startRoom
   }
   console.log('properties:');
   console.log(properties);
   return JSON.stringify(properties);
+}
+
+user.prototype.startAffects = function() {
+  // Currently no starting affects, will add
+  // sustain and others as needed later.
+  return JSON.stringify({});
 }
 
  // Validate character name input

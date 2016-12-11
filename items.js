@@ -1,5 +1,7 @@
 var item = function(){};
 
+// TODO: refactor this mess. Item types should be a single list.
+
 item.prototype.listTypes = function() {
   var list = ['weapon','equipment','misc','container','food'];
   return list;
@@ -8,6 +10,7 @@ item.prototype.listTypes = function() {
 // TODO: rename select option and/or label to more descriptive term
 item.prototype.weapon = {
   name: 'Weapon',
+  type: 'weapon',
   selectOption: 'w',
   label: '[::1::]eapon',
   description: 'Make things dead.'
@@ -15,6 +18,7 @@ item.prototype.weapon = {
 
 item.prototype.equipment = {
   name: 'Equipment',
+  type: 'equipment',
   selectOption: 'e',
   label: '[::2::]quipment',
   description: 'Wear it.'
@@ -22,6 +26,7 @@ item.prototype.equipment = {
 
 item.prototype.misc = {
   name: 'Misc',
+  type: 'misc',
   label: '[::3::]isc',
   selectOption: 'm',
   description: 'Random junk.'
@@ -29,16 +34,99 @@ item.prototype.misc = {
 
 item.prototype.container = {
   name: 'Container',
-  label: '[::4::]',
+  type: 'container',
+  label: '[::4::]ontainer',
   selectOption: 'c',
   description: 'Put stuff in it.'
 }
 
 item.prototype.food = {
   name: 'Food',
+  type: 'food',
   selectOption: 'f',
   label: '[::5::]ood',
   description: 'Eat it.'
+}
+
+item.prototype.flags = {
+  'NONE': {
+    selectOption: '0',
+    properties: {}
+  },
+
+  'CONTAINER': {
+    selectOption: '1',
+    properties: {
+      max_item_count: 'int',
+      max_weight: 'int'
+    }
+  },
+
+  'WEARABLE': {
+    selectOption: '2',
+    properties: {
+      eq_slot: 'select',
+      options: this.eqSlots
+    }
+  },
+
+  'CURSE': {
+    selectOption: '3',
+    properties: {}
+  },
+
+  'BLESS': {
+    selectOption: '4',
+    properties: {}
+  },
+
+  'HUM': {
+    selectOption: '5',
+    properties: {}
+  },
+
+  'HOLD': {
+    selectOptions: '6',
+    properties: {}
+  }
+}
+
+item.prototype.flagOptions = function() {
+  var options = {};
+  var flags = global.items.flags;
+  var keys = Object.keys(flags);
+  for (i = 0; i < keys.length; ++i) {
+    options[flags[keys[i]].selectOption] = keys[i];
+  }
+  console.log('flag options:');
+  console.log(options);
+  return options;
+}
+
+item.prototype.flagsPrompt = function() {
+  var promptMessage = 'What flags should this item have?\n';
+  var flags = global.items.flags;
+  var keys = Object.keys(flags);
+  for (i = 0; i < keys.length; ++i) {
+    promptMessage += '[::' + i + '::] ' + keys[i] + '\n';
+  }
+  console.log(promptMessage);
+  return promptMessage;
+}
+
+item.prototype.eqSlots = {
+  head: {1: 'head'},
+  face: {2: 'face'},
+  neck: {3: 'neck'},
+  body: {4: 'body'},
+  arms: {5: 'arms'},
+  wrist: {6: 'wrist'},
+  hands: {7: 'hands'},
+  finger: {8: 'finger'},
+  waist: {8: 'waist'},
+  legs: {9: 'legs'},
+  feet: {10: 'feet'}
+
 }
 
 item.prototype.loadItem = function(socket, itemId, callback, args) {
@@ -86,6 +174,14 @@ item.prototype.createItem = function(socket) {
   fullDescriptionField.promptMessage = 'Provide a thorough description. This is what will be displayed if this item is examined.',
   itemPrompt.addField(fullDescriptionField);
 
+  var flagsField = itemPrompt.newField();
+  flagsField.name = 'flags';
+  flagsField.type = 'select';
+  flagsField.options = global.items.flagOptions();
+  flagsField.inputCacheName = 'flags';
+  flagsField.promptMessage = global.items.flagsPrompt();
+  itemPrompt.addField(flagsField);
+
   var createItemField = itemPrompt.newField();
   createItemField.name = 'create',
   createItemField.type = 'select',
@@ -105,8 +201,10 @@ item.prototype.getTypeOptions = function() {
   var itemTypes = global.items.listTypes();
   for (i = 0; i < itemTypes.length; ++i) {
     currentItem = global.items[itemTypes[i]];
-    options.push(currentItem.selectOption);
+    options[currentItem.selectOption] = currentItem.type;
   }
+  console.log('options:');
+  console.log(options);
   return options;
 }
 
@@ -184,18 +282,19 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
   switch (fieldValues.transferType) {
     case 'character-to-room':
       // get current room id
-      var currentRoom = socket.playerSession.character.currentRoom;
-      var item = fieldValues.item;
-      // get index of target item in character inventory
-      var itemIndex = global.items.searchInventory(item.instance_id, 'instance_id', socket.playerSession.character.inventory, false);
+      var roomId = socket.playerSession.character.currentRoom;
       // delete inventory[index] from character inventory
-      delete socket.playerSession.character.inventory[itemIndex];
+      delete socket.playerSession.character.inventory[fieldValues.index];
       // add item to room[room id].inventory
-      global.rooms.room[currentRoom].inventory.push(item);
+      global.rooms.room[roomId].inventory.push(fieldValues.item);
       break;
 
     case 'room-to-character':
-
+      var roomId = socket.playerSession.character.currentRoom;
+      // delete inventory[index] from character inventory
+      delete global.rooms.room[roomId].inventory[fieldValues.index];
+      // add item to room[room id].inventory
+      socket.playerSession.character.inventory.push(fieldValue.item);
       break;
 
     case 'character-to-character':
@@ -211,6 +310,10 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
       break;
 
     case 'character-to-container':
+      delete socket.playerSession.character.inventory[fieldValues.index];
+      if (fieldValues.containerLocation === 'character inventory') {
+
+      }
 
       break;
 
