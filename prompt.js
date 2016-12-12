@@ -11,6 +11,7 @@ function prompt(socket, completionCallback) {
     case 'multi':
       this.socket.write(field.promptMessage + ' (@@ to end)');
       break;
+    case 'multi-select':
     case 'select':
       var promptMessage = field.promptMessage;
       keys = Object.keys(field.options);
@@ -148,6 +149,24 @@ prompt.prototype.cacheInput = function(inputRaw) {
       else {
         return true;
       }
+      break;
+    case 'multi-select':
+      input = input.toLowerCase();
+      if (input !== '@@') {
+        if (typeof currentField.options[input] !== 'undefined') {
+          if (typeof this.socket.playerSession.prompt.fields[index].value.push === 'undefined') {
+            this.socket.playerSession.prompt.fields[index].value = [];
+          }
+          this.socket.playerSession.prompt.fields[index].value.push(input);
+          var selected = this.socket.playerSession.prompt.fields[index].value.join(',');
+          this.socket.write('Currently selected:' + selected + '\n');
+          return false;
+        }
+      }
+      else {
+        return true;
+      }
+      break;
     default:
       console.log('this should not happen');
   }

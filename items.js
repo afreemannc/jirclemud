@@ -176,7 +176,7 @@ item.prototype.createItem = function(socket) {
 
   var flagsField = itemPrompt.newField();
   flagsField.name = 'flags';
-  flagsField.type = 'select';
+  flagsField.type = 'multi-select';
   flagsField.options = global.items.flagOptions();
   flagsField.inputCacheName = 'flags';
   flagsField.promptMessage = global.items.flagsPrompt();
