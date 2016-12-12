@@ -17,7 +17,7 @@ function prompt(socket, completionCallback) {
       keys = Object.keys(field.options);
       for (i = 0; i < keys.length; ++i) {
         option = keys[i];//field.options[keys[i]];
-        pattern = '::' + (i + 1) + '::';
+        pattern = '::' + keys[i] + '::';
         replacement = color.yellow(option.toUpperCase());
         promptMessage = promptMessage.replace(pattern, replacement);
       }

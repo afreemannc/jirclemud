@@ -12,7 +12,7 @@ item.prototype.weapon = {
   name: 'Weapon',
   type: 'weapon',
   selectOption: 'w',
-  label: '[::1::]eapon',
+  label: '[::w::]eapon',
   description: 'Make things dead.'
 }
 
@@ -20,14 +20,14 @@ item.prototype.equipment = {
   name: 'Equipment',
   type: 'equipment',
   selectOption: 'e',
-  label: '[::2::]quipment',
+  label: '[::e::]quipment',
   description: 'Wear it.'
 }
 
 item.prototype.misc = {
   name: 'Misc',
   type: 'misc',
-  label: '[::3::]isc',
+  label: '[::m::]isc',
   selectOption: 'm',
   description: 'Random junk.'
 }
@@ -35,7 +35,7 @@ item.prototype.misc = {
 item.prototype.container = {
   name: 'Container',
   type: 'container',
-  label: '[::4::]ontainer',
+  label: '[::c::]ontainer',
   selectOption: 'c',
   description: 'Put stuff in it.'
 }
@@ -44,7 +44,7 @@ item.prototype.food = {
   name: 'Food',
   type: 'food',
   selectOption: 'f',
-  label: '[::5::]ood',
+  label: '[::f::]ood',
   description: 'Eat it.'
 }
 
@@ -185,9 +185,9 @@ item.prototype.createItem = function(socket) {
   var createItemField = itemPrompt.newField();
   createItemField.name = 'create',
   createItemField.type = 'select',
-  createItemField.options = ['y','n'],
+  createItemField.options = {y:'y', n:'n'},
   createItemField.inputCacheName = 'create',
-  createItemField.promptMessage = ':: [::1::]es or [::2::]o ::';
+  createItemField.promptMessage = ':: [::y::]es or [::n::]o ::';
   itemPrompt.addField(createItemField);
   // TO DO: start working on properties
   // helper function should switch on type to build out valid additional fields
@@ -222,6 +222,14 @@ item.prototype.createMessage = function() {
   return prompt + '\n';
 }
 
+item.prototype.setItemProperties = function(fieldValues) {
+  var properties = {};
+  properties.flags = fieldValues.flags.join(',');
+  // TODO: set container max weight, max item count
+  // TODO: set item weight, size
+  return properties;
+}
+
 item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) {
 
   var properties = {};
@@ -230,7 +238,7 @@ item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) 
     type:fieldValues.type,
     room_description:fieldValues.room_description,
     full_description:fieldValues.full_description,
-    properties: JSON.stringify(properties)
+    properties: JSON.stringify(global.items.setItemProperties(fieldValues))
   }
   if (fieldValues.create === 'y') {
     callback = global.items.saveItemInstance;
@@ -244,6 +252,8 @@ item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) 
     }
   });
 }
+
+
 
 
 item.prototype.saveItemInstance = function(socket, itemId, callback, callbackArgs) {

@@ -10,7 +10,7 @@ var user = function(){};
 user.prototype.start = function(socket) {
   var message = colors.green('Welcome to ' + global.config.mudName + "\n");
   // TODO: display splash screen.
-  message += "[::1::]ogin, [::2::]reate a character or [::3::]uit.\n";
+  message += "[::l::]ogin, [::c::]reate a character or [::q::]uit.\n";
   var startPrompt = prompt.new(socket, global.user.startSwitch);
   var startField = startPrompt.newField();
   startField.name = 'start';
