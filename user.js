@@ -1,7 +1,6 @@
 // user stuff
 
 var crypto = require('crypto');
-var prompt = require('./prompt');
 // Session mode handler for login
 
 var user = function(){};
@@ -10,18 +9,17 @@ var user = function(){};
 user.prototype.start = function(socket) {
   var message = colors.green('Welcome to ' + global.config.mudName + "\n");
   // TODO: display splash screen.
-  message += "[::l::]ogin, [::c::]reate a character or [::q::]uit.\n";
   var startPrompt = prompt.new(socket, global.user.startSwitch);
-  var startField = startPrompt.newField();
+  var startField = startPrompt.newField('select');
+  console.log('startfield');
+  console.log(startField);
   startField.name = 'start';
-  startField.type = 'select';
-  startField.options = {l:'l', c:'c', q:'q'};
+  startField.options = {l:{value:'l', label:'og in'}, c:{value:'c', label:'reate character'}, q:{value:'q', label:'uit'}};
+  startField.promptMessage = startField.formatPrompt('[::l::]og in, [::c::]reate a character, or [::q::]uit', true);
   startField.startField = true;
-  startField.inputCacheName = 'start';
-  startField.promptMessage = message;
   startPrompt.addField(startField);
 
-  startPrompt.setActivePrompt(startPrompt);
+  startPrompt.start();
 }
 
 
@@ -39,6 +37,8 @@ user.prototype.start = function(socket) {
  *
  */
 user.prototype.startSwitch = function(socket, fieldValues) {
+  console.log('field values:');
+  console.log(fieldValues);
   input = fieldValues.start;
   if (input === 'l') {
     global.user.login(socket);

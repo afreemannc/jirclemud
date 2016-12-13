@@ -1,4 +1,3 @@
-var prompt = require('./prompt');
 
 var room = function(){
   this.room = {};

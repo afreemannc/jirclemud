@@ -9,7 +9,7 @@ var rooms = require('./room');
 var classes = require('./classes');
 var dice = require('./dice');
 var items = require('./items');
-var prompt = require('./prompt');
+var prompt = require('./prompt/prompt.js');
 
 global.sockets = [];
 global.config = config;
@@ -54,6 +54,7 @@ function parseData(socket, data) {
   inputContext = socket.playerSession.getInputContext();
   switch (socket.playerSession.inputContext) {
     case 'prompt':
+      console.log('prompt input:' + data);
       // certain prompts require collection of multi-line inputs so raw data is provided here.
       socket.playerSession.prompt.promptHandler(data);
       break;
