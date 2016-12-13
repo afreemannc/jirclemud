@@ -14,7 +14,7 @@ user.prototype.start = function(socket) {
   console.log('startfield');
   console.log(startField);
   startField.name = 'start';
-  startField.options = {l:{value:'l', label:'og in'}, c:{value:'c', label:'reate character'}, q:{value:'q', label:'uit'}};
+  startField.options = {l:'l', c:'c', q:'q'};
   startField.promptMessage = startField.formatPrompt('[::l::]og in, [::c::]reate a character, or [::q::]uit', true);
   startField.startField = true;
   startPrompt.addField(startField);
@@ -55,23 +55,22 @@ user.prototype.startSwitch = function(socket, fieldValues) {
  * Login screen prompt.
  */
 user.prototype.login = function(socket) {
+  console.log('login prompt build');
   var loginPrompt = prompt.new(socket, this.loginAuthenticate);
-  var loginField = loginPrompt.newField();
+  var loginField = loginPrompt.newField('text');
   loginField.name = 'username';
-  loginField.type = 'text';
   loginField.startField = true;
-  loginField.inputCacheName = 'username';
-  loginField.promptMessage = 'Character Name:\n';
+  loginField.promptMessage = loginField.formatPrompt('Character Name:');
+  console.log('login field:');
+  console.log(loginField);
   loginPrompt.addField(loginField);
 
-  var passwordField = loginPrompt.newField();
+  var passwordField = loginPrompt.newField('text');
   passwordField.name = 'password';
-  passwordField.type = 'text';
-  passwordField.inputCacheName = 'password';
-  passwordField.promptMessage = 'Password:\n';
+  passwordField.promptMessage = passwordField.formatPrompt('Password:');
   loginPrompt.addField(passwordField);
 
-  loginPrompt.setActivePrompt(loginPrompt);
+  loginPrompt.start();
 }
 
 /**

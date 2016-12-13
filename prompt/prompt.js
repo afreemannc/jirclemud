@@ -12,6 +12,8 @@ function Prompt(socket, completionCallback) {
   },
 
   this.promptUser = function() {
+    console.log('current field:');
+    console.log(this.currentField);
     this.socket.write(this.currentField.promptMessage);
   }
 
@@ -34,10 +36,12 @@ function Prompt(socket, completionCallback) {
       else {
         inputComplete = this.currentField.cacheInput(input);
       }
-
+      console.log('input complete:' + inputComplete);
       // The current field has completed gathering input.
       if (inputComplete) {
         fieldIndex = this.getFieldIndex(this.currentField.name);
+        console.log('field index:' + fieldIndex);
+        console.log('length:' + this.fields.length);
         // Prompt user for input on  next field if available.
         if (fieldIndex < this.fields.length - 1) {
           ++fieldIndex;
@@ -47,7 +51,8 @@ function Prompt(socket, completionCallback) {
         }
         // Otherwise complete the form submission.
         else {
-          if (this.completionCallback !== false) {
+          console.log('calling prompt completion callback');
+          if (typeof this.completionCallback === 'function') {
              var fieldValues = {};
              for (i = 0; i < this.fields.length; ++i) {
                fieldValues[this.fields[i].name] = this.fields[i].value;
@@ -100,11 +105,14 @@ function Prompt(socket, completionCallback) {
   }
 
   this.start = function() {
+    console.log('start triggered');
     this.socket.playerSession.inputContext = 'prompt';
     this.socket.playerSession.prompt = this;
     for (i = 0; i < this.fields.length; ++i) {
       field = this.fields[i];
       if (typeof field.startField !== 'undefined' && field.startField === true) {
+        console.log('start field:');
+        console.log(field);
         this.currentField = field;
         this.promptUser(field);
       }

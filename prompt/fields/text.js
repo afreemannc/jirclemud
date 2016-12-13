@@ -9,9 +9,14 @@ function Text() {
 
 
   this.formatPrompt = function(message) {
-    this.promptMessage = message + '\n';
+    return  message + '\n';
   };
-  this.sanitizeInput = false;
+
+  this.sanitizeInput = function(input) {
+    input = input.toString().replace(/(\r\n|\n|\r)/gm,"");
+    return input;
+  }
+
   this.validate = false;
   this.validationError = false;
 
