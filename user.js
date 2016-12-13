@@ -131,30 +131,25 @@ user.prototype.loadCharacterDetails = function(socket) {
 user.prototype.createCharacter = function(socket) {
     var createCharacterPrompt = prompt.new(socket, this.saveCharacter);
 
-    var characterNameField = createCharacterPrompt.newField();
-    characterNameField.name = 'name';
-    characterNameField.type = 'text';
+    var characterNameField = createCharacterPrompt.newField('text');
+    characterNameField.name = 'charactername';
     characterNameField.startField = true;
-    characterNameField.inputCacheName = 'username';
     characterNameField.validationCallback = this.validateCharacterName;
-    characterNameField.promptMessage = 'Character Name:\n';
+    characterNameField.formatPrompt('Character Name:\n');
     createCharacterPrompt.addField(characterNameField);
 
-    var passwordField = createCharacterPrompt.newField();
+    var passwordField = createCharacterPrompt.newField('text');
     passwordField.name = 'password';
-    passwordField.type = 'text';
-    passwordField.inputCacheName = 'password';
-    passwordField.promptMessage = 'Password:\n';
+    passwordField.formatPrompt('Password:\n');
     createCharacterPrompt.addField(passwordField);
 
-    var classField = createCharacterPrompt.newField();
+    var classField = createCharacterPrompt.newField('select');
     classField.name = 'characterclass';
-    classField.type = 'select';
     classField.options = global.classes.selectionOptions();
-    classField.inputCacheName = 'characterclass';
-    classField.promptMessage = global.classes.selectionPrompt();
+    classField.formatPrompt('Please select a character class:');
     createCharacterPrompt.addField(classField);
-    createCharacterPrompt.setActivePrompt(createCharacterPrompt);
+
+    createCharacterPrompt.start();;
 
 }
 
@@ -171,7 +166,7 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
     // I do not currently understand why this.passHash doesn't work
     var hashedPassword = global.user.passHash(salt, fieldValues.password);
     var values = {
-      name: fieldValues.name,
+      name: fieldValues.charactername,
       pass: hashedPassword,
       salt: salt,
       last_login: 0,

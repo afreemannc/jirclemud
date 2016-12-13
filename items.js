@@ -143,50 +143,39 @@ item.prototype.loadItem = function(socket, itemId, callback, args) {
 item.prototype.createItem = function(socket) {
 
   var itemPrompt = global.prompt.new(socket, this.saveItem);
-  var typeField = itemPrompt.newField();
+  var typeField = itemPrompt.newField('select');
   typeField.name = 'type';
-  typeField.type = 'select';
   typeField.options = global.items.getTypeOptions();
   typeField.startField = true;
-  typeField.inputCacheName = 'type';
   typeField.promptMessage = global.items.createMessage();
   itemPrompt.addField(typeField);
 
   // TODO: implement length limitation on text fields.
-  var nameField = itemPrompt.newField();
+  var nameField = itemPrompt.newField('text');
   nameField.name = 'name',
-  nameField.type = 'text',
   nameField.inputCacheName = 'name',
   nameField.promptMessage = 'What do you want to name it? Note the name is what is displayed in personal inventory or when equipped.',
   itemPrompt.addField(nameField);
 
-  var roomDescriptionField = itemPrompt.newField();
+  var roomDescriptionField = itemPrompt.newField('text');
   roomDescriptionField.name = 'room_description',
-  roomDescriptionField.type = 'text',
-  roomDescriptionField.inputCacheName = 'room_description',
   roomDescriptionField.promptMessage = 'Provide a short description of the item that will be shown when it is sitting out in a room.',
   itemPrompt.addField(roomDescriptionField);
 
-  var fullDescriptionField = itemPrompt.newField();
+  var fullDescriptionField = itemPrompt.newField('multi-text');
   fullDescriptionField.name = 'full_description',
-  fullDescriptionField.type = 'multi',
-  fullDescriptionField.inputCacheName = 'full_description',
   fullDescriptionField.promptMessage = 'Provide a thorough description. This is what will be displayed if this item is examined.',
   itemPrompt.addField(fullDescriptionField);
 
-  var flagsField = itemPrompt.newField();
+  var flagsField = itemPrompt.newField('multi-select');
   flagsField.name = 'flags';
-  flagsField.type = 'multi-select';
   flagsField.options = global.items.flagOptions();
-  flagsField.inputCacheName = 'flags';
   flagsField.promptMessage = global.items.flagsPrompt();
   itemPrompt.addField(flagsField);
 
-  var createItemField = itemPrompt.newField();
+  var createItemField = itemPrompt.newField('select');
   createItemField.name = 'create',
-  createItemField.type = 'select',
   createItemField.options = {y:'y', n:'n'},
-  createItemField.inputCacheName = 'create',
   createItemField.promptMessage = ':: [::y::]es or [::n::]o ::';
   itemPrompt.addField(createItemField);
   // TO DO: start working on properties
