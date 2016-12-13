@@ -9,7 +9,7 @@ function Multitext() {
   this.validated = false;
 
   this.formatPrompt = function(message) {
-    return message + '(@@ to save)' + '\n';
+    this.promptMessage = message + '(@@ to save)' + '\n';
   };
 
   this.sanitizeInput = false;

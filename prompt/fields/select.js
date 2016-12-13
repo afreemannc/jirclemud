@@ -2,7 +2,6 @@ function Select(socket) {
 
   this.socket = socket;
   this.name = '';
-  this.type = '';
   this.options = {};
   this.value = false;
   this.startField = false;
@@ -10,20 +9,19 @@ function Select(socket) {
   this.validated = false;
 
   this.formatPrompt = function(prefix, replaceInPrefix) {
-    var promptMessage = prefix + '\n';
+    this.promptMessage = prefix + '\n';
     var keys = Object.keys(this.options);
 
     for (i = 0; i < keys.length; ++i) {
       if (replaceInPrefix === true) {
         pattern = '[::' + keys[i] + '::]';
         replacement = '[' + global.color.yellow(keys[i].toUpperCase()) + ']';
-        promptMessage = promptMessage.replace(pattern, replacement);
+        this.promptMessage = promptMessage.replace(pattern, replacement);
       }
       else {
-        promptMessage += '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + this.options[keys[i]] + '\n';
+        this.promptMessage += '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + this.options[keys[i]] + '\n';
       }
     }
-    return promptMessage;
   };
 
   this.sanitizeInput = function(input) {

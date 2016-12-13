@@ -9,7 +9,7 @@ function Text() {
 
 
   this.formatPrompt = function(message) {
-    return  message + '\n';
+    this.promptMessage =  message + '\n';
   };
 
   this.sanitizeInput = function(input) {
