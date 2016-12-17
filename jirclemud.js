@@ -22,7 +22,8 @@ global.rooms = rooms;
 global.commands = commands;
 global.items = items;
 global.prompt = prompt;
-
+console.log('commands:');
+console.log(commands);
 function newSocket(socket) {
   console.log('socket:');
   console.log(socket);

@@ -113,6 +113,7 @@ function Prompt(socket, completionCallback) {
         console.log(field);
         this.currentField = field;
         this.promptUser(field);
+        break;
       }
     }
   }

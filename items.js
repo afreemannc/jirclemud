@@ -375,7 +375,7 @@ item.prototype.loadInventory = function(socket, fieldValues, callback, callbackA
     }
     if (typeof callback === 'function') {
       console.log('triggering callback for loadInventory');
-      callback(socket, callbackArgs);
+      callback(socket, '');
     }
     else {
       console.log('No callback defined for loadInventory');

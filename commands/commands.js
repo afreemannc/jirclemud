@@ -1,5 +1,6 @@
 function Commands() {
   this.commands = {};
+  this.triggers = {};
   // Load core commands
   var normalizedPath = require("path").join(__dirname, "core");
 
@@ -7,6 +8,7 @@ function Commands() {
   for(i = 0; i < coreCommands.length; ++i) {
     command = require("./core/" + coreCommands[i]);
     this.commands[command.trigger] = command;
+    this.triggers[command.trigger] = command.callback;
   }
 
   // Load optional plugins
@@ -20,6 +22,7 @@ function Commands() {
     // behavior by declaring a custom version of the command in the
     // plugins directory.
     this.commands[command.trigger] = command;
+    this.triggers[command.trigger] = command.callback;
   }
 
   this.commandHandler  = function(socket, inputRaw, connection) {
@@ -33,7 +36,8 @@ function Commands() {
     }
 
     if (typeof this.commands[command] !== 'undefined') {
-      this.commands[command].callback(socket, arg);
+      console.log('activating callback for command: ' + command);
+      this.triggers[command](socket, arg);
     }
     else {
        socket.write('wut\n');

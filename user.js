@@ -97,13 +97,13 @@ user.prototype.loginAuthenticate = function(socket, fieldValues) {
         }
         else {
           // authentication failed, throw error and reset prompt. (add reset method to prompt class)
-          socket.playerSession.prompt.completionError(socket, 'Login incorrect.\n');
+          socket.playerSession.prompt.displayCompletionError(socket, 'Login incorrect.\n');
         }
       });
     }
     else {
       // TODO: throw error and reset prompt. (add reset method to prompt class)
-      socket.playerSession.prompt.completionError(socket, 'Login incorrect.\n');
+      socket.playerSession.prompt.displayCompletionError(socket, 'Login incorrect.\n');
     }
   });
   //socket.write('Welcome back ' + username + '\n');

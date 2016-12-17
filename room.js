@@ -67,7 +67,7 @@ room.prototype.loadRoom = function(socket, roomId, input) {
   }
   else {
     socket.playerSession.character.currentRoom = roomId;
-    global.commands.look(socket);
+    global.commands.triggers.look(socket, '');
   }
 }
 
@@ -85,7 +85,7 @@ room.prototype.loadExits = function(socket, roomId, callback, callbackArgs) {
   socket.connection.query(sql, inserts, function(err, results, fields) {
     global.rooms.room[roomId].exits = results;
     if (typeof callback === 'function') {
-      callback(socket, callbackArgs, global.commands.look, socket);
+      callback(socket, callbackArgs, global.commands.triggers.look, socket);
     }
   });
 }
