@@ -24,9 +24,7 @@ function Prompt(socket, completionCallback) {
       if (typeof this.currentField.sanitizeInput === 'function') {
         input = this.currentField.sanitizeInput(input);
       }
-      // Process the next field. If we are on the last field run the
-      // completion callback function. For multi-line fields this gets
-      // skipped until the input end sequence @@ is received.
+      // Custom validation handlers can be used by overwriting the default .validate function on the field object.
       if (typeof this.currentField.validate === 'function') {
         console.log('calling validation with input:' + input);
         if (this.currentField.validate(input)) {

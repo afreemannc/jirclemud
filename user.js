@@ -134,7 +134,7 @@ user.prototype.createCharacter = function(socket) {
     var characterNameField = createCharacterPrompt.newField('text');
     characterNameField.name = 'charactername';
     characterNameField.startField = true;
-    characterNameField.validationCallback = this.validateCharacterName;
+    characterNameField.validate = this.validateCharacterName;
     characterNameField.formatPrompt('Character Name:\n');
     createCharacterPrompt.addField(characterNameField);
 

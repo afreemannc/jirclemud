@@ -196,3 +196,13 @@ module.exports.inv = function(socket) {
   var output = 'You are carrying:\n' + display + '\n';
   socket.playerSession.write(output);
 }
+
+module.exports.eq = function(socket) {
+  var display = global.items.equipmentDisplay(socket);
+  var output = 'You are wearing:\n' + display + '\n';
+  socket.playerSession.write(output);
+}
+
+module.exports.wear = function(socket, input) {
+
+}

@@ -84,9 +84,16 @@ item.prototype.flags = {
     selectOption: '5',
     properties: {}
   },
-
+  'TAKE': {
+    selectOption: '6',
+    properties: {}
+  },
+  'WIELD': {
+    selectOptions: '7',
+    properties: {}
+  },
   'HOLD': {
-    selectOptions: '6',
+    selectOptions: '8',
     properties: {}
   }
 }
@@ -138,6 +145,7 @@ item.prototype.loadItem = function(socket, itemId, callback, args) {
         callback(socket, results);
       }
     });
+    // TODO: if container load inventory
 }
 
 item.prototype.createItem = function(socket) {
@@ -375,6 +383,19 @@ item.prototype.loadInventory = function(socket, fieldValues, callback, callbackA
   });
 }
 
+/**
+ * Provides a list of the content of an inventory.
+ *
+ * Since this is used in multiple places the inventory in question has to
+ * be passed explicitly instead of merely assuming that the current character
+ * inventory is the target.
+ *
+ * -  Used by inv command to display character inventory contents
+ * -  Used by look command to display items in room
+ * -  Used by exam command to display contents of a container
+ * -  Used by glance skill to display contents of mob/character inventory
+ */
+
 item.prototype.inventoryDisplay = function(socket, inventory) {
   if (inventory.length === 0) {
    return '';
@@ -404,6 +425,20 @@ item.prototype.searchInventory = function(input, field, inventory, like) {
     }
   }
   return false;
+}
+
+/**
+ * Provide a list of worn equipment.
+ *
+ *  - Used by eq command to display character equipment
+ *  - Used by look command to display mob/character equipment
+ */
+item.prototype.equipmentDisplay(socket, equipment) {
+  // Empty slot display:
+  // (head): - empty
+  //
+  // Equipped slot display:
+  // (head): - The enamel chin of Rolph
 }
 
 module.exports = new item();
