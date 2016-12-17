@@ -3,16 +3,18 @@ function Commands() {
   // Load core commands
   var normalizedPath = require("path").join(__dirname, "core");
 
-  require("fs").readdirSync(normalizedPath).forEach(function(file) {
-    command = require("./core/" + file);
+  var coreCommands = require("fs").readdirSync(normalizedPath)
+  for(i = 0; i < coreCommands.length; ++i) {
+    command = require("./core/" + coreCommends[i]);
     this.commands[command.trigger] = command;
-  });
+  }
 
   // Load optional plugins
   normalizedPath = require("path").join(__dirname, "plugins");
 
-  require("fs").readdirSync(normalizedPath).forEach(function(file) {
-    command = require("./plugin/" + file);
+  var pluginCommands = require("fs").readdirSync(normalizedPath);
+  for(i = 0; i < pluginCommands.length; ++i) {
+    command = require("./plugin/" + pluginCommands[i]);
     // Intentionally skipping checks for pre-existing commands.
     // This permits individual implementations to override core command
     // behavior by declaring a custom version of the command in the
