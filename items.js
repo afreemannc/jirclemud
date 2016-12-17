@@ -433,7 +433,7 @@ item.prototype.searchInventory = function(input, field, inventory, like) {
  *  - Used by eq command to display character equipment
  *  - Used by look command to display mob/character equipment
  */
-item.prototype.equipmentDisplay(socket, equipment) {
+item.prototype.equipmentDisplay = function(socket, equipment) {
   // Empty slot display:
   // (head): - empty
   //

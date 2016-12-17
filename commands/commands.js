@@ -5,7 +5,7 @@ function Commands() {
 
   var coreCommands = require("fs").readdirSync(normalizedPath)
   for(i = 0; i < coreCommands.length; ++i) {
-    command = require("./core/" + coreCommends[i]);
+    command = require("./core/" + coreCommands[i]);
     this.commands[command.trigger] = command;
   }
 
@@ -20,7 +20,7 @@ function Commands() {
     // behavior by declaring a custom version of the command in the
     // plugins directory.
     this.commands[command.trigger] = command;
-  });
+  }
 
   this.commandHandler  = function(socket, inputRaw, connection) {
     var commandSegments = inputRaw.split(' ');
