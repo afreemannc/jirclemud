@@ -26,13 +26,14 @@ function Commands() {
   }
 
   this.commandHandler  = function(socket, inputRaw, connection) {
+    var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
     var commandSegments = inputRaw.split(' ');
     var command = commandSegments[0];
     commandSegments.splice(0, 1);
     var arg = commandSegments.join(' ');
     // If input matches an exit label for the current room treat as move.
-    if (global.rooms.inputIsExit(socket, inputRaw) === true) {
-      return;
+    if (global.rooms.inputIsExit(socket, input) === true) {
+      this.triggers.move(socket, input);
     }
 
     if (typeof this.commands[command] !== 'undefined') {

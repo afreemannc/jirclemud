@@ -19,18 +19,13 @@ room.prototype.message = function(socket, roomId, message, skipCharacter) {
   }
 }
 
-room.prototype.inputIsExit = function(socket, inputRaw) {
-  console.log('checking for move event:' + inputRaw);
-  var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
+room.prototype.inputIsExit = function(socket, input) {
   var roomId = socket.playerSession.character.currentRoom;
-  var characterId = socket.playerSession.character.id;
   var currentExits = global.rooms.room[roomId].exits;
 
   for (i = 0; i < currentExits.length; ++i) {
     currentExit = currentExits[i];
     if (currentExit.label === input) {
-      console.log('move event triggered:' + input);
-      global.rooms.loadRoom(socket, currentExit.target_rid, input);
       return true;
     }
   }
