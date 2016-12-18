@@ -35,10 +35,20 @@ function Multiselect(socket) {
   this.validate = function(socket, input) {
     if (input !== '@@') {
       if (typeof this.options[input] !== 'undefined') {
-      var value = this.value;
-      value.push(input);
-      var selected = value.join(', ');
-      socket.write('Currently selected:' + selected + '\n');
+
+        var index = this.value.indexOf(this.options[input]);
+        var value = this.value.slice();
+        // unset in display on double entry
+        console.log('index:' + index);
+        if (index >= 0) {
+          value.splice(index, 1);
+        }
+        else {
+          // add selection to display
+          value.push(this.options[input]);
+        }
+        var selected = value.join(', ');
+        socket.write('Currently selected:' + selected + '\n');
         return true;
       }
       else {
@@ -58,7 +68,14 @@ function Multiselect(socket) {
 
   this.cacheInput = function(input) {
     if (input !== '@@') {
-      this.value.push(this.options[input]);
+      // unset in cached value on double entry
+      var index = this.value.indexOf(this.options[input]);
+      if (index >= 0) {
+        this.value.splice(index, 1);
+      }
+      else {
+        this.value.push(this.options[input]);
+      }
       return false;
     }
     else {
