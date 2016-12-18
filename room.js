@@ -7,10 +7,10 @@ room.prototype.message = function(socket, roomId, message, skipCharacter) {
   for (i = 0; i < global.sockets.length; ++i) {
     playerSession = global.sockets[i].playerSession;
     // They ain't here.
-    if (playerSession.characterId.currentRoom !== roomId) {
+    if (roomId !== false && playerSession.characterId.currentRoom !== roomId) {
       return;
     }
-    if (playerSession.character.id === socket.playerSession.character.id && skipCharacter === true) {
+    else if (playerSession.character.id === socket.playerSession.character.id && skipCharacter === true) {
       return;
     }
     else {
