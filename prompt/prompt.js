@@ -12,10 +12,18 @@ function Prompt(socket, completionCallback) {
   },
 
   this.promptUser = function() {
-    this.socket.write(this.currentField.promptMessage);
+    var message = this.currentField.promptMessage;
+    message += global.colors.yellow('(@q to quit)\n');
+    this.socket.write(message);
   }
 
   this.promptHandler = function(input) {
+    if (input.toString().replace(/(\r\n|\n|\r)/gm,"") === '@q') {
+      this.socket.playerSession.inputContext = 'command';
+      global.commands.triggers.look(this.socket, '');
+      console.log('prompt bailout');
+      return;
+    }
     var inputComplete = false;
     if (typeof this.currentField !== 'undefined') {
       if (typeof this.currentField.sanitizeInput === 'function') {
