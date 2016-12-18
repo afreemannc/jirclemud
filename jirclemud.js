@@ -47,6 +47,14 @@ function newSocket(socket) {
 // Initialize service and set listening port
 var server = net.createServer(newSocket);
 server.listen(config.port);
+global.connection  = mysql.createConnection({
+    host: config.dbHost,
+    user: config.dbUser,
+    password: config.dbPass,
+    database: config.dbName,
+    port: config.dbPort
+  });
+global.rooms.loadRooms();
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(socket, data) {
   inputContext = socket.playerSession.getInputContext();

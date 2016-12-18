@@ -32,6 +32,27 @@ room.prototype.inputIsExit = function(socket, input) {
   return false;
 }
 
+// Load all zones into memory
+room.prototype.loadRooms = function(connection) {
+  // Only trigger room load if the target room isn't already loaded.
+  var sql = "SELECT * FROM rooms";
+  global.connection.query(sql, function(err, results, fields) {
+    for(i = 0; i < results.length; ++i) {
+      console.log('loading room ' + results[i].rid);
+      var roomId = results[i].rid;
+      global.rooms.room[roomId] = results[i];
+      global.rooms.loadExits(roomId);
+      var values = {
+        containerType: 'room_inventory',
+        parentId: roomId
+      }
+      global.items.loadInventory(values);
+    }
+    console.log('The world is loaded!');
+  });
+}
+
+/*
 //TODO: extend this so it can be used for edit form instead of just
 // the login/change room workflow.
 room.prototype.loadRoom = function(socket, roomId, input) {
@@ -50,7 +71,7 @@ room.prototype.loadRoom = function(socket, roomId, input) {
         global.rooms.exitMessage(socket, input);
       }
       // TODO: find where this is used and refactor it out of existence.
-      socket.playerSession.character.currenRoom = roomId;
+      socket.playerSession.character.currentRoom = roomId;
       var values = {
         containerType: 'room_inventory',
         parentId: roomId
@@ -63,7 +84,7 @@ room.prototype.loadRoom = function(socket, roomId, input) {
     global.commands.triggers.look(socket, '');
   }
 }
-
+*/
 // TODO: this should be deprecated by room.message
 room.prototype.exitMessage = function(socket, input) {
   var currentRoomId = socket.playerSession.character.currentRoom;
@@ -71,10 +92,10 @@ room.prototype.exitMessage = function(socket, input) {
   global.rooms.message(socket, currentRoomId, name + " leaves heading " + input, true);
 }
 
-room.prototype.loadExits = function(socket, roomId, callback, callbackArgs) {
+room.prototype.loadExits = function(roomId, callback, callbackArgs) {
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
-  socket.connection.query(sql, inserts, function(err, results, fields) {
+  global.connection.query(sql, inserts, function(err, results, fields) {
     global.rooms.room[roomId].exits = results;
     if (typeof callback === 'function') {
       callback(socket, callbackArgs, global.commands.triggers.look, socket);
@@ -108,7 +129,7 @@ room.prototype.createRoom = function(socket) {
   var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
   message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
   flagsField.name = 'flags';
-  flagsField.options = {0:'none', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP'};
+  flagsField.options = {0:'none', s:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP'};
   flagsField.formatPrompt(message, true);
   createRoomPrompt.addField(flagsField);
 

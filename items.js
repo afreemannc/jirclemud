@@ -327,7 +327,7 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
   */
 }
 
-item.prototype.loadInventory = function(socket, fieldValues, callback, callbackArgs) {
+item.prototype.loadInventory = function(fieldValues, socket) {
   var inserts = [fieldValues.containerType, fieldValues.parentId];
   var sql = `
     SELECT
@@ -350,14 +350,13 @@ item.prototype.loadInventory = function(socket, fieldValues, callback, callbackA
 
   sql = global.mysql.format(sql, inserts);
 
-  socket.connection.query(sql, function(err, results, fields) {
+  global.connection.query(sql, function(err, results, fields) {
     switch(fieldValues.containerType) {
       case 'player_inventory':
         socket.playerSession.character.inventory = results;
         break;
       case 'room_inventory':
-        var roomId = socket.playerSession.character.currentRoom;
-        global.rooms.room[roomId].inventory = results;
+        global.rooms.room[fieldValues.parentId].inventory = results;
         break;
       default:
         break;

@@ -7,7 +7,8 @@ function Multiselect(socket) {
   this.startField = false;
   this.promptMessage = '';
   this.validated = false;
-
+  this.conditional = false;
+  this.displayCondition = false;
 
   this.formatPrompt = function(prefix, replaceInPrefix) {
     this.promptMessage = prefix + '\n';

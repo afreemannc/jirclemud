@@ -9,7 +9,8 @@ var Command = function() {
     for (i = 0; i < currentExits.length; ++i) {
       currentExit = currentExits[i];
       if (currentExit.label === input) {
-        global.rooms.loadRoom(socket, currentExit.target_rid, input);
+        socket.playerSession.character.currentRoom = currentExit.target_rid;
+        global.commands.triggers.look(socket, '');
       }
     }
 

@@ -119,11 +119,11 @@ user.prototype.loadCharacterDetails = function(socket) {
     containerType: 'player_inventory',
     parentId: character.id
   }
-  global.items.loadInventory(socket, values);
+  global.items.loadInventory(values, socket);
   // Load current character room if needed.
-  global.rooms.loadRoom(socket, character.current_room, false);
   socket.write('Welcome back ' + character.name + '\n');
   socket.playerSession.inputContext = 'command';
+  global.commands.triggers.look(socket, '');
 }
 
 user.prototype.createCharacter = function(socket) {

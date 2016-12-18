@@ -3,12 +3,13 @@ var Command = function() {
   this.helpText = 'Immortals only: instantly change rooms.';
   this.callback = function(socket, input) {
     // TODO: confirm current user has GOD or DEMI flag
-    if (input.length === 0) {
+    if (input.length === 0 || typeof global.rooms.room[input] === 'undefined') {
       socket.playerSession.error("Teleport where??\n");
     }
     else {
       var exitMessage = 'Bamf!';
-      global.rooms.loadRoom(socket, input, exitMessage);
+      socket.playerSession.character.currentRoom = input;
+      global.commands.triggers.look(socket, '');
     }
   }
 
