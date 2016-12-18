@@ -167,12 +167,12 @@ item.prototype.createItem = function(socket) {
   roomDescriptionField.promptMessage = 'Provide a short description of the item that will be shown when it is sitting out in a room.',
   itemPrompt.addField(roomDescriptionField);
 
-  var fullDescriptionField = itemPrompt.newField('multi-text');
+  var fullDescriptionField = itemPrompt.newField('multitext');
   fullDescriptionField.name = 'full_description',
   fullDescriptionField.promptMessage = 'Provide a thorough description. This is what will be displayed if this item is examined.',
   itemPrompt.addField(fullDescriptionField);
 
-  var flagsField = itemPrompt.newField('multi-select');
+  var flagsField = itemPrompt.newField('multiselect');
   flagsField.name = 'flags';
   flagsField.options = global.items.flagOptions();
   flagsField.promptMessage = global.items.flagsPrompt();
@@ -181,7 +181,7 @@ item.prototype.createItem = function(socket) {
   var createItemField = itemPrompt.newField('select');
   createItemField.name = 'create',
   createItemField.options = {y:'y', n:'n'},
-  createItemField.promptMessage = ':: [::y::]es or [::n::]o ::';
+  createItemField.formatPrompt(':: [::y::]es or [::n::]o ::', true);
   itemPrompt.addField(createItemField);
   // TO DO: start working on properties
   // helper function should switch on type to build out valid additional fields

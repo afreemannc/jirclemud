@@ -1,5 +1,5 @@
 var Command = function() {
-  this.trigger = 'quit';
+  this.trigger = 'dig';
   this.helpText = '';
   this.callback = function(socket, input) {
     if (input.length === 0) {

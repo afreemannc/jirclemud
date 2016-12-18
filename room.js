@@ -96,20 +96,52 @@ room.prototype.createRoom = function(socket) {
   shortDescField.formatPrompt('Enter short description of room. (I have no idea where this will get displayed yet)');
   createRoomPrompt.addField(shortDescField);
 
-  var fullDescField = createRoomPrompt.newField('multi-text');
+  var fullDescField = createRoomPrompt.newField('multitext');
+  console.log('full desc field:');
+  console.log(fullDescField);
   fullDescField.name = 'full_description';
   fullDescField.formatPrompt('Enter full room description. (This is displayed whenever a player enters the room)');
   createRoomPrompt.addField(fullDescField);
 
+
+  var flagsField = createRoomPrompt.newField('multiselect');
+  var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
+  message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
+  flagsField.name = 'flags';
+  flagsField.options = {0:'none', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP'};
+  flagsField.formatPrompt(message, true);
+  createRoomPrompt.addField(flagsField);
+
   createRoomPrompt.start();
 }
 
-room.prototype.editRoom = function(connection) {
+room.prototype.editRoom = function(socket, roomId) {
+  var editRoomPrompt = prompt.new(socket, this.saveRoom);
 
+  var nameField = edidRoomPrompt.newField('text');
+  nameField.name = 'name';
+  nameField.startField = true;
+  nameField.formatPrompt('Enter room name. (This is displayed at the top of the room description)');
+  editRoomPrompt.addField(nameField);
+
+  var shortDescField = editRoomPrompt.newField('text');
+  shortDescField.name = 'short_description';
+  shortDescField.formatPrompt('Enter short description of room. (I have no idea where this will get displayed yet)');
+  editRoomPrompt.addField(shortDescField);
+
+  var fullDescField = createRoomPrompt.newField('multitext');
+  fullDescField.name = 'full_description';
+  fullDescField.formatPrompt('Enter full room description. (This is displayed whenever a player enters the room)');
+  editRoomPrompt.addField(fullDescField);
+
+  editRoomPrompt.start();
 }
 
-room.prototype.deleteRoom = function(connection) {
-
+room.prototype.deleteRoom = function(socket, roomId) {
+  // unload room from memory if present
+  // delete db record for room
+  // delete all room exits
+  // delete any room exits targeting this room
 }
 
 room.prototype.createPlaceholderExit = function(socket, target_rid, label) {
@@ -189,7 +221,8 @@ room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) 
   var values = {
     name:fieldValues.name,
     short_description:fieldValues.short_description,
-    full_description:fieldValues.full_description
+    full_description:fieldValues.full_description,
+    flags:JSON.stringify(fieldValues.flags)
   }
   socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
     socket.playerSession.write('Room saved.');

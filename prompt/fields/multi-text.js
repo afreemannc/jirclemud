@@ -37,5 +37,5 @@ function Multitext() {
 }
 
 module.exports.new = function() {
-  new Multitext();
+  return new Multitext();
 }
