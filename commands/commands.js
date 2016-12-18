@@ -26,7 +26,7 @@ function Commands() {
   }
 
   this.commandHandler  = function(socket, inputRaw, connection) {
-    var input = inputRaw.toString().toLowerCase.replace(/(\r\n|\n|\r)/gm,"");
+    var input = inputRaw.toString().toLowerCase().replace(/(\r\n|\n|\r)/gm,"");
     var commandFound = false;
     var commandSegments = inputRaw.split(' ');
     var command = commandSegments[0];

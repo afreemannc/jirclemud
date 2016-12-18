@@ -66,13 +66,13 @@ function Prompt(socket, completionCallback) {
     for (i = 0; i < this.fields.length; ++i) {
       this.fields[i].value = false;
       if (this.fields[i].startField === true) {
-        this.currentField = fields[i];
+        this.currentField = this.fields[i];
       }
     }
   }
 
 
-  this.displayCompletionError = function(error) {
+  this.displayCompletionError = function(socket, error) {
     this.resetPrompt(socket);
     this.socket.write(color.red(error));
     this.start();
