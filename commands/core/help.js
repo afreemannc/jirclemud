@@ -4,7 +4,10 @@ var Command = function() {
   this.callback = function (socket, input) {
     if (typeof global.commands.commands[input] !== 'undefined') {
       var helpText = global.commands.commands[input].helpText;
-      socket.playersession.write(helpText);
+      socket.playerSession.write(helpText);
+    }
+    else {
+      socket.playerSession.write('There is no help for that term.');
     }
   }
 
