@@ -1,8 +1,9 @@
 var Command = function() {
   this.trigger = 'create';
-  this.helpText = '';
-  this.callback = function (socket, input) {
-    if (input.length === 0) {
+  this.helpText = 'Immortals only: create a thing (room, item, etc).';
+  this.callback = function(socket, context) {
+    // TODO: implement character perms checking
+    if (context.length === 0) {
       socket.playerSession.error("Create what??\n");
     }
     else {
@@ -18,6 +19,7 @@ var Command = function() {
       }
     }
   }
+
 }
 
 module.exports = new Command();
