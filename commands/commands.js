@@ -26,23 +26,36 @@ function Commands() {
   }
 
   this.commandHandler  = function(socket, inputRaw, connection) {
-    var input = inputRaw.toString().replace(/(\r\n|\n|\r)/gm,"");
+    var input = inputRaw.toString().toLowerCase.replace(/(\r\n|\n|\r)/gm,"");
+    var commandFound = false;
     var commandSegments = inputRaw.split(' ');
     var command = commandSegments[0];
     commandSegments.splice(0, 1);
     var arg = commandSegments.join(' ');
+
     // If input matches an exit label for the current room treat as move.
     if (global.rooms.inputIsExit(socket, input) === true) {
       this.triggers.move(socket, input);
+      commandFound = true;
+    }
+    // Otherwise lets check available commands
+    var keys = Object.keys(this.commands);
+    console.log('input:' + arg);
+    console.log('keys:');
+    console.log(keys);
+
+    for (i = 0; i < keys.length; ++i) {
+      if (keys[i].startsWith(command)) {
+        this.triggers[keys[i]](socket, arg);
+        commandFound = true;
+        break;
+      }
     }
 
-    if (typeof this.commands[command] !== 'undefined') {
-      console.log('activating callback for command: ' + command);
-      this.triggers[command](socket, arg);
+    if (commandFound === false) {
+      socket.write('wut\n');
     }
-    else {
-       socket.write('wut\n');
-    }
+
   }
 }
 
