@@ -52,39 +52,6 @@ room.prototype.loadRooms = function(connection) {
   });
 }
 
-/*
-//TODO: extend this so it can be used for edit form instead of just
-// the login/change room workflow.
-room.prototype.loadRoom = function(socket, roomId, input) {
-  var sql = "SELECT * FROM ?? WHERE ?? = ?";
-  var inserts = ['rooms', 'rid', roomId];
-  // Only trigger room load if the target room isn't already loaded.
-  if (typeof global.rooms.room[roomId] === 'undefined') {
-    sql = global.mysql.format(sql, inserts);
-    socket.connection.query(sql, function(err, results, fields) {
-      var roomId = results[0].rid;
-      socket.playerSession.character.currentRoom = roomId;
-      global.rooms.room[roomId] = results[0];
-      global.rooms.room[roomId].inventory = {}; // initialize with empty inventory
-      if (input !== false) {
-       // TODO: move this somewhere else. Having this function emit output means it cant be used as a generic loader.
-        global.rooms.exitMessage(socket, input);
-      }
-      // TODO: find where this is used and refactor it out of existence.
-      socket.playerSession.character.currentRoom = roomId;
-      var values = {
-        containerType: 'room_inventory',
-        parentId: roomId
-      }
-      global.rooms.loadExits(socket, roomId, global.items.loadInventory, values);
-    });
-  }
-  else {
-    socket.playerSession.character.currentRoom = roomId;
-    global.commands.triggers.look(socket, '');
-  }
-}
-*/
 // TODO: this should be deprecated by room.message
 room.prototype.exitMessage = function(socket, input) {
   var currentRoomId = socket.playerSession.character.currentRoom;
