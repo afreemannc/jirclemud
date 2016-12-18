@@ -218,6 +218,8 @@ room.prototype.saveExit = function(socket, fieldValues, callback, callbackArgs) 
 }
 
 room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) {
+  console.log('field values in saveRoom:');
+  console.log(fieldValues);
   var values = {
     name:fieldValues.name,
     short_description:fieldValues.short_description,

@@ -13,20 +13,12 @@ function Multitext() {
   };
 
   this.sanitizeInput = false;
-
-  this.validate = function(socket, input) {
-    if (input !== '@@') {
-      return false;
-    }
-    else {
-      return true;
-    }
-  };
-
+  this.validate = false;
   this.validationError = false;
 
   this.cacheInput = function(input) {
-    if (input !== '@@') {
+    inputClean = input.toString().replace(/(\r\n|\n|\r)/gm,"");
+    if (inputClean !== '@@') {
       this.value += input;
       return false;
     }
