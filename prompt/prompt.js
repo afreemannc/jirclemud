@@ -27,7 +27,7 @@ function Prompt(socket, completionCallback) {
       // Custom validation handlers can be used by overwriting the default .validate function on the field object.
       if (typeof this.currentField.validate === 'function') {
         console.log('calling validation with input:' + input);
-        if (this.currentField.validate(input)) {
+        if (this.currentField.validate(socket, input)) {
           inputComplete = this.currentField.cacheInput(input);
         }
       }

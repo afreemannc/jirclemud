@@ -14,7 +14,7 @@ function Multitext() {
 
   this.sanitizeInput = false;
 
-  this.validate = function() {
+  this.validate = function(socket, input) {
     if (input !== '@@') {
       return false;
     }
@@ -23,9 +23,7 @@ function Multitext() {
     }
   };
 
-  this.validationError = function (input) {
-    this.cacheInput(input);
-  };
+  this.validationError = false;
 
   this.cacheInput = function(input) {
     if (input !== '@@') {

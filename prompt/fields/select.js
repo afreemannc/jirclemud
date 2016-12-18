@@ -30,18 +30,18 @@ function Select(socket) {
     return input;
   }
 
-  this.validate = function(input) {
+  this.validate = function(socket, input) {
     if (typeof this.options[input] !== 'undefined') {
         return true;
     }
     else {
-      this.validationError();
+      this.validationError(socket, input);
       return false;
     }
   };
 
 
-  this.validationError = function(input) {
+  this.validationError = function(socket, input) {
     socket.write('"' + input + '" is not a valid option.\n');
     global.prompt.promptUser(this);
   };

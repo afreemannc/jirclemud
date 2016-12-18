@@ -22,10 +22,13 @@ function Multiselect(socket) {
     return input;
   }
 
-  this.validate = function(input) {
+  this.validate = function(socket, input) {
     if (input !== '@@') {
       if (typeof this.options[input] !== 'undefined') {
         return false;
+      }
+      else {
+         this.validationError(socket, input);
       }
     }
     else {
@@ -33,7 +36,10 @@ function Multiselect(socket) {
     }
   };
 
-  this.validationError = false;
+  this.validationError = function(socket, input) {
+    socket.write('"' + input + '" is not a valid option.\n');
+    global.prompt.promptUser(this);
+  };
 
   this.cacheInput = function(input) {
     if (input !== '@@') {
