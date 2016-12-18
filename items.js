@@ -105,8 +105,6 @@ item.prototype.flagOptions = function() {
   for (i = 0; i < keys.length; ++i) {
     options[flags[keys[i]].selectOption] = keys[i];
   }
-  console.log('flag options:');
-  console.log(options);
   return options;
 }
 
@@ -117,7 +115,6 @@ item.prototype.flagsPrompt = function() {
   for (i = 0; i < keys.length; ++i) {
     promptMessage += '[::' + i + '::] ' + keys[i] + '\n';
   }
-  console.log(promptMessage);
   return promptMessage;
 }
 
@@ -200,8 +197,6 @@ item.prototype.getTypeOptions = function() {
     currentItem = global.items[itemTypes[i]];
     options[currentItem.selectOption] = currentItem.type;
   }
-  console.log('options:');
-  console.log(options);
   return options;
 }
 
@@ -210,10 +205,7 @@ item.prototype.createMessage = function() {
   var prompt = 'What type of item would you like to create?\n';
   var item = {};
   for (i = 0; i < itemTypes.length; ++i) {
-    console.log('thing:' + itemTypes[i]);
-    console.log(global.items[itemTypes[i]]);
     currentItem = global.items[itemTypes[i]];
-    console.log(currentItem);
     prompt += currentItem.label + ' :: ';
   }
   return prompt + '\n';
@@ -336,7 +328,6 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
 }
 
 item.prototype.loadInventory = function(socket, fieldValues, callback, callbackArgs) {
-  console.log('loadInventory invoked');
   var inserts = [fieldValues.containerType, fieldValues.parentId];
   var sql = `
     SELECT
@@ -365,20 +356,14 @@ item.prototype.loadInventory = function(socket, fieldValues, callback, callbackA
         socket.playerSession.character.inventory = results;
         break;
       case 'room_inventory':
-        console.log(global.rooms.room);
         var roomId = socket.playerSession.character.currentRoom;
-        console.log('current player room:' + roomId);
         global.rooms.room[roomId].inventory = results;
         break;
       default:
         break;
     }
     if (typeof callback === 'function') {
-      console.log('triggering callback for loadInventory');
       callback(socket, '');
-    }
-    else {
-      console.log('No callback defined for loadInventory');
     }
   });
 }

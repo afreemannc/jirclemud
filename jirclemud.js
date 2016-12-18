@@ -22,11 +22,8 @@ global.rooms = rooms;
 global.commands = commands;
 global.items = items;
 global.prompt = prompt;
-console.log('commands:');
-console.log(commands);
+
 function newSocket(socket) {
-  console.log('socket:');
-  console.log(socket);
   socket.playerSession = new session(socket);
   socket.connection = mysql.createConnection({
     host: config.dbHost,
@@ -55,7 +52,6 @@ function parseData(socket, data) {
   inputContext = socket.playerSession.getInputContext();
   switch (socket.playerSession.inputContext) {
     case 'prompt':
-      console.log('prompt input:' + data);
       // certain prompts require collection of multi-line inputs so raw data is provided here.
       socket.playerSession.prompt.promptHandler(data);
       break;

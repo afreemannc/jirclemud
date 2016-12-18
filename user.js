@@ -10,9 +10,8 @@ user.prototype.start = function(socket) {
   var message = colors.green('Welcome to ' + global.config.mudName + "\n");
   // TODO: display splash screen.
   var startPrompt = prompt.new(socket, global.user.startSwitch);
+
   var startField = startPrompt.newField('select');
-  console.log('startfield');
-  console.log(startField);
   startField.name = 'start';
   startField.options = {l:'l', c:'c', q:'q'};
   startField.formatPrompt('[::l::]og in, [::c::]reate a character, or [::q::]uit', true);
@@ -37,9 +36,8 @@ user.prototype.start = function(socket) {
  *
  */
 user.prototype.startSwitch = function(socket, fieldValues) {
-  console.log('field values:');
-  console.log(fieldValues);
-  input = fieldValues.start;
+
+  var input = fieldValues.start;
   if (input === 'l') {
     global.user.login(socket);
   }
@@ -55,7 +53,7 @@ user.prototype.startSwitch = function(socket, fieldValues) {
  * Login screen prompt.
  */
 user.prototype.login = function(socket) {
-  console.log('login prompt build');
+
   var loginPrompt = prompt.new(socket, this.loginAuthenticate);
   var loginField = loginPrompt.newField('text');
   loginField.name = 'username';
@@ -175,7 +173,7 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
       stats: global.user.startProperties(fieldValues.characterclass),
       affects: global.user.startAffects,
     };
-    console.log(values);
+
     socket.connection.query('INSERT INTO characters SET ?', values, function (error, result) {
       characterId = result.insertId;
       // TODO: update session with character
@@ -202,8 +200,7 @@ user.prototype.startProperties = function(characterClass) {
     currentmana: startingMana,
     current_room: global.config.startRoom
   }
-  console.log('properties:');
-  console.log(properties);
+
   return JSON.stringify(properties);
 }
 

@@ -2,8 +2,6 @@ var Command = function() {
   this.trigger = 'look';
   this.helpText = '';
   this.callback = function (socket, input) {
-    console.log('look input:' + input);
-    console.log(typeof input);
     // Room look, aka look with no additional arguments passed.
     if (input === '') {
       var roomId = socket.playerSession.character.currentRoom;
@@ -21,7 +19,6 @@ var Command = function() {
         exits.push(global.colors.yellow(exit.label));
       }
       socket.playerSession.write('Exits: [ ' + exits.join(' ') + ' ]\n');
-      console.log('completed look output');
     }
   }
 

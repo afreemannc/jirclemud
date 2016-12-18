@@ -35,7 +35,6 @@ room.prototype.inputIsExit = function(socket, input) {
 //TODO: extend this so it can be used for edit form instead of just
 // the login/change room workflow.
 room.prototype.loadRoom = function(socket, roomId, input) {
-  console.log('loadRoom invoked for roomId:' + roomId);
   var sql = "SELECT * FROM ?? WHERE ?? = ?";
   var inserts = ['rooms', 'rid', roomId];
   // Only trigger room load if the target room isn't already loaded.
@@ -44,7 +43,6 @@ room.prototype.loadRoom = function(socket, roomId, input) {
     socket.connection.query(sql, function(err, results, fields) {
       var roomId = results[0].rid;
       socket.playerSession.character.currentRoom = roomId;
-      console.log('updated character room location');
       global.rooms.room[roomId] = results[0];
       global.rooms.room[roomId].inventory = {}; // initialize with empty inventory
       if (input !== false) {
@@ -74,7 +72,6 @@ room.prototype.exitMessage = function(socket, input) {
 }
 
 room.prototype.loadExits = function(socket, roomId, callback, callbackArgs) {
-  console.log('load exits invoked for room:' + roomId);
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
   socket.connection.query(sql, inserts, function(err, results, fields) {
@@ -123,13 +120,11 @@ room.prototype.createPlaceholderExit = function(socket, target_rid, label) {
     description: 'Nothing to see here.',
     properties: [],
   }
-  console.log(fieldValues);
   args = {target_rid:target_rid, label:label};
   global.rooms.saveExit(socket, fieldValues, global.rooms.createReciprocalExit, args);
 }
 
 room.prototype.createReciprocalExit = function(socket, args) {
-  console.log('made it to reciprocal');
   label = args.label;
   rid = args.target_rid;
 

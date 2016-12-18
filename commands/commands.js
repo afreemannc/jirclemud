@@ -40,9 +40,6 @@ function Commands() {
     }
     // Otherwise lets check available commands
     var keys = Object.keys(this.commands);
-    console.log('input:' + arg);
-    console.log('keys:');
-    console.log(keys);
 
     for (i = 0; i < keys.length; ++i) {
       if (keys[i].startsWith(command)) {
