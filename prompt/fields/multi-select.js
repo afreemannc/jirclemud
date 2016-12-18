@@ -8,12 +8,22 @@ function Multiselect(socket) {
   this.promptMessage = '';
   this.validated = false;
 
-  this.formatPrompt = function(lede, options) {
-    this.promptMessage = lede + '\n';
-    var keys = Object.keys(options);
+
+  this.formatPrompt = function(prefix, replaceInPrefix) {
+    this.promptMessage = prefix + '\n';
+    var keys = Object.keys(this.options);
+
     for (i = 0; i < keys.length; ++i) {
-      this.promptMessage += '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + options[keys[i]] + '\n';
+      if (replaceInPrefix === true) {
+        pattern = '[::' + keys[i] + '::]';
+        replacement = '[' + global.color.yellow(keys[i].toUpperCase()) + ']';
+        this.promptMessage = this.promptMessage.replace(pattern, replacement);
+      }
+      else {
+        this.promptMessage = '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + this.options[keys[i]] + '\n';
+      }
     }
+    this.promptMessage += '(@@ to finalize selections)\n';
   };
 
   this.sanitizeInput = function(input) {
