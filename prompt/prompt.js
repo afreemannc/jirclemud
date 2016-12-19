@@ -3,6 +3,7 @@ function Prompt(socket, completionCallback) {
   this.fields = [];
   this.currentField = false;
   this.completionCallback = completionCallback;
+  this.quittable = true;
 
   this.fieldTypes = {
     text: require('./fields/text.js'),
@@ -13,12 +14,14 @@ function Prompt(socket, completionCallback) {
 
   this.promptUser = function() {
     var message = this.currentField.promptMessage;
-    message += global.colors.yellow('(@q to quit)\n');
+    if (this.quittable === true) {
+      message += global.colors.yellow('(@q to quit)\n');
+    }
     this.socket.write(message);
   }
 
   this.promptHandler = function(input) {
-    if (input.toString().replace(/(\r\n|\n|\r)/gm,"") === '@q') {
+    if (input.toString().replace(/(\r\n|\n|\r)/gm,"") === '@q' && this.quittable === true) {
       this.socket.playerSession.inputContext = 'command';
       global.commands.triggers.look(this.socket, '');
       console.log('prompt bailout');

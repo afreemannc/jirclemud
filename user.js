@@ -10,6 +10,8 @@ user.prototype.start = function(socket) {
   var message = colors.green('Welcome to ' + global.config.mudName + "\n");
   // TODO: display splash screen.
   var startPrompt = prompt.new(socket, global.user.startSwitch);
+  // The standard prompt bailout doesn't make sense on this screen.
+  startPrompt.quittable = false;
 
   var startField = startPrompt.newField('select');
   startField.name = 'start';
@@ -55,6 +57,8 @@ user.prototype.startSwitch = function(socket, fieldValues) {
 user.prototype.login = function(socket) {
 
   var loginPrompt = prompt.new(socket, this.loginAuthenticate);
+  loginPrompt.quittable = false;
+
   var loginField = loginPrompt.newField('text');
   loginField.name = 'username';
   loginField.startField = true;
@@ -128,6 +132,7 @@ user.prototype.loadCharacterDetails = function(socket) {
 
 user.prototype.createCharacter = function(socket) {
     var createCharacterPrompt = prompt.new(socket, this.saveCharacter);
+    createCharacterPrompt.quittable = false;
 
     var characterNameField = createCharacterPrompt.newField('text');
     characterNameField.name = 'charactername';
