@@ -33,6 +33,7 @@ Currently supported:
   - select: select field, only accepts input from pre-defined list of options
   - multi-text: multi-line text field. Accepts one or more lines of text. (@@ to end input)
   - multi-select: select field, accepts one or more input options from predefined list
+  - value: hidden field designed to pass a set value straight through to fieldValues
 
 ### Text field
 Single line text field
@@ -96,7 +97,20 @@ validation error: Displays "INPUT is not a valid option"
 
 input caching: pushes each selected value onto the field .value array.
 
+### Value field
+Single value hidden field
 
+prompt: none, does not prompt user for input..
+
+custom prompt: none, does not prompt user for input.
+
+input sanitation: none, does not accept user input.
+
+validation: none.
+
+validation error: none.
+
+input caching: pushes value onto the field .value array.
 
 ## Additional field properties
 
