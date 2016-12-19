@@ -293,7 +293,7 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
       // delete inventory[index] from character inventory
       delete global.rooms.room[roomId].inventory[fieldValues.index];
       // add item to room[room id].inventory
-      socket.playerSession.character.inventory.push(fieldValue.item);
+      socket.playerSession.character.inventory.push(fieldValues.item);
       break;
 
     case 'character-to-character':

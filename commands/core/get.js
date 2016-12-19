@@ -11,9 +11,15 @@ var Command = function() {
         index: index
       }
       global.items.transferItemInstance(socket, fieldValues);
+      var roomId = socket.playerSession.character.currentRoom;
+      var name = socket.playerSession.character.name;
+      // player message
+      socket.playerSession.write('You pick up a ' + fieldValues.item.name);
+      // room message
+      global.rooms.message(socket, roomId, name + ' picks up a ' +fieldValues.item.name, true);
     }
     else {
-      socket.playerSession.error('Drop what??\n');
+      socket.playerSession.error('Get what??\n');
     }
   }
 }

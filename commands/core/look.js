@@ -20,6 +20,13 @@ var Command = function() {
       }
       socket.playerSession.write('Exits: [ ' + exits.join(' ') + ' ]\n');
     }
+    else {
+      // Check personal inventory
+      var itemIndex = global.items.searchInventory(input, 'name', socket.playerSession.character.inventory, true);
+      if (itemIndex !== false) {
+        console.log(socket.playerSession.character.inventory[itemIndex]);
+      }
+    }
   }
 
 }

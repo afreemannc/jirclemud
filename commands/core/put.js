@@ -6,22 +6,24 @@ var Command = function() {
     var containerIndex = false;
     var inventory = false;
     var containerLocation = false;
-    // expected command format: get <item name> from <container name>
-    commandParts = input.split('from');
-    if (commandParts.length < 2) {
+    // expected command format: put <item name> in <container name>
+    // expected command format: put <item name> <container name>
+    commandParts = input.split(' in ');
+    if (commandParts.length < 1) {
       socket.playerSession.error('Put what where?');
       return;
     }
     // check personal inventory for item
     itemIndex = global.items.searchInventory(commandParts[0], 'name', socket.playerSession.character.inventory, true);
+    console.log('put item found at index:' + itemIndex);
 
     if (itemIndex === 'false') {
-      socket.playerSession.error('You dont have ' + commandParts[0]);
+      socket.playerSession.error('You dont have a ' + commandParts[0]);
       return;
     }
   // check personal inventory for container
-    containerIndex = global.items.searchInventory(commandParts[0], 'name', socket.playerSession.character.inventory, true);
-
+    containerIndex = global.items.searchInventory(commandParts[1], 'name', socket.playerSession.character.inventory, true);
+    console.log('put container found at index:' + containerIndex);
     if (containerIndex !== false) {
       inventory = socket.playerSession.character.inventory;
       containerLocation = 'character inventory';
@@ -42,11 +44,17 @@ var Command = function() {
         var fieldValues = {
           transferType: 'character-to-container',
           item: inventory[itemIndex],
-          index: index,
+          index: itemIndex,
           containerIndex: containerIndex,
           containerLocation: containerLocation
         }
         global.items.transferItemInstance(socket, fieldValues);
+        var roomId = socket.playerSession.character.currentRoom;
+        var name = socket.playerSession.character.name;
+        // player message
+        socket.playerSession.write('You put a ' + fieldValues.item.name + ' in the ' + inventory[containerIndex].name);
+        // room message
+        global.rooms.message(socket, roomId, name + ' puts a ' + fieldValues.item.name + ' in a ' + inventory[containerIndex].name, true);
       }
       else {
         socket.playerSession.error('That is not a container.');
