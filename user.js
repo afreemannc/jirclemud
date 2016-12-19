@@ -176,13 +176,14 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
 
     socket.connection.query('INSERT INTO characters SET ?', values, function (error, result) {
       characterId = result.insertId;
-      // TODO: update session with character
       // TODO: generate default inventory
-      // TODO: set default room number
+      socket.playerSession.character = values;
+      socket.playerSession.character.id = characterId;
+      socket.playerSession.character.currentRoom = global.config.startRoom;
+
       socket.write('Welcome ' + values.name + '\n');
       socket.playerSession.inputContext = 'command';
-      global.user.changeRoom(socket, global.config.startRoom);
-      // TODO: run "look"
+      global.commands.triggers.look(socket, '');
     });
 }
 
@@ -207,7 +208,7 @@ user.prototype.startProperties = function(characterClass) {
 user.prototype.startAffects = function() {
   // Currently no starting affects, will add
   // sustain and others as needed later.
-  return JSON.stringify({});
+  return JSON.stringify({sustain:500});
 }
 
  // Validate character name input
@@ -216,17 +217,30 @@ user.prototype.startAffects = function() {
       socket.playerSession.prompt('Character Name:\n', 'name');
     }
     socket.connection.query('SELECT id FROM characters WHERE name = ?', [name],
-      function(error, results, fields) {
+      ret = function(error, results, fields) {
         if (results.length !== 0) {
           var message = name + ' is already in use. Please select a different character name.\n';
-          socket.playerSession.prompt.validationError(message);
-          return;
+          socket.playerSession.error(message);
+          return false;
         }
         else {
-          socket.playerSession.prompt.validationSuccess('name', name);
+          return true;
         }
       }
     );
+  return ret;
 }
+
+user.prototype.searchActiveCharactersByName = function(name) {
+  for (i = 0; i < global.sockets.length; ++i) {
+    check = global.sockets[i];
+    if (check.playerSession.character.name.startsWith(name)) {
+      return check.playerSession.character.id;
+    }
+  }
+  console.log('player not found:' + name);
+  return false;
+}
+
 
 module.exports = new user();

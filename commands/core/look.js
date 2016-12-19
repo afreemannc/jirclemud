@@ -1,6 +1,7 @@
 var Command = function() {
   this.trigger = 'look';
   this.helpText = '';
+  this.synonyms = ['examine'];
   this.callback = function (socket, input) {
     // Room look, aka look with no additional arguments passed.
     if (input === '') {
