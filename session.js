@@ -24,9 +24,12 @@ function session(socket) {
   this.characterPrompt = function() {
     var hp = this.character.stats.currenthp;
     var mana = this.character.stats.currentmana;
+    var xp = this.character.stats.xp;
     var prompt = global.color.red('H:' + hp);
     prompt += ' | ';
     prompt += global.color.blue('M:' + mana);
+    prompt += ' | ';
+    prompt += global.color.cyan('XP:' + xp);
     prompt += ' >\n';
 
     return "\n" + prompt;

@@ -204,6 +204,7 @@ user.prototype.startProperties = function(characterClass) {
     currenthp: startingHP,
     maxmana: startingMana,
     currentmana: startingMana,
+    xp: 1,
     current_room: global.config.startRoom
   }
 
