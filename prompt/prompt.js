@@ -42,26 +42,28 @@ function Prompt(socket, completionCallback) {
       }
       else {
         inputComplete = this.currentField.cacheInput(input);
+        console.log('inputComplete: ' + inputComplete);
       }
       // The current field has completed gathering input.
       if (inputComplete) {
         fieldIndex = this.getFieldIndex(this.currentField.name);
-        // Prompt user for input on  next field if available.
-        if (fieldIndex < this.fields.length - 1) {
+        // Iterate past hidden fields if needed.
+        while (fieldIndex < this.fields.length - 1) {
           ++fieldIndex;
           var field = this.fields[fieldIndex];
           this.currentField = field;
-          this.promptUser(field);
-        }
-        // Otherwise complete the form submission.
-        else {
-          if (typeof this.completionCallback === 'function') {
-             var fieldValues = {};
-             for (i = 0; i < this.fields.length; ++i) {
-               fieldValues[this.fields[i].name] = this.fields[i].value;
-             }
-             this.completionCallback(this.socket, fieldValues);
+          if (this.currentField.promptMessage !== false) {
+            this.promptUser(field);
+            return;
           }
+        }
+        // Complete form submission if we have reached the last available field.
+        if (fieldIndex === (this.fields.length - 1) && typeof this.completionCallback === 'function') {
+          var fieldValues = {};
+          for (i = 0; i < this.fields.length; ++i) {
+            fieldValues[this.fields[i].name] = this.fields[i].value;
+          }
+          this.completionCallback(this.socket, fieldValues);
         }
       }
     }

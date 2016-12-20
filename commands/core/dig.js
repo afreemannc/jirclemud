@@ -17,7 +17,6 @@ var Command = function() {
       }
       fieldValues = {
         name: 'Empty space',
-        short_description: 'Nothing to see here.',
         full_description: 'Empty space just waiting to be filled. Remind you of Prom night?'
       }
       global.rooms.saveRoom(socket, fieldValues, global.rooms.createPlaceholderExit, input);

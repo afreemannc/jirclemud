@@ -79,11 +79,6 @@ room.prototype.createRoom = function(socket) {
   nameField.formatPrompt('Enter room name. (This is displayed at the top of the room description)');
   createRoomPrompt.addField(nameField);
 
-  var shortDescField = createRoomPrompt.newField('text');
-  shortDescField.name = 'short_description';
-  shortDescField.formatPrompt('Enter short description of room. (I have no idea where this will get displayed yet)');
-  createRoomPrompt.addField(shortDescField);
-
   var fullDescField = createRoomPrompt.newField('multitext');
   fullDescField.name = 'full_description';
   fullDescField.formatPrompt('Enter full room description. (This is displayed whenever a player enters the room)');
@@ -110,7 +105,7 @@ room.prototype.editRoomName = function(socket) {
   ridField.value = roomId;
   editNamePrompt.addField(ridField);
 
-  var currently =  'Currently:\n' + global.colors.cyan(global.rooms.room[roomId].name);
+  var currently =  'Currently:\n' + global.colors.cyan(global.rooms.room[roomId].name) + '\n\n';
   var nameField = editNamePrompt.newField('text');
   nameField.name = 'name';
   nameField.startField = true;
@@ -128,7 +123,7 @@ room.prototype.editRoomName = function(socket) {
   flagsField.name = 'flags';
   flagsField.value = global.rooms.room[roomId].flags;
   editNamePrompt.addField(flagsField);
-
+  console.log('start name prompt');
   editNamePrompt.start();
 }
 
@@ -287,9 +282,13 @@ room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) 
   // are being saved.
   if (typeof fieldValues.rid !== 'undefined') {
     values.rid = fieldValues.rid;
-    socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
+    socket.connection.query('UPDATE rooms SET ? WHERE RID = ' + values.rid, values, function (error, results) {
+      // Update copy loaded in memory
+      global.rooms.room[values.rid].name = values.name;
+      global.rooms.room[values.rid].full_description = values.full_description;
       socket.playerSession.write('Room changes saved.');
       socket.playerSession.inputContext = 'command';
+
       if (typeof callback === 'function') {
         callback(socket, results.insertId, callbackArgs);
       }
