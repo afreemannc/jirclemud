@@ -1,7 +1,6 @@
 function Value() {
 
   this.name = '';
-  this.type = '';
   this.value = false;
   this.startField = false;
   this.promptMessage = false;
@@ -10,7 +9,10 @@ function Value() {
   this.sanitizeInput = false;
   this.validate = false;
   this.validationError = false;
-  this.cacheInput = false;
+  this.cacheInput = function(input) {
+    this.value = input;
+    return true;
+  };
 }
 
 module.exports.new = function() {

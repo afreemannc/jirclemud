@@ -85,8 +85,6 @@ room.prototype.createRoom = function(socket) {
   createRoomPrompt.addField(shortDescField);
 
   var fullDescField = createRoomPrompt.newField('multitext');
-  console.log('full desc field:');
-  console.log(fullDescField);
   fullDescField.name = 'full_description';
   fullDescField.formatPrompt('Enter full room description. (This is displayed whenever a player enters the room)');
   createRoomPrompt.addField(fullDescField);
@@ -103,26 +101,98 @@ room.prototype.createRoom = function(socket) {
   createRoomPrompt.start();
 }
 
-room.prototype.editRoom = function(socket, roomId) {
-  var editRoomPrompt = prompt.new(socket, this.saveRoom);
+room.prototype.editRoomName = function(socket) {
+  var roomId = socket.playerSession.character.currentRoom;
+  var editNamePrompt = prompt.new(socket, this.saveRoom);
 
-  var nameField = edidRoomPrompt.newField('text');
+  var ridField = editNamePrompt.newField('value');
+  ridField.name = 'rid';
+  ridField.value = roomId;
+  editNamePrompt.addField(ridField);
+
+  var currently =  'Currently:\n' + global.colors.cyan(global.rooms.room[roomId].name);
+  var nameField = editNamePrompt.newField('text');
   nameField.name = 'name';
   nameField.startField = true;
-  nameField.formatPrompt('Enter room name. (This is displayed at the top of the room description)');
-  editRoomPrompt.addField(nameField);
+  nameField.formatPrompt(currently + 'Enter room name. (This is displayed at the top of the room description)');
+  nameField.value = global.rooms.room[roomId].name;
+  editNamePrompt.addField(nameField);
 
-  var shortDescField = editRoomPrompt.newField('text');
-  shortDescField.name = 'short_description';
-  shortDescField.formatPrompt('Enter short description of room. (I have no idea where this will get displayed yet)');
-  editRoomPrompt.addField(shortDescField);
 
-  var fullDescField = createRoomPrompt.newField('multitext');
+  var descField = editNamePrompt.newField('value');
+  descField.name = 'full_description';
+  descField.value = global.rooms.room[roomId].full_description;
+  editNamePrompt.addField(descField);
+
+  var flagsField = editNamePrompt.newField('value');
+  flagsField.name = 'flags';
+  flagsField.value = global.rooms.room[roomId].flags;
+  editNamePrompt.addField(flagsField);
+
+  editNamePrompt.start();
+}
+
+room.prototype.editRoomDesc = function(socket) {
+  var roomId = socket.playerSession.character.currentRoom;
+  var editDescPrompt = prompt.new(socket, this.saveRoom);
+
+  var ridField = editDescPrompt.newField('value');
+  ridField.name = 'rid';
+  ridField.value = roomId;
+  editDescPrompt.addField(ridField);
+
+  var nameField = editDescPrompt.newField('value');
+  nameField.name = 'name';
+  nameField.value = global.rooms.room[roomId].name;
+  editDescPrompt.addField(nameField);
+
+  var currently = 'Currently:\n' + global.colors.cyan(global.rooms.room[roomId].full_description);
+  var fullDescField = editDescPrompt.newField('multitext');
   fullDescField.name = 'full_description';
-  fullDescField.formatPrompt('Enter full room description. (This is displayed whenever a player enters the room)');
-  editRoomPrompt.addField(fullDescField);
+  fullDescField.startField = true;
+  fullDescField.formatPrompt(currently + 'Enter full room description. (This is displayed whenever a player enters the room)');
+  fullDescField.value = global.rooms.room[roomId].full_description;
+  editDescPrompt.addField(fullDescField);
 
-  editRoomPrompt.start();
+  var flagsField = editDescPrompt.newField('value');
+  flagsField.name = 'flags';
+  flagsField.value = global.rooms.room[roomId].flags;
+  editDescPrompt.addField(flagsField);
+
+  editDescPrompt.start();
+}
+
+room.prototype.editRoomFlags = function(socket) {
+  var roomId = socket.playerSession.character.currentRoom;
+  var editFlagsPrompt = prompt.new(socket, this.saveRoom);
+
+  var ridField = editFlagsPrompt.newField('value');
+  ridField.name = 'rid';
+  ridField.value = roomId;
+  editFlagsPrompt.addField(ridField);
+
+  var nameField = editFlagsPrompt.newField('value');
+  nameField.name = 'name';
+  nameField.value = global.rooms.room[roomId].name;
+  editFlagsPrompt.addField(nameField);
+
+  var descField = editFlagsPrompt.newField('value');
+  descField.name = 'full_description';
+  descField.value = global.rooms.room[roomId].full_description;
+  editFlagsPrompt.addField(descField);
+
+  var currently = 'Currently:\n' + global.colors.cyan(global.rooms.room[roomId].flags.join(', '));
+  var flagsField = editFlagsPrompt.newField('multiselect');
+  var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
+  message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
+  flagsField.name = 'flags';
+  flagsField.startField = true;
+  flagsField.options = {0:'none', s:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP'};
+  flagsField.formatPrompt(currently + message, true);
+  flagsField.value = global.rooms.room[roomId].flags;
+  editFlagsPrompt.addField(flagsField);
+
+  editFlagsPrompt.start();
 }
 
 room.prototype.deleteRoom = function(socket, roomId) {
@@ -210,17 +280,31 @@ room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) 
   console.log(fieldValues);
   var values = {
     name:fieldValues.name,
-    short_description:fieldValues.short_description,
     full_description:fieldValues.full_description,
     flags:JSON.stringify(fieldValues.flags)
   }
-  socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
-    socket.playerSession.write('Room saved.');
-    socket.playerSession.inputContext = 'command';
-    if (typeof callback === 'function') {
-      callback(socket, results.insertId, callbackArgs);
-    }
-  });
+  // If rid is passed in with field values this indicates changes to an existing room
+  // are being saved.
+  if (typeof fieldValues.rid !== 'undefined') {
+    values.rid = fieldValues.rid;
+    socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
+      socket.playerSession.write('Room changes saved.');
+      socket.playerSession.inputContext = 'command';
+      if (typeof callback === 'function') {
+        callback(socket, results.insertId, callbackArgs);
+      }
+    });
+  }
+  else {
+    // If rid is not provided this should be saved as a new room.
+    socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
+      socket.playerSession.write('New room saved.');
+      socket.playerSession.inputContext = 'command';
+      if (typeof callback === 'function') {
+        callback(socket, results.insertId, callbackArgs);
+      }
+    });
+  }
 }
 
 module.exports = new room();

@@ -81,7 +81,7 @@ var Command = function() {
       containerIndex = global.items.searchInventory(containerName, 'name', global.rooms.room[roomId].inventory, true);
       inventoryType = 'room';
     }
-    if containerIndex !== false) {
+    if (containerIndex !== false) {
       return {index:containerIndex, location:inventoryType}
     }
     else {
@@ -89,7 +89,7 @@ var Command = function() {
     }
   }
 
-  this.isContainer(socket, containerDetails) {
+  this.isContainer = function(socket, containerDetails) {
     switch (containerDetails.location) {
       case 'room':
         inventory = global.rooms.room[socket.playerSession.character.currentRoom].inventory;

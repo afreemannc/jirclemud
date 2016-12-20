@@ -1,21 +1,30 @@
 var Command = function() {
-  this.trigger = 'Edit';
-  this.helpText = 'Immortals only: universal in-game editing command for world building. Great for editing rooms and items.';
+  this.trigger = 'edit';
+  this.helpText = 'Builder only: universal in-game editing command for world building. Great for editing rooms and items.';
   this.callback = function (socket, input) {
     commandArgs = input.split(' ');
     switch (commandArgs[0]) {
-      // Full room edit.
-      case 'here':
-        global.rooms.editRoom(socket, false);
-        break;
       case 'room':
-        // room name
-
-        // short desc
-
-        // long desc
-
-        // flags
+        // room name (no argument passed (ex: 'edit room')
+        if (commandArgs.length === 1) {
+          socket.playerSession.error('What do you want to change?');
+          break;
+        }
+        // room name (ex: 'edit room name')
+        if (commandArgs[1] === 'name') {
+          global.rooms.editRoomName(socket);
+          break;
+        }
+        // long desc (ex: 'edit room desc')
+        if (commandArgs[1] === 'desc') {
+          global.rooms.editRoomDesc(socket);
+          break;
+        }
+        // flags (ex: 'edit room flags')
+        if (commandArgs[1] === 'flags') {
+          global.rooms.editRoomFlags(socket);
+          break;
+        }
         break;
       default:
         socket.playerSession.error('Edit what??');

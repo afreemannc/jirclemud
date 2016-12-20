@@ -5,11 +5,13 @@ function Prompt(socket, completionCallback) {
   this.completionCallback = completionCallback;
   this.quittable = true;
 
+  // TODO: this could probably be replaced with a loader.
   this.fieldTypes = {
     text: require('./fields/text.js'),
     multitext: require('./fields/multi-text.js'),
     select: require('./fields/select.js'),
-    multiselect: require('./fields/multi-select.js')
+    multiselect: require('./fields/multi-select.js'),
+    value: require('./fields/value.js')
   },
 
   this.promptUser = function() {
