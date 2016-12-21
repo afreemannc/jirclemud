@@ -180,7 +180,7 @@ room.prototype.editRoomFlags = function(socket) {
   message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
   flagsField.name = 'flags';
   flagsField.startField = true;
-  flagsField.options = {0:'none', s:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP'};
+  flagsField.options = {0:'none', s:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP', m:'!MAGIC'};
   flagsField.formatPrompt(currently + message, true);
   flagsField.value = global.rooms.room[roomId].flags;
   editFlagsPrompt.addField(flagsField);
@@ -269,8 +269,6 @@ room.prototype.saveExit = function(socket, fieldValues, callback, callbackArgs) 
 }
 
 room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) {
-  console.log('field values in saveRoom:');
-  console.log(fieldValues);
   var values = {
     name:fieldValues.name,
     full_description:fieldValues.full_description,

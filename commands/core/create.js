@@ -8,6 +8,9 @@ var Command = function() {
     }
     else {
       switch (context) {
+        case 'zone':
+          global.zones.createZone(socket);
+          break;
         case 'room':
           global.rooms.createRoom(socket);
           break;

@@ -25,8 +25,11 @@ var Command = function() {
           global.rooms.editRoomFlags(socket);
           break;
         }
+        // Garbled 2nd arg
+        socket.playerSession.error('Edit what??');
         break;
       default:
+        // Unknown 1st arg
         socket.playerSession.error('Edit what??');
     }
 

@@ -61,9 +61,16 @@ item.prototype.flags = {
       max_weight: 'int'
     }
   },
-
-  'WEARABLE': {
+  'INVISIBLE': {
     selectOption: '2',
+    properties: {}
+  }
+  'PLAYERINVISIBLE': {
+    selectOption: '3',
+    properties: {}
+  }
+  'WEARABLE': {
+    selectOption: '4',
     properties: {
       eq_slot: 'select',
       options: this.eqSlots
@@ -71,29 +78,33 @@ item.prototype.flags = {
   },
 
   'CURSE': {
-    selectOption: '3',
+    selectOption: '5',
     properties: {}
   },
 
   'BLESS': {
-    selectOption: '4',
+    selectOption: '6',
     properties: {}
   },
 
   'HUM': {
-    selectOption: '5',
+    selectOption: '7',
     properties: {}
   },
   'TAKE': {
-    selectOption: '6',
+    selectOption: '8',
     properties: {}
   },
   'WIELD': {
-    selectOptions: '7',
+    selectOptions: '9',
     properties: {}
   },
   'HOLD': {
-    selectOptions: '8',
+    selectOptions: '10',
+    properties: {}
+  }
+  'TWO-HANDED': {
+    selectOptions: '11',
     properties: {}
   }
 }
