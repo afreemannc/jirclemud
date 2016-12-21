@@ -270,6 +270,7 @@ room.prototype.saveExit = function(socket, fieldValues, callback, callbackArgs) 
 
 room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) {
   var values = {
+    zid:fieldValues.zid,
     name:fieldValues.name,
     full_description:fieldValues.full_description,
     flags:JSON.stringify(fieldValues.flags)

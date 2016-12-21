@@ -10,6 +10,7 @@ var classes = require('./classes');
 var dice = require('./dice');
 var items = require('./items');
 var prompt = require('./prompt/prompt.js');
+var zones = require('./zones');
 
 global.sockets = [];
 global.config = config;
@@ -22,6 +23,7 @@ global.rooms = rooms;
 global.commands = commands;
 global.items = items;
 global.prompt = prompt;
+global.zones = zones;
 
 function newSocket(socket) {
   socket.playerSession = new session(socket);

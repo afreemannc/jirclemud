@@ -1,0 +1,38 @@
+{
+  "name":"test zone",
+  "description":"A random collection of rooms intended to test the zone parse/import functionality"
+  "rooms":
+  [
+    {
+      "id":1,
+      "label":"A test Room",
+      "short_description":"a blank room",
+      "full_description":"This is a large empty room. There are several exits.",
+      "exits":
+      [
+        {"label":"e","destination":2},
+        {"label":"n","destination":3}
+      ]
+    },
+    {
+      "id":2,
+      "label":"Anoter test room",
+      "short_description":"a blank room",
+      "full_description":"This is another large empty room, similar to the last.",
+      "exits":
+      [
+        {"label":"w","destination":1}
+      ]
+    },
+    {
+      "id":3,
+      "label":"Yet Another Test Room",
+      "short_description":"a blank room",
+      "full_description":"Yet another large empty room.",
+      "exits":
+      [
+        {"label":"s","destination":1"}
+      ]
+    }
+  ]
+}

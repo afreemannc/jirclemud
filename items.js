@@ -64,11 +64,11 @@ item.prototype.flags = {
   'INVISIBLE': {
     selectOption: '2',
     properties: {}
-  }
+  },
   'PLAYERINVISIBLE': {
     selectOption: '3',
     properties: {}
-  }
+  },
   'WEARABLE': {
     selectOption: '4',
     properties: {
@@ -102,7 +102,7 @@ item.prototype.flags = {
   'HOLD': {
     selectOptions: '10',
     properties: {}
-  }
+  },
   'TWO-HANDED': {
     selectOptions: '11',
     properties: {}
