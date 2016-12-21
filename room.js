@@ -110,7 +110,6 @@ room.prototype.editRoomName = function(socket) {
   nameField.name = 'name';
   nameField.startField = true;
   nameField.formatPrompt(currently + 'Enter room name. (This is displayed at the top of the room description)');
-  nameField.value = global.rooms.room[roomId].name;
   editNamePrompt.addField(nameField);
 
 
@@ -146,7 +145,6 @@ room.prototype.editRoomDesc = function(socket) {
   fullDescField.name = 'full_description';
   fullDescField.startField = true;
   fullDescField.formatPrompt(currently + 'Enter full room description. (This is displayed whenever a player enters the room)');
-  fullDescField.value = global.rooms.room[roomId].full_description;
   editDescPrompt.addField(fullDescField);
 
   var flagsField = editDescPrompt.newField('value');
