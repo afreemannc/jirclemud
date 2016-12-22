@@ -71,7 +71,16 @@ room.prototype.loadExits = function(roomId, callback, callbackArgs) {
 }
 
 room.prototype.createRoom = function(socket) {
+
+  var roomId = socket.playerSession.character.currentRoom;
+  var currentRoom = global.rooms.room[roomId];
+
   var createRoomPrompt = prompt.new(socket, this.saveRoom);
+
+  var zoneIdField = createRoomPrompt.newField('value');
+  zoneIdField.name = 'zid';
+  zoneIdField.value = currentRoom.zid;
+  createRoomPrompt.addField(zoneIdField);
 
   var nameField = createRoomPrompt.newField('text');
   nameField.name = 'name';
@@ -98,6 +107,8 @@ room.prototype.createRoom = function(socket) {
 
 room.prototype.editRoomName = function(socket) {
   var roomId = socket.playerSession.character.currentRoom;
+  var currentRoom = global.rooms.room[roomId];
+
   var editNamePrompt = prompt.new(socket, this.saveRoom);
 
   var ridField = editNamePrompt.newField('value');
@@ -105,7 +116,12 @@ room.prototype.editRoomName = function(socket) {
   ridField.value = roomId;
   editNamePrompt.addField(ridField);
 
-  var currently =  'Currently:\n' + global.colors.cyan(global.rooms.room[roomId].name) + '\n\n';
+  var zoneIdField = editNamePrompt.newField('value');
+  zoneIdField.name = 'zid';
+  zoneIdField.value = currentRoom.zid;
+  editNamePrompt.addField(zoneIdField);
+
+  var currently =  'Currently:\n' + global.colors.cyan(currentRoom.name) + '\n\n';
   var nameField = editNamePrompt.newField('text');
   nameField.name = 'name';
   nameField.startField = true;
@@ -115,12 +131,12 @@ room.prototype.editRoomName = function(socket) {
 
   var descField = editNamePrompt.newField('value');
   descField.name = 'full_description';
-  descField.value = global.rooms.room[roomId].full_description;
+  descField.value = currentRoom.full_description;
   editNamePrompt.addField(descField);
 
   var flagsField = editNamePrompt.newField('value');
   flagsField.name = 'flags';
-  flagsField.value = global.rooms.room[roomId].flags;
+  flagsField.value = currentRoom.flags;
   editNamePrompt.addField(flagsField);
   console.log('start name prompt');
   editNamePrompt.start();
@@ -128,6 +144,8 @@ room.prototype.editRoomName = function(socket) {
 
 room.prototype.editRoomDesc = function(socket) {
   var roomId = socket.playerSession.character.currentRoom;
+  var currentRoom = global.rooms.room[roomId];
+
   var editDescPrompt = prompt.new(socket, this.saveRoom);
 
   var ridField = editDescPrompt.newField('value');
@@ -135,12 +153,17 @@ room.prototype.editRoomDesc = function(socket) {
   ridField.value = roomId;
   editDescPrompt.addField(ridField);
 
+  var zoneIdField = editDescPrompt.newField('value');
+  zoneIdField.name = 'zid';
+  zoneIdField.value = currentRoom.zid;
+  editDescPrompt.addField(zoneIdField);
+
   var nameField = editDescPrompt.newField('value');
   nameField.name = 'name';
-  nameField.value = global.rooms.room[roomId].name;
+  nameField.value = currentRoom.name;
   editDescPrompt.addField(nameField);
 
-  var currently = 'Currently:\n' + global.colors.cyan(global.rooms.room[roomId].full_description);
+  var currently = 'Currently:\n' + global.colors.cyan(currentRoom.full_description);
   var fullDescField = editDescPrompt.newField('multitext');
   fullDescField.name = 'full_description';
   fullDescField.startField = true;
@@ -149,7 +172,7 @@ room.prototype.editRoomDesc = function(socket) {
 
   var flagsField = editDescPrompt.newField('value');
   flagsField.name = 'flags';
-  flagsField.value = global.rooms.room[roomId].flags;
+  flagsField.value = currentRoom.flags;
   editDescPrompt.addField(flagsField);
 
   editDescPrompt.start();
@@ -157,6 +180,8 @@ room.prototype.editRoomDesc = function(socket) {
 
 room.prototype.editRoomFlags = function(socket) {
   var roomId = socket.playerSession.character.currentRoom;
+  var currentRoom = global.rooms.room[roomId];
+
   var editFlagsPrompt = prompt.new(socket, this.saveRoom);
 
   var ridField = editFlagsPrompt.newField('value');
@@ -164,17 +189,22 @@ room.prototype.editRoomFlags = function(socket) {
   ridField.value = roomId;
   editFlagsPrompt.addField(ridField);
 
+  var zoneIdField = editFlagsPrompt.newField('value');
+  zoneIdField.name = 'zid';
+  zoneIdField.value = currentRoom.zid;
+  editFlagsPrompt.addField(zoneIdField);
+
   var nameField = editFlagsPrompt.newField('value');
   nameField.name = 'name';
-  nameField.value = global.rooms.room[roomId].name;
+  nameField.value = currentRoom.name;
   editFlagsPrompt.addField(nameField);
 
   var descField = editFlagsPrompt.newField('value');
   descField.name = 'full_description';
-  descField.value = global.rooms.room[roomId].full_description;
+  descField.value = currentRoom.full_description;
   editFlagsPrompt.addField(descField);
 
-  var currently = 'Currently:\n' + global.colors.cyan(global.rooms.room[roomId].flags.join(', '));
+  var currently = 'Currently:\n' + global.colors.cyan(currentRoom.flags.join(', '));
   var flagsField = editFlagsPrompt.newField('multiselect');
   var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
   message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
