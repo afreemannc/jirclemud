@@ -32,7 +32,8 @@ function newSocket(socket) {
     user: config.dbUser,
     password: config.dbPass,
     database: config.dbName,
-    port: config.dbPort
+    port: config.dbPort,
+    debug: ['ComQueryPacket', 'RowDataPacket']
   });
   sockets.push(socket);
   user.start(socket);

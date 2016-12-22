@@ -294,6 +294,9 @@ room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) 
   else {
     // If rid is not provided this should be saved as a new room.
     socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
+      global.rooms.room[results.insertId] = values;
+      global.rooms.room[results.insertId].inventory = [];
+      global.rooms.room[results.insertId].exits = [];
       socket.playerSession.write('New room saved.');
       socket.playerSession.inputContext = 'command';
       if (typeof callback === 'function') {

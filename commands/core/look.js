@@ -19,7 +19,12 @@ var Command = function() {
         exit = global.rooms.room[roomId].exits[i];
         exits.push(global.colors.yellow(exit.label));
       }
-      socket.playerSession.write('Exits: [ ' + exits.join(' ') + ' ]\n');
+      if (exits.length > 0) {
+        socket.playerSession.write('Exits: [ ' + exits.join(' ') + ' ]\n');
+      }
+      else {
+        socket.playerSession.write('Exits: [none]\n');
+      }
     }
     else {
       // Check personal inventory

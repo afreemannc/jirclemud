@@ -3,6 +3,7 @@ var Command = function() {
   this.helpText = 'Immortals only: instantly change rooms.';
   this.callback = function(socket, input) {
     // TODO: confirm current user has GOD or DEMI flag
+    console.log('bamf input:' + input);
     if (input.length === 0 || typeof global.rooms.room[input] === 'undefined') {
       socket.playerSession.error("Teleport where??\n");
     }
