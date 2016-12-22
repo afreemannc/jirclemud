@@ -218,7 +218,39 @@ room.prototype.editRoomFlags = function(socket) {
   editFlagsPrompt.start();
 }
 
-room.prototype.deleteRoom = function(socket, roomId) {
+room.prototype.deleteRoomPrompt = function(socket) {
+  var roomId = socket.playerSession.character.currentRoom;
+
+  var deleteRoomPrompt = prompt.new(socket, this.deleteRoom);
+
+  var roomIdField = deleteRoomPrompt.newField('value');
+  roomIdField.name = 'rid';
+  roomIdField.value = roomId;
+  deleteRoomPrompt.addField(roomIdField);
+
+  var confirmField = deleteRoomPrompt.newField('select');
+  confirmField.name = 'confirm';
+  confirmField.startField = true;
+  confirmField.options = {d:'Delete', c:'Cancel'};
+  confirmField.formatPrompt('If you proceed this room and its contents will be unrecoverably destroyed. Are you certain you want to do this?');
+  confirmField.cacheInput = function(input) {
+    if (input === 'd') {
+      return true;
+    }
+    else {
+      // This is unusual for a cache function. Since there is a cancel option we want to gracefully bail out of
+      // prompt mode without triggering the prompt completion callback.
+      socket.playerSession.inputContext = 'command';
+      socket.playerSession.write('Primal chaos recedes as you turn your thoughts away from destruction.');
+      return false;
+    }
+  };
+  deleteRoomPrompt.addField(roomIdField);
+
+  deleteRoomPrompt.start();
+}
+
+room.prototype.deleteRoom = function(socket, fieldValues) {
   // unload room from memory if present
   // delete db record for room
   // delete all room exits
