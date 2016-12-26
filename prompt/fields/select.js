@@ -45,7 +45,6 @@ function Select(socket) {
 
   this.validationError = function(socket, input) {
     socket.write('"' + input + '" is not a valid option.\n');
-    global.prompt.promptUser(this);
   };
 
   this.cacheInput = function(input) {
