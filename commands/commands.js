@@ -27,6 +27,10 @@ function Commands() {
 
   this.commandHandler  = function(socket, inputRaw, connection) {
     var input = inputRaw.toString().toLowerCase().replace(/(\r\n|\n|\r)/gm,"");
+    // Prevent user session from dropping into limbo if a blank newline is sent.
+    if (input === '') {
+      return;
+    }
     var commandFound = false;
     var commandSegments = inputRaw.split(' ');
     var command = commandSegments[0];
@@ -37,6 +41,7 @@ function Commands() {
     if (global.rooms.inputIsExit(socket, input) === true) {
       this.triggers.move(socket, input);
       commandFound = true;
+      return;
     }
     // Otherwise lets check available commands
     var keys = Object.keys(this.commands);
