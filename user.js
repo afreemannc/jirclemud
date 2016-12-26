@@ -47,6 +47,7 @@ user.prototype.startSwitch = function(socket, fieldValues) {
     global.user.createCharacter(socket);
   }
   else if (input === 'q') {
+    socket.write(global.config.quitMessage);
     global.commands.quit(socket, false);
   }
 }
