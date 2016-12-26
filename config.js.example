@@ -1,0 +1,20 @@
+
+// global configuration
+module.exports = {
+  mudName: 'MUD MUD',
+  //port number MUD server should listen on
+  port: 8765,
+
+  //DB stuffs
+  dbHost: 'localhost',
+  dbName: '<db name>',
+  dbUser: '<db username>',
+  dbPass: '<db password>',
+  // Uncomment this line if you are running mudjs on a mac with MAMP
+  // dbPort: '/Applications/MAMP/tmp/mysql/mysql.sock',
+
+  // mud stuffs
+  startRoomId: 1, // room new characters get dropped in
+
+  quitMessage: 'Goodbye!'
+}
