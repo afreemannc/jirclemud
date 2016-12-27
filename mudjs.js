@@ -2,7 +2,7 @@ var net = require('net');
 var mysql = require('mysql');
 var colors = require('colors/safe');
 var session = require('./session');
-var config = require('./config');
+global.config = require('./config');
 var commands = require('./commands/commands');
 var user = require('./user');
 var rooms = require('./room');
@@ -11,9 +11,9 @@ var dice = require('./dice');
 var items = require('./items');
 var prompt = require('./prompt/prompt.js');
 var zones = require('./zones');
+var tokens = require('./tokens');
 
 global.sockets = [];
-global.config = config;
 global.user = user;
 global.mysql = mysql;
 global.colors = colors;
@@ -24,6 +24,7 @@ global.commands = commands;
 global.items = items;
 global.prompt = prompt;
 global.zones = zones;
+global.tokens = tokens;
 
 function newSocket(socket) {
   socket.playerSession = new session(socket);

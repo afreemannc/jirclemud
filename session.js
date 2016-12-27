@@ -24,7 +24,9 @@ function session(socket) {
   this.characterPrompt = function() {
     // Prompt is configurable in config.js.
     // @see comments in config.js.example for details.
-    var prompt = global.config.playerPrompt;
+    var prompt = global.tokens.replace(this.socket, global.config.playerPrompt);
+
+    /*
     var stats = this.character.stats;
     console.log(stats);
     var statKeys = Object.keys(stats);
@@ -45,7 +47,7 @@ function session(socket) {
           return colors[style](capture);
         });
       }
-    }
+    }*/
     return "\n" + prompt;
   }
 
