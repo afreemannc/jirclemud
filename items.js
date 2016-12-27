@@ -189,6 +189,29 @@ item.prototype.createItem = function(socket) {
   flagsField.promptMessage = global.items.flagsPrompt();
   itemPrompt.addField(flagsField);
 
+  // Container fields
+    // container size
+  var containerSizeField = itemPrompt.newField('int');
+  containerSizeField.name = 'containerSize';
+  containerSizeField.conditional = {
+    field: 'flags',
+    value: 1
+  };
+  containerSizeField.formatPrompt('Enter container size as a number.');
+  itemPrompt.addField(containerSizeField);
+
+  // Wearable fields
+
+  // Wield fields
+    // base damage dice
+    // spell affect
+      // spell
+      // percentage fire
+      // strength ??
+    // additional effects
+      // effect (+dam, +hit, +ac, +stat
+        // effect
+        // bonus
   var createItemField = itemPrompt.newField('select');
   createItemField.name = 'create',
   createItemField.options = {y:'y', n:'n'},
@@ -198,7 +221,7 @@ item.prototype.createItem = function(socket) {
   // helper function should switch on type to build out valid additional fields
   // ex. weapon needs dam dice, container needs capacity (weight, size), etc
 
-  itemPrompt.setActivePrompt(itemPrompt);
+  itemPrompt.start();
 }
 
 item.prototype.getTypeOptions = function() {

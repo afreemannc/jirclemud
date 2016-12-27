@@ -11,15 +11,27 @@ function Prompt(socket, completionCallback) {
     multitext: require('./fields/multi-text.js'),
     select: require('./fields/select.js'),
     multiselect: require('./fields/multi-select.js'),
-    value: require('./fields/value.js')
+    value: require('./fields/value.js'),
+    int: require('./fields/int.js')
   },
 
   this.promptUser = function() {
+    if (typeof this.currentField.conditional === 'object') {
+      var field = this.currentField.conditional.field;
+      var value = this.currentField.conditional.value;
+      var fieldIndex = this.getFieldIndex(field);
+      // TODO: this is noddy, add conditional check function to each field type.
+      if (fieldIndex === false || this.fields[fieldIndex].value.includes(value) === false) {
+        // conditional not met, do not prompt
+        return false;
+      }
+    }
     var message = this.currentField.promptMessage;
     if (this.quittable === true) {
       message += global.colors.yellow('(@q to quit)\n');
     }
     this.socket.write(message);
+    return true;
   }
 
   this.promptHandler = function(input) {
@@ -53,8 +65,13 @@ function Prompt(socket, completionCallback) {
           var field = this.fields[fieldIndex];
           this.currentField = field;
           if (this.currentField.promptMessage !== false) {
-            this.promptUser(field);
-            return;
+            // Conditional fields may not prompt if conditions are not met.
+            // In this case promptUser returns false and the current field
+            // is skipped.
+            prompted = this.promptUser(field);
+            if (prompted === true) {
+              return;
+            }
           }
         }
         // Complete form submission if we have reached the last available field.
