@@ -41,4 +41,11 @@ module.exports = {
   //   @see https://www.npmjs.com/package/colors Colors package documentation for additional details:
 
   playerPrompt: '%red%%currenthp%H%red% | %blue%%currentmana%M%blue% | %cyan%%xp%XP%cyan%'
+
+  // Characters may access the wimp command unless this is set to false.
+  //
+  // Note: turning wimp off guarantees a grittier combat experience and much higher player fatalities,
+  // ESPECIALLY for new characters. Consider carefully what kind of experience you want players to have
+  // before turning this off.
+  wimpEnabled: true,
 }

@@ -7,7 +7,7 @@ var Command = function() {
       keys = Object.keys(global.commands.commands);
       for (i = 0; i < keys.length; ++i) {
         command = global.commands.commands[keys[i]];
-        if (command.help !== '') {
+        if (command.helpText !== '') {
           socket.write(command.trigger.toUpperCase() + '\n');
         }
       }
@@ -15,8 +15,15 @@ var Command = function() {
       return;
     }
     if (typeof global.commands.commands[input] !== 'undefined') {
-      var helpText = global.commands.commands[input].helpText;
-      socket.playerSession.write(helpText);
+      command = global.commands.commands[input];
+      var helpText = command.helpText;
+      // Valid commands may have their help text intentionally blanked
+      if (command.helpText !== '') {
+        socket.playerSession.write(helpText);
+      }
+      else {
+        socket.playerSession.write('There is no help for that term.');
+      }
     }
     else {
       socket.playerSession.write('There is no help for that term.');
