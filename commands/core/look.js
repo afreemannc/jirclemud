@@ -7,12 +7,12 @@ var Command = function() {
     if (input === '') {
       var roomId = socket.playerSession.character.currentRoom;
       // display room title
-      socket.write(global.colors.bold(global.rooms.room[roomId].name) + "\n");
+      socket.write(global.colors.bold(global.tokens.replace(socket, global.rooms.room[roomId].name)) + "\n");
       // display room description
-      socket.write(global.rooms.room[roomId].full_description + "\n\n");
+      socket.write(global.tokens.replace(socket, global.rooms.room[roomId].full_description) + "\n\n");
       // display room inventory
       var display = global.items.inventoryDisplay(socket, global.rooms.room[roomId].inventory);
-      socket.write(display + "\n\n");
+      socket.write(global.tokens.replace(socket, display) + "\n\n");
       // display exits
       var exits = [];
       for (i = 0; i < global.rooms.room[roomId].exits.length; ++i) {
