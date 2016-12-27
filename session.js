@@ -22,16 +22,30 @@ function session(socket) {
   }
 
   this.characterPrompt = function() {
-    var hp = this.character.stats.currenthp;
-    var mana = this.character.stats.currentmana;
-    var xp = this.character.stats.xp;
-    var prompt = global.color.red('H:' + hp);
-    prompt += ' | ';
-    prompt += global.color.blue('M:' + mana);
-    prompt += ' | ';
-    prompt += global.color.cyan('XP:' + xp);
-    prompt += ' >\n';
-
+    // Prompt is configurable in config.js.
+    // @see comments in config.js.example for details.
+    var prompt = global.config.playerPrompt;
+    var stats = this.character.stats;
+    console.log(stats);
+    var statKeys = Object.keys(stats);
+    // Replace stat values in prompt
+    for (i = 0; i < statKeys.length; ++i) {
+      stat = statKeys[i];
+      if (prompt.includes('%' + stat + '%')) {
+        prompt = prompt.replace('%' + stat + '%', this.character.stats[stat]);
+      }
+    }
+    // Handle colors style options
+    var colorKeys = Object.keys(global.colors.styles);
+    for (i = 0; i < colorKeys.length; ++i) {
+      style = colorKeys[i];
+      if (prompt.includes('%' + style +'%')) {
+        regex = new RegExp('%' + style +'%([\\w\\s]+)%' + style + '%', 'g');
+        prompt = prompt.replace(regex, function(match, capture) {
+          return colors[style](capture);
+        });
+      }
+    }
     return "\n" + prompt;
   }
 

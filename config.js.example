@@ -16,5 +16,29 @@ module.exports = {
   // mud stuffs
   startRoomId: 1, // room new characters get dropped in
 
-  quitMessage: 'Goodbye!'
+  quitMessage: 'Goodbye!,
+
+  // The Player Prompt is a color-coded HUD of critical character information that also servers as a command prompt.
+  //
+  // It is displayed below the room description, after a command is executed, and after each round of combat
+  // has been displayed.
+  //
+  // Available tokens:
+  //   - %currenthp% : characters current hitpoints
+  //   - %currentmana% : characters current mana points
+  //   - %xp% : characters current xp total
+  //
+  // Note: any keys added to the character.stats object will be available as tokens as well.
+  // Example:
+  //    A module adds "stamina" to character.stats
+  //    %stamina% is now an available token
+  //    The %stamina% token will display the value in character.stats.stamina
+  //
+  // Colors support:
+  //   All of the Colors package styles are available as well.
+  //   To Use:
+  //      %style%<output to style>%style%
+  //   @see https://www.npmjs.com/package/colors Colors package documentation for additional details:
+
+  playerPrompt: '%red%%currenthp%H%red% | %blue%%currentmana%M%blue% | %cyan%%xp%XP%cyan%'
 }
