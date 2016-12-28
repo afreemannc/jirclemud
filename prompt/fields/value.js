@@ -6,6 +6,7 @@ function Value() {
   this.promptMessage = false;
   this.validated = true;
   this.conditional = false;
+  this.checkConditional = false;
   this.formatPrompt = false;
   this.sanitizeInput = false;
   this.validate = false;
