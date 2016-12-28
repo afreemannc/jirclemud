@@ -28,7 +28,7 @@ function Multiselect(socket) {
         this.promptMessage = this.promptMessage.replace(pattern, replacement);
       }
       else {
-        this.promptMessage = '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + this.options[keys[i]] + '\n';
+        this.promptMessage += '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + this.options[keys[i]] + '\n';
       }
     }
     this.promptMessage += '(@@ to finalize selections)\n';
