@@ -8,6 +8,15 @@ function Int() {
   this.validated = false;
   this.conditional = false;
 
+  this.checkConditional = function(input) {
+    if (this.value === input) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   this.formatPrompt = function(message) {
     this.promptMessage =  message + '\n';
   };

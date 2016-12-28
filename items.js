@@ -195,7 +195,7 @@ item.prototype.createItem = function(socket) {
   containerSizeField.name = 'containerSize';
   containerSizeField.conditional = {
     field: 'flags',
-    value: 1
+    value: 'CONTAINER'
   };
   containerSizeField.formatPrompt('Enter container size as a number.');
   itemPrompt.addField(containerSizeField);

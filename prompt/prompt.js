@@ -16,12 +16,14 @@ function Prompt(socket, completionCallback) {
   },
 
   this.promptUser = function() {
+    // Skip prompting on conditional fields where condition is not met
     if (typeof this.currentField.conditional === 'object') {
       var field = this.currentField.conditional.field;
       var value = this.currentField.conditional.value;
       var fieldIndex = this.getFieldIndex(field);
-      // TODO: this is noddy, add conditional check function to each field type.
-      if (fieldIndex === false || this.fields[fieldIndex].value.includes(value) === false) {
+      var targetField = this.fields[fieldIndex];
+
+      if (targetField.checkConditional(value) === false) {
         // conditional not met, do not prompt
         return false;
       }
