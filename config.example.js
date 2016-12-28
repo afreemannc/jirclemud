@@ -48,4 +48,22 @@ module.exports = {
   // ESPECIALLY for new characters. Consider carefully what kind of experience you want players to have
   // before turning this off.
   wimpEnabled: true,
+
+  // List of available equipment slots for characters
+  // WARNING: removing or changing items from this list can make pre-existing equipment unwearable.
+  // Proceed with caution, especially if you already have an active player base.
+  equipmentSlots: {
+    he: 'HEAD',
+    fa: 'FACE',
+    n:  'NECK',
+    b:  'BODY',
+    ab: 'ABOUT_BODY',
+    ar: 'ARMS',
+    wr: 'WRIST',
+    ha: 'HANDS',
+    fi: 'FINGER',
+    wa: 'WAIST',
+    l:  'LEGS',
+    fe: 'FEET'
+  }
 }
