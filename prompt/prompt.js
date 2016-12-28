@@ -12,7 +12,8 @@ function Prompt(socket, completionCallback) {
     select: require('./fields/select.js'),
     multiselect: require('./fields/multi-select.js'),
     value: require('./fields/value.js'),
-    int: require('./fields/int.js')
+    int: require('./fields/int.js'),
+    dice: require('./fields/dice.js')
   },
 
   this.promptUser = function() {

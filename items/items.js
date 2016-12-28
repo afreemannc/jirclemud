@@ -7,6 +7,7 @@ item.prototype.listTypes = function() {
   return list;
 }
 
+// TODO: replace with flag objects that include effect callbacks?
 item.prototype.flags = {
   0:  'NONE',
   c:  'CONTAINER',
@@ -83,8 +84,16 @@ item.prototype.createItem = function(socket) {
   itemPrompt.addField(wearSlotField);
 
   // Wield fields
-    // base damage dice
-    // spell affect
+  // base damage dice
+  var damageDiceField = itemPrompt.newField('dice');
+  damageDiceField.name = 'damageDice';
+  damageDiceField.formatPrompt('Weapon base damage dice');
+  damageDiceField.conditional = {
+    field: 'flags',
+    value: 'WIELD',
+  }
+  itemPrompt.addField(damageDiceField);
+   // TODO: spell affect
       // spell
       // percentage fire
       // strength ??
