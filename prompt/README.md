@@ -34,6 +34,7 @@ Currently supported:
   - multi-text: multi-line text field. Accepts one or more lines of text. (@@ to end input)
   - multi-select: select field, accepts one or more input options from predefined list
   - value: hidden field designed to pass a set value straight through to fieldValues
+  - int: single value numeric field
 
 ### Text field
 Single line text field
@@ -111,6 +112,38 @@ validation: none.
 validation error: none.
 
 input caching: pushes value onto the field .value array.
+
+### Int field
+Single value numeric field
+
+Prompt: displays prefix
+
+input sanitation: strips newline and carriage return and converts input to a number
+
+validation: confirms input is numeric
+
+validation error: Displays "INPUT is not a number."
+
+input caching: saves sanitized input to the .value property of this field
+
+
+## Conditional fields
+
+Fields may be configured to only display if certain conditions are met. Typically this involves checking the value
+of another field in the form. For example, if a new item gets the CONTAINER flag then we need to also prompt for the
+container size.
+
+### Usage
+
+To make a field conditional simply set the .conditional property to an object with field and value properties:
+
+var testConditionalField = myPrompt.newField('text');
+testConditionalField.name = 'test';
+testConditionalField.formatPrompt('Enter a value');
+testConditionalField.conditional = {
+  field: 'someOtherFieldName',
+  value: true
+}
 
 ## Additional field properties
 
