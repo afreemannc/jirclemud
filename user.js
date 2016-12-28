@@ -17,7 +17,6 @@ user.prototype.start = function(socket) {
   startField.name = 'start';
   startField.options = {l:'l', c:'c', q:'q'};
   startField.formatPrompt('[::l::]og in, [::c::]reate a character, or [::q::]uit', true);
-  startField.startField = true;
   startPrompt.addField(startField);
 
   startPrompt.start();
@@ -62,7 +61,6 @@ user.prototype.login = function(socket) {
 
   var loginField = loginPrompt.newField('text');
   loginField.name = 'username';
-  loginField.startField = true;
   loginField.formatPrompt('Character Name:');
   loginPrompt.addField(loginField);
 
@@ -137,7 +135,6 @@ user.prototype.createCharacter = function(socket) {
 
     var characterNameField = createCharacterPrompt.newField('text');
     characterNameField.name = 'charactername';
-    characterNameField.startField = true;
     characterNameField.validate = this.validateCharacterName;
     characterNameField.formatPrompt('Character Name:\n');
     createCharacterPrompt.addField(characterNameField);

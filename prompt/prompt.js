@@ -91,10 +91,8 @@ function Prompt(socket, completionCallback) {
   this.resetPrompt = function() {
     for (i = 0; i < this.fields.length; ++i) {
       this.fields[i].value = false;
-      if (this.fields[i].startField === true) {
-        this.currentField = this.fields[i];
-      }
     }
+    this.currentField = this.fields[0];
   }
 
 
@@ -135,12 +133,10 @@ function Prompt(socket, completionCallback) {
     this.socket.playerSession.inputContext = 'prompt';
     this.socket.playerSession.prompt = this;
     for (i = 0; i < this.fields.length; ++i) {
-      field = this.fields[i];
-      if (typeof field.startField !== 'undefined' && field.startField === true) {
-        console.log('start field:');
-        console.log(field);
-        this.currentField = field;
-        this.promptUser(field);
+      // skip value fields
+      if (this.fields[i].formatPrompt !== false) {
+        this.currentField = this.fields[i];
+        this.promptUser(this.currentField);
         break;
       }
     }

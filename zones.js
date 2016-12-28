@@ -21,7 +21,6 @@ function Zones() {
     // name
     var nameField = createZonePrompt.newField('text');
     nameField.name = 'name';
-    nameField.startField = true;
     nameField.validate = this.validateZoneName;
     nameField.formatPrompt('Enter zone name.');
     createZonePrompt.addField(nameField);
@@ -71,7 +70,6 @@ function Zones() {
     var currently = 'Currently:' + zone.name;
     var nameField = createZonePrompt.newField('text');
     nameField.name = 'name';
-    nameField.startField = true;
     nameField.validate = this.validateZoneName;
     nameField.formatPrompt(currently + 'Enter zone name.');
     editZonePrompt.addField(nameField);

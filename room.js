@@ -84,7 +84,6 @@ room.prototype.createRoom = function(socket) {
 
   var nameField = createRoomPrompt.newField('text');
   nameField.name = 'name';
-  nameField.startField = true;
   nameField.formatPrompt('Enter room name. (This is displayed at the top of the room description)');
   createRoomPrompt.addField(nameField);
 
@@ -124,7 +123,6 @@ room.prototype.editRoomName = function(socket) {
   var currently =  'Currently:\n' + global.colors.cyan(currentRoom.name) + '\n\n';
   var nameField = editNamePrompt.newField('text');
   nameField.name = 'name';
-  nameField.startField = true;
   nameField.formatPrompt(currently + 'Enter room name. (This is displayed at the top of the room description)');
   editNamePrompt.addField(nameField);
 
@@ -166,7 +164,6 @@ room.prototype.editRoomDesc = function(socket) {
   var currently = 'Currently:\n' + global.colors.cyan(currentRoom.full_description);
   var fullDescField = editDescPrompt.newField('multitext');
   fullDescField.name = 'full_description';
-  fullDescField.startField = true;
   fullDescField.formatPrompt(currently + 'Enter full room description. (This is displayed whenever a player enters the room)');
   editDescPrompt.addField(fullDescField);
 
@@ -209,7 +206,6 @@ room.prototype.editRoomFlags = function(socket) {
   var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
   message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
   flagsField.name = 'flags';
-  flagsField.startField = true;
   flagsField.options = {0:'none', s:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP', m:'!MAGIC'};
   flagsField.formatPrompt(currently + message, true);
   flagsField.value = global.rooms.room[roomId].flags;
@@ -230,7 +226,6 @@ room.prototype.deleteRoomPrompt = function(socket) {
 
   var confirmField = deleteRoomPrompt.newField('select');
   confirmField.name = 'confirm';
-  confirmField.startField = true;
   confirmField.options = {d:'Delete', c:'Cancel'};
   confirmField.formatPrompt('If you proceed this room and its contents will be unrecoverably destroyed. Are you certain you want to do this?');
   confirmField.cacheInput = function(input) {

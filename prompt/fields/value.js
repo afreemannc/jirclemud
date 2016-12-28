@@ -2,7 +2,6 @@ function Value() {
 
   this.name = '';
   this.value = false;
-  this.startField = false;
   this.promptMessage = false;
   this.validated = true;
   this.conditional = false;

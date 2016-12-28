@@ -4,7 +4,6 @@ function Multiselect(socket) {
   this.type = '';
   this.options = {};
   this.value = [];
-  this.startField = false;
   this.promptMessage = '';
   this.validated = false;
   this.conditional = false;

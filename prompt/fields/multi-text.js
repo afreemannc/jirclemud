@@ -3,7 +3,6 @@ function Multitext() {
   this.name = '';
   this.type = '';
   this.value = [];
-  this.startField = false;
   this.promptMessage = '';
   this.validate = false;
   this.validated = false;

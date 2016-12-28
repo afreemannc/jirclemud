@@ -3,7 +3,6 @@ function Text() {
   this.name = '';
   this.type = '';
   this.value = false;
-  this.startField = false;
   this.promptMessage = '';
   this.validated = false;
   this.conditional = false;
