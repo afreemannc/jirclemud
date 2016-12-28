@@ -9,6 +9,15 @@ function Select(socket) {
   this.validated = false;
   this.conditional = false;
 
+  this.checkConditional = function(input) {
+    if (this.value === input) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   this.formatPrompt = function(prefix, replaceInPrefix) {
     this.promptMessage = prefix + '\n';
     var keys = Object.keys(this.options);

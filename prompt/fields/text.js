@@ -7,6 +7,7 @@ function Text() {
   this.promptMessage = '';
   this.validated = false;
   this.conditional = false;
+  this.checkConditional = false;
 
   this.formatPrompt = function(message) {
     this.promptMessage =  message + '\n';
