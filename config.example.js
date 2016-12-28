@@ -16,7 +16,7 @@ module.exports = {
   // mud stuffs
   startRoomId: 1, // room new characters get dropped in
 
-  quitMessage: 'Goodbye!,
+  quitMessage: 'Goodbye!',
 
   // The Player Prompt is a color-coded HUD of critical character information that also servers as a command prompt.
   //
@@ -40,7 +40,7 @@ module.exports = {
   //      %style%<output to style>%style%
   //   @see https://www.npmjs.com/package/colors Colors package documentation for additional details:
 
-  playerPrompt: '%red%%currenthp%H%red% | %blue%%currentmana%M%blue% | %cyan%%xp%XP%cyan%'
+  playerPrompt: '%red%%currenthp%H%red% | %blue%%currentmana%M%blue% | %cyan%%xp%XP%cyan% >',
 
   // Characters may access the wimp command unless this is set to false.
   //
