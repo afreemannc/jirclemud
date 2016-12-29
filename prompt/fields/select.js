@@ -26,10 +26,10 @@ function Select(socket) {
       if (replaceInPrefix === true) {
         pattern = '[::' + keys[i] + '::]';
         replacement = '[' + global.color.yellow(keys[i].toUpperCase()) + ']';
-        this.promptMessage = this.promptMessage.replace(pattern, replacement);
+        this.promptMessage += this.promptMessage.replace(pattern, replacement);
       }
       else {
-        this.promptMessage = '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + this.options[keys[i]] + '\n';
+        this.promptMessage += '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + this.options[keys[i]] + '\n';
       }
     }
   };
