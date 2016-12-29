@@ -26,7 +26,7 @@ function Int() {
     return parseInt(input);
   }
 
-  this.validate = function(input) {
+  this.validate = function(socket, input) {
     if (Number.isInteger(input)) {
       return true;
     }
