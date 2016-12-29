@@ -10,11 +10,21 @@ function Multiselect(socket) {
   this.fieldGroup = false;
 
   this.checkConditional = function(input) {
-    if (this.value.includes(input) === true) {
-      return true;
+    if (Array.isArray(input)) {
+      for (i = 0; i < input.length; ++i) {
+        if (this.value.includes(input[i])) {
+          return true;
+        }
+      }
+      return false;
     }
     else {
-      return false;
+      if (this.value.includes(input) === true) {
+        return true;
+      }
+      else {
+        return false;
+      }
     }
   }
 

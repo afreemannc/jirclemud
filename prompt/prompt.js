@@ -66,7 +66,15 @@ function Prompt(socket, completionCallback) {
         // to the field group values
         if (this.currentField.fieldGroup !== false) {
           fieldGroup = this.currentField.fieldGroup;
+          console.log('fieldGroup:' + fieldGroup);
           delta = this.fieldGroups[fieldGroup].delta;
+          console.log('delta:' + delta);
+          console.log('field:' + this.currentField.name);
+          console.log('value:' + this.currentField.value);
+          console.log(this.fieldGroups);
+          if (typeof this.fieldGroups[fieldGroup].values[delta] === 'undefined') {
+            this.fieldGroups[fieldGroup].values[delta] = {};
+          }
           this.fieldGroups[fieldGroup].values[delta][this.currentField.name] = this.currentField.value;
         }
 

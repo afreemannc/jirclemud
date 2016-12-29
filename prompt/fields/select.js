@@ -10,11 +10,21 @@ function Select(socket) {
   this.fieldGroup = false;
 
   this.checkConditional = function(input) {
-    if (this.value === input) {
-      return true;
+    if (Array.isArray(input)) {
+      for (i = 0; i < input.length; ++i) {
+        if (this.value === input[i]) {
+          return true;
+        }
+      }
+      return false;
     }
     else {
-      return false;
+      if (this.value === input) {
+        return true;
+      }
+      else {
+        return false;
+      }
     }
   }
 

@@ -81,8 +81,6 @@ item.prototype.createItem = function(socket) {
     value: 'WEARABLE',
   }
   wearSlotField.formatPrompt('Where can this be worn?');
-  console.log('wear slot field');
-  console.log(wearSlotField);
   itemPrompt.addField(wearSlotField);
 
   // Wield fields
@@ -119,6 +117,8 @@ item.prototype.createItem = function(socket) {
     field: 'effects',
     value: 'stat',
   }
+  statField.fieldGroup = 'effects';
+  itemPrompt.addField(statField);
 
   var bonusField = itemPrompt.newField('int');
   bonusField.name = 'bonus';
@@ -127,6 +127,7 @@ item.prototype.createItem = function(socket) {
     field: 'effects',
     value: ['dam', 'hit', 'ac', 'stat']
   }
+  bonusField.fieldGroup = 'effects';
   itemPrompt.addField(bonusField);
   // bonus reiteration handled by fieldGroup processing code. No need to add
   // additional prompt logic here.
