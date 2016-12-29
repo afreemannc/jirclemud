@@ -92,6 +92,7 @@ function Prompt(socket, completionCallback) {
           for (i = 0; i < this.fields.length; ++i) {
             fieldValues[this.fields[i].name] = this.fields[i].value;
           }
+          fieldValues.fieldGroups = this.fieldGroups;
           this.completionCallback(this.socket, fieldValues);
         }
       }
@@ -132,6 +133,11 @@ function Prompt(socket, completionCallback) {
           delta: 0,
           values: [],
         }
+      }
+      else {
+        // This is cheap but since we're iterating anyway may as well let this
+        // overwrite automatically until the last field in the group is added.
+        this.fieldGroups[field.fieldGroup].endOn = field.name;
       }
     }
   }
