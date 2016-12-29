@@ -81,6 +81,8 @@ item.prototype.createItem = function(socket) {
     value: 'WEARABLE',
   }
   wearSlotField.formatPrompt('Where can this be worn?');
+  console.log('wear slot field');
+  console.log(wearSlotField);
   itemPrompt.addField(wearSlotField);
 
   // Wield fields
@@ -100,14 +102,14 @@ item.prototype.createItem = function(socket) {
     // additional effects
   var selectEffectField = itemPrompt.newField('select');
   selectEffectField.name = 'effects';
-  selectEffectsField.options = {d:'dam', h:'hit', a:'ac', s:'stat'};
-  selectEffectsField.formatPrompt('What additional effects does this equipment have?');
-  selectEffectsField.conditional = {
+  selectEffectField.options = {d:'dam', h:'hit', a:'ac', s:'stat'};
+  selectEffectField.formatPrompt('What additional effects does this equipment have?');
+  selectEffectField.conditional = {
     field: 'flags',
     value: ['WIELD', 'HOLD', 'WEARABLE']
   }
-  selectEffectsField.fieldGroup = 'effects';
-  itemPrompt.addField(selectEffectsField);
+  selectEffectField.fieldGroup = 'effects';
+  itemPrompt.addField(selectEffectField);
 
   var statField = itemPrompt.newField('select');
   statField.name = 'effectedStat';
@@ -138,27 +140,6 @@ item.prototype.createItem = function(socket) {
   itemPrompt.start();
 }
 
-item.prototype.getTypeOptions = function() {
-  var options = [];
-  var itemTypes = global.items.listTypes();
-  for (i = 0; i < itemTypes.length; ++i) {
-    currentItem = global.items[itemTypes[i]];
-    options[currentItem.selectOption] = currentItem.type;
-  }
-  return options;
-}
-
-item.prototype.createMessage = function() {
-  var itemTypes = global.items.listTypes();
-  var prompt = 'What type of item would you like to create?\n';
-  var item = {};
-  for (i = 0; i < itemTypes.length; ++i) {
-    currentItem = global.items[itemTypes[i]];
-    prompt += currentItem.label + ' :: ';
-  }
-  return prompt + '\n';
-}
-
 item.prototype.setItemProperties = function(fieldValues) {
   var properties = {};
   properties.flags = fieldValues.flags.join(',');
@@ -168,6 +149,8 @@ item.prototype.setItemProperties = function(fieldValues) {
 }
 
 item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) {
+  console.log('fieldValues in item save');
+  console.log(fieldValues);
 
   var properties = {};
   var values = {
@@ -275,13 +258,12 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
   */
 }
 
-item.prototype.loadInventory = function(fieldValues, socket) {
+item.prototype.loadInventory = function(socket, fieldValues) {
   var inserts = [fieldValues.containerType, fieldValues.parentId];
   var sql = `
     SELECT
       ii.instance_id,
       i.name,
-      i.type,
       i.room_description,
       i.full_description,
       i.properties
