@@ -155,7 +155,6 @@ item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) 
   var properties = {};
   var values = {
     name:fieldValues.name,
-    type:fieldValues.type,
     room_description:fieldValues.room_description,
     full_description:fieldValues.full_description,
     properties: JSON.stringify(global.items.setItemProperties(fieldValues))
