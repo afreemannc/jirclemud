@@ -8,6 +8,7 @@ function Multitext() {
   this.validated = false;
   this.conditional = false;
   this.checkConditional = false;
+  this.fieldGroup = false;
 
   this.formatPrompt = function(message) {
     this.promptMessage = message + '(@@ to save)' + '\n';

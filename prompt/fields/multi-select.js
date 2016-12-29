@@ -7,6 +7,7 @@ function Multiselect(socket) {
   this.promptMessage = '';
   this.validated = false;
   this.conditional = false;
+  this.fieldGroup = false;
 
   this.checkConditional = function(input) {
     if (this.value.includes(input) === true) {

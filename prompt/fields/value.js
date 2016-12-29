@@ -10,7 +10,7 @@ function Value() {
   this.sanitizeInput = false;
   this.validate = false;
   this.validationError = false;
-
+  this.fieldGroup = false;
 
   this.cacheInput = function(input) {
     this.value = input;

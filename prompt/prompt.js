@@ -4,6 +4,7 @@ function Prompt(socket, completionCallback) {
   this.currentField = false;
   this.completionCallback = completionCallback;
   this.quittable = true;
+  this.fieldGroups = {};
 
   // TODO: this could probably be replaced with a loader.
   this.fieldTypes = {
@@ -61,6 +62,14 @@ function Prompt(socket, completionCallback) {
       }
       // The current field has completed gathering input.
       if (inputComplete) {
+        // If this field is in a field group the current field value needs to be added
+        // to the field group values
+        if (this.currentField.fieldGroup !== false) {
+          fieldGroup = this.currentField.fieldGroup;
+          delta = this.fieldGroups[fieldGroup].delta;
+          this.fieldGroups[fieldGroup].values[delta][this.currentField.name] = this.currentField.value;
+        }
+
         fieldIndex = this.getFieldIndex(this.currentField.name);
         // Iterate past hidden fields if needed.
         while (fieldIndex < this.fields.length - 1) {
@@ -117,6 +126,14 @@ function Prompt(socket, completionCallback) {
 
   this.addField = function(field) {
     this.fields.push(field);
+    if (field.fieldGroup !== false) {
+      if (typeof this.fieldGroups[field.fieldGroup] === 'undefined') {
+        this.fieldGroups[field.fieldGroup] = {
+          delta: 0,
+          values: [],
+        }
+      }
+    }
   }
 
 

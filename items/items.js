@@ -98,9 +98,37 @@ item.prototype.createItem = function(socket) {
       // percentage fire
       // strength ??
     // additional effects
-      // effect (+dam, +hit, +ac, +stat
-        // effect
-        // bonus
+  var selectEffectField = itemPrompt.newField('select');
+  selectEffectField.name = 'effects';
+  selectEffectsField.options = {d:'dam', h:'hit', a:'ac', s:'stat'};
+  selectEffectsField.formatPrompt('What additional effects does this equipment have?');
+  selectEffectsField.conditional = {
+    field: 'flags',
+    value: ['WIELD', 'HOLD', 'WEARABLE']
+  }
+  selectEffectsField.fieldGroup = 'effects';
+  itemPrompt.addField(selectEffectsField);
+
+  var statField = itemPrompt.newField('select');
+  statField.name = 'effectedStat';
+  statField.options = {i:'int', w:'wis', ch:'cha', s:'str', co:'con', d:'dex'};
+  statField.formatPrompt('Select a stat to buff');
+  statField.conditional = {
+    field: 'effects',
+    value: 'stat',
+  }
+
+  var bonusField = itemPrompt.newField('int');
+  bonusField.name = 'bonus';
+  bonusField.formatPrompt('Effect bonus (positive or negative numbers only)');
+  bonusField.conditional = {
+    field: 'effects',
+    value: ['dam', 'hit', 'ac', 'stat']
+  }
+  itemPrompt.addField(bonusField);
+  // bonus reiteration handled by fieldGroup processing code. No need to add
+  // additional prompt logic here.
+
   var createItemField = itemPrompt.newField('select');
   createItemField.name = 'create',
   createItemField.options = {y:'y', n:'n'},

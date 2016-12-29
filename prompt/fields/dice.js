@@ -8,7 +8,7 @@ function Dice(socket) {
   this.validated = false;
   this.conditional = false;
   this.checkConditional = false;
-
+  this.fieldGroup = false;
 
   this.formatPrompt = function(prefix, replaceInPrefix) {
     this.promptMessage = prefix + '  (ex: 1d6, 2d8, etc)\n';
