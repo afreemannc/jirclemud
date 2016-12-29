@@ -33,7 +33,7 @@ room.prototype.inputIsExit = function(socket, input) {
 }
 
 // Load all zones into memory
-room.prototype.loadRooms = function(connection) {
+room.prototype.loadRooms = function() {
   // Only trigger room load if the target room isn't already loaded.
   var sql = "SELECT * FROM rooms";
   global.connection.query(sql, function(err, results, fields) {
@@ -46,7 +46,7 @@ room.prototype.loadRooms = function(connection) {
         containerType: 'room_inventory',
         parentId: roomId
       }
-      global.items.loadInventory(values);
+      global.items.loadInventory({}, values);
     }
     console.log('The world is loaded!');
   });
