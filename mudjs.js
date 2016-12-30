@@ -28,6 +28,7 @@ global.tokens = tokens;
 
 function newSocket(socket) {
   socket.playerSession = new session(socket);
+  // TODO: replace this with pooling
   socket.connection = mysql.createConnection({
     host: config.dbHost,
     user: config.dbUser,
@@ -59,6 +60,7 @@ global.connection  = mysql.createConnection({
     port: config.dbPort
   });
 global.rooms.loadRooms();
+global.zones.loadZones();
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(socket, data) {
   inputContext = socket.playerSession.getInputContext();
