@@ -6,6 +6,8 @@ var Command = function() {
     // Room look, aka look with no additional arguments passed.
     if (input === '') {
       var roomId = socket.playerSession.character.currentRoom;
+      console.log('exits:');
+      console.log(global.rooms.room[roomId].exits);
       // display room title
       socket.write(global.colors.bold(global.tokens.replace(socket, global.rooms.room[roomId].name)) + "\n");
       // display room description
@@ -14,13 +16,10 @@ var Command = function() {
       var display = global.items.inventoryDisplay(socket, global.rooms.room[roomId].inventory);
       socket.write(global.tokens.replace(socket, display) + "\n\n");
       // display exits
-      var exits = [];
-      for (i = 0; i < global.rooms.room[roomId].exits.length; ++i) {
-        exit = global.rooms.room[roomId].exits[i];
-        exits.push(global.colors.yellow(exit.label));
-      }
-      if (exits.length > 0) {
-        socket.playerSession.write('Exits: [ ' + exits.join(' ') + ' ]\n');
+      var exits = global.rooms.room[roomId].exits;
+      exitKeys = Object.keys(exits);
+      if (exitKeys.length > 0) {
+        socket.playerSession.write('Exits: [ ' + exitKeys.join(' ') + ' ]\n');
       }
       else {
         socket.playerSession.write('Exits: [none]\n');

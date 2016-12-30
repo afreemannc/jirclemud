@@ -21,15 +21,14 @@ room.prototype.message = function(socket, roomId, message, skipCharacter) {
 
 room.prototype.inputIsExit = function(socket, input) {
   var roomId = socket.playerSession.character.currentRoom;
-  var currentExits = global.rooms.room[roomId].exits;
+  var currentExits = Object.keys(global.rooms.room[roomId].exits);
 
-  for (i = 0; i < currentExits.length; ++i) {
-    currentExit = currentExits[i];
-    if (currentExit.label === input) {
-      return true;
-    }
+  if (currentExits.includes(input) === true) {
+    return true;
   }
-  return false;
+  else {
+    return false;
+  }
 }
 
 // Load all zones into memory
@@ -63,7 +62,11 @@ room.prototype.loadExits = function(roomId, callback, callbackArgs) {
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
   global.connection.query(sql, inserts, function(err, results, fields) {
-    global.rooms.room[roomId].exits = results;
+    global.rooms.room[roomId].exits = {};
+    for (i = 0; i < results.length; ++i) {
+      global.rooms.room[roomId].exits[results[i].label] = results[i];
+    }
+    // TODO ditch this pattern in favor of promises if needed
     if (typeof callback === 'function') {
       callback(socket, callbackArgs, global.commands.triggers.look, socket);
     }
@@ -302,26 +305,29 @@ room.prototype.invertExitLabel = function(label) {
   return output;
 }
 
-room.prototype.saveExit = function(socket, fieldValues, callback, callbackArgs) {
-  var properties = fieldValues.properties;
-  var values = {
-    rid: fieldValues.rid,
-    target_rid:fieldValues.target_rid,
-    label:fieldValues.label,
-    description: fieldValues.description,
-    properties: JSON.stringify(properties) // TODO: implement exit properties?
-  }
-  socket.connection.query('INSERT INTO room_exits SET ?', values, function (error, result) {
-    socket.playerSession.write('Exit saved.');
-    socket.playerSession.inputContext = 'command';
-    if (typeof callback === 'function') {
-      if (callbackArgs === false) {
-        callback(socket, results.insertId);
-      }
-      else {
-        callback(socket, callbackArgs);
-      }
+room.prototype.saveExit = function(socket, fieldValues) {
+  return new Promise((resolve, reject) => {
+    var properties = fieldValues.properties;
+    var values = {
+      rid: fieldValues.rid,
+      target_rid:fieldValues.target_rid,
+      label:fieldValues.label,
+      description: fieldValues.description,
+      properties: JSON.stringify(properties) // TODO: implement exit properties?
     }
+    socket.connection.query('INSERT INTO room_exits SET ?', values, function (error, result) {
+      if (error) {
+        return reject(error);
+      }
+      socket.playerSession.write('Exit saved.');
+      socket.playerSession.inputContext = 'command';
+      values[eid] = results.insertId;
+      values[properties] = JSON.parse(values.properties);
+      // update exit in memory;
+      global.rooms.room[values.rid].exits[value.label] = values;
+      return resolve(values);
+    });
+
   });
 }
 

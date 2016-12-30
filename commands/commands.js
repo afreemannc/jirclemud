@@ -40,7 +40,6 @@ function Commands() {
     // If input matches an exit label for the current room treat as move.
     if (global.rooms.inputIsExit(socket, input) === true) {
       this.triggers.move(socket, input);
-      commandFound = true;
       return;
     }
     // Otherwise lets check available commands

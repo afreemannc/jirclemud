@@ -6,14 +6,14 @@ var Command = function() {
     var characterId = socket.playerSession.character.id;
     var currentExits = global.rooms.room[roomId].exits;
 
-    for (i = 0; i < currentExits.length; ++i) {
-      currentExit = currentExits[i];
-      if (currentExit.label === input) {
-        socket.playerSession.character.currentRoom = currentExit.target_rid;
-        global.commands.triggers.look(socket, '');
-      }
+    if (typeof currentExits[input] === 'undefined') {
+      socket.playerSession.error('Alas, you cannot go that way.');
     }
-
+    else {
+      var currentExit = currentExits[input];
+      socket.playerSession.character.currentRoom = currentExit.target_rid;
+      global.commands.triggers.look(socket, '');
+    }
   }
 }
 

@@ -8,12 +8,8 @@ var Command = function() {
     else {
       var roomId = socket.playerSession.character.currentRoom;
       // It would be nonsensical to permit digging in a direction with a pre-existing exit.
-      for (i = 0; i < global.rooms.room[roomId].exits.length; ++i) {
-        exit = global.rooms.room[roomId].exits[i];
-        if (input === exit.label) {
-          socket.playerSession.error('An exit already exists in that direction');
-          break;
-        }
+      if (typeof global.rooms.room[roomId].exits[input] !== 'undefined') {
+        socket.playerSession.error('An exit already exists in that direction');
       }
       fieldValues = {
         name: 'Empty space',

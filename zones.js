@@ -1,16 +1,18 @@
 // Zone CRUD
 
 function Zones() {
-  this.zone = [];
+  this.zone = {};
   // Zone details need to be in memory for "where", help <zone>, and zone <zone id> commands
   //  to work without a bunch of grovelling.
   this.loadZones = function() {
-    var sql = "SELECT * FROM zones";
-    global.connection.query(sql, function(err, results, fields) {
+
+    global.connection.query('SELECT * FROM zones', function(err, results, fields) {
       for(i = 0; i < results.length; ++i) {
         console.log('loading zone ' + results[i].zid);
         var zoneId = results[i].zid;
-        global.zones.zone[zoneId] = results[i];
+        if (zoneId > 0) {
+          global.zones.zone[zoneId] = results[i];
+        }
       }
     });
   }
