@@ -32,7 +32,8 @@ function Prompt(socket, completionCallback) {
     }
     var message = this.currentField.promptMessage;
     if (this.quittable === true) {
-      message += global.colors.yellow('(@q to quit)\n');
+      message = message.toString().replace(/(\r\n|\n|\r)/gm,"");
+      message += global.colors.yellow(' (@q to quit)\n');
     }
     this.socket.write(message);
     return true;
