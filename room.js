@@ -300,7 +300,7 @@ room.prototype.invertExitLabel = function(label) {
       output = 'se';
       break;
     case 's':
-      output = 's';
+      output = 'n';
       break;
     case 'se':
       output = 'nw';
@@ -332,16 +332,16 @@ room.prototype.saveExit = function(socket, fieldValues) {
       description: fieldValues.description,
       properties: JSON.stringify(properties) // TODO: implement exit properties?
     }
-    socket.connection.query('INSERT INTO room_exits SET ?', values, function (error, result) {
+    socket.connection.query('INSERT INTO room_exits SET ?', values, function (error, results) {
       if (error) {
         return reject(error);
       }
       socket.playerSession.write('Exit saved.');
       socket.playerSession.inputContext = 'command';
-      values[eid] = results.insertId;
-      values[properties] = JSON.parse(values.properties);
+      values.eid = results.insertId;
+      values.properties = JSON.parse(values.properties);
       // update exit in memory;
-      global.rooms.room[values.rid].exits[value.label] = values;
+      global.rooms.room[values.rid].exits[values.label] = values;
       return resolve(values);
     });
   });
@@ -349,7 +349,9 @@ room.prototype.saveExit = function(socket, fieldValues) {
 
 room.prototype.saveRoomChanges = function(socket, fieldValues) {
   this.saveRoom(socket, fieldValues).then((response) => {
-    if (typeof fieldValues.rid !=== 'undefined') {
+    console.log('response:');
+    console.log(response);
+    if (typeof fieldValues.rid !== 'undefined') {
       socket.write('Room changes saved');
       return response;
     }
@@ -357,7 +359,9 @@ room.prototype.saveRoomChanges = function(socket, fieldValues) {
       socket.write('New room created');
       return response;
     }
-  }):
+  }).catch(function (error) {
+    console.log('something has gone terribly wrong:' + error);
+  });
 }
 
 room.prototype.saveRoom = function(socket, values) {
@@ -389,6 +393,15 @@ room.prototype.saveRoom = function(socket, values) {
           global.rooms.room[results.insertId] = values;
           global.rooms.room[results.insertId].inventory = [];
           global.rooms.room[results.insertId].exits = [];
+          // A container entry for the new room needs to be created so the room can
+          // hold items.
+          var containerValues = {
+            container_type: 'room',
+            parent_id: results.insertId,
+            max_size: -1,
+            max_weight: -1
+          }
+          global.containers.createContainer(values);
           return resolve(values);
         }
       });
