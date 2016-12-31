@@ -17,6 +17,12 @@ function Zones() {
     });
   }
 
+  this.getCurrentZoneId = function(socket) {
+    var roomId = socket.playerSession.character.currentRoom;
+    var currentRoom = global.rooms.room[roomId];
+    return currentRoom.zid;
+  }
+
   this.createZone = function(socket) {
     var createZonePrompt = global.prompt.new(socket, this.saveZone);
 
@@ -208,7 +214,9 @@ function Zones() {
         }
         console.log('values going into room:');
         console.log(roomValues);
-        global.rooms.saveRoom(socket, roomValues, global.commands.triggers.bamf, false);
+        global.rooms.saveRoom(socket, roomValues, global.commands.triggers.bamf, false).then((response) => {
+          global.commands.triggers.bamf(socket, response.rid);
+        });
       });
     }
   }

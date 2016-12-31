@@ -15,7 +15,26 @@ var Command = function() {
         name: 'Empty space',
         full_description: 'Empty space just waiting to be filled. Remind you of Prom night?'
       }
-      global.rooms.saveRoom(socket, fieldValues, global.rooms.createPlaceholderExit, input);
+      global.rooms.saveRoomChanges(socket, fieldValues).then((response) => {
+        // create exit from current room to new room.
+        var exitValues = {
+          rid: socket.playerSession.character.currentRoom,
+          zid: global.zones.getCurrentZoneId(socket),
+          target_rid: response.rid,
+          label: input,
+          description: 'Nothing to see here.',
+          properties: [],
+        }
+        global.rooms.saveExit(socket, exitValues).then((response) => {
+          //create reciprocal exit in new room. Flip values and save.
+          exitValues.rid = response.rid;
+          exitValues.target_rid = socket.playerSession.character.currentRoom;
+          exitValues.label = global.rooms.invertExitLabel(label);
+          global.rooms.saveExit(socket, exitValues).then((response) => {
+            global.commands.triggers.look(socket, '');
+          });
+        });
+      });
     }
   }
 

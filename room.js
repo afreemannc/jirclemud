@@ -78,7 +78,7 @@ room.prototype.createRoom = function(socket) {
   var roomId = socket.playerSession.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var createRoomPrompt = prompt.new(socket, this.saveRoom);
+  var createRoomPrompt = prompt.new(socket, this.saveRoomChanges);
 
   var zoneIdField = createRoomPrompt.newField('value');
   zoneIdField.name = 'zid';
@@ -111,7 +111,7 @@ room.prototype.editRoomName = function(socket) {
   var roomId = socket.playerSession.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editNamePrompt = prompt.new(socket, this.saveRoom);
+  var editNamePrompt = prompt.new(socket, this.saveRoomChanges);
 
   var ridField = editNamePrompt.newField('value');
   ridField.name = 'rid';
@@ -147,7 +147,7 @@ room.prototype.editRoomDesc = function(socket) {
   var roomId = socket.playerSession.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editDescPrompt = prompt.new(socket, this.saveRoom);
+  var editDescPrompt = prompt.new(socket, this.saveRoomChanges);
 
   var ridField = editDescPrompt.newField('value');
   ridField.name = 'rid';
@@ -182,7 +182,7 @@ room.prototype.editRoomFlags = function(socket) {
   var roomId = socket.playerSession.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editFlagsPrompt = prompt.new(socket, this.saveRoom);
+  var editFlagsPrompt = prompt.new(socket, this.saveRoomChanges);
 
   var ridField = editFlagsPrompt.newField('value');
   ridField.name = 'rid';
@@ -285,22 +285,39 @@ room.prototype.invertExitLabel = function(label) {
   var output = '';
   switch (label) {
     case 'e':
-     output = 'w';
-     break;
+      output = 'w';
+      break;
     case 'w':
-     output = 'e';
-     break;
+      output = 'e';
+      break;
     case 'n':
-     output = 's';
-     break;
+      output = 's';
+      break;
+    case 'ne':
+      output = 'sw';
+      break;
+    case 'nw':
+      output = 'se';
+      break;
     case 's':
-     output = 's';
-     break;
+      output = 's';
+      break;
+    case 'se':
+      output = 'nw';
+      break;
+    case 'sw':
+      output = 'ne';
+      break;
     case 'u':
-     output = 'd';
-     break;
+      output = 'd';
+      break;
+    case 'd':
+      output = 'u';
+      break;
     default:
+      // Get the weird stuff like "portal" or "gate"
       output = label;
+      break;
   }
   return output;
 }
@@ -327,46 +344,56 @@ room.prototype.saveExit = function(socket, fieldValues) {
       global.rooms.room[values.rid].exits[value.label] = values;
       return resolve(values);
     });
-
   });
 }
 
-room.prototype.saveRoom = function(socket, fieldValues, callback, callbackArgs) {
-  var values = {
-    zid:fieldValues.zid,
-    name:fieldValues.name,
-    full_description:fieldValues.full_description,
-    flags:JSON.stringify(fieldValues.flags)
-  }
-  // If rid is passed in with field values this indicates changes to an existing room
-  // are being saved.
-  if (typeof fieldValues.rid !== 'undefined') {
-    values.rid = fieldValues.rid;
-    socket.connection.query('UPDATE rooms SET ? WHERE RID = ' + values.rid, values, function (error, results) {
-      // Update copy loaded in memory
-      global.rooms.room[values.rid].name = values.name;
-      global.rooms.room[values.rid].full_description = values.full_description;
-      socket.playerSession.write('Room changes saved.');
-      socket.playerSession.inputContext = 'command';
+room.prototype.saveRoomChanges = function(socket, fieldValues) {
+  this.saveRoom(socket, fieldValues).then((response) => {
+    if (typeof fieldValues.rid !=== 'undefined') {
+      socket.write('Room changes saved');
+      return response;
+    }
+    else {
+      socket.write('New room created');
+      return response;
+    }
+  }):
+}
 
-      if (typeof callback === 'function') {
-        callback(socket, results.insertId, callbackArgs);
-      }
-    });
-  }
-  else {
-    // If rid is not provided this should be saved as a new room.
-    socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
-      global.rooms.room[results.insertId] = values;
-      global.rooms.room[results.insertId].inventory = [];
-      global.rooms.room[results.insertId].exits = [];
-      socket.playerSession.write('New room saved.');
-      socket.playerSession.inputContext = 'command';
-      if (typeof callback === 'function') {
-        callback(socket, results.insertId, callbackArgs);
-      }
-    });
-  }
+room.prototype.saveRoom = function(socket, values) {
+  return new Promise((resolve, reject) => {
+    values.flags = JSON.stringify(values.flags);
+    // If rid is passed in with field values this indicates changes to an existing room
+    // are being saved.
+    if (typeof values.rid !== 'undefined') {
+      socket.connection.query('UPDATE rooms SET ? WHERE RID = ' + values.rid, values, function (error, results) {
+        // Update copy loaded in memory
+        if (error) {
+          return reject(error);
+        }
+        else {
+          global.rooms.room[values.rid].name = values.name;
+          global.rooms.room[values.rid].full_description = values.full_description;
+          return resolve(values);
+        }
+      });
+    }
+    else {
+      // If rid is not provided this should be saved as a new room.
+      socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
+        if (error) {
+          return reject(error);
+        }
+        else {
+          values.rid = results.insertId;
+          global.rooms.room[results.insertId] = values;
+          global.rooms.room[results.insertId].inventory = [];
+          global.rooms.room[results.insertId].exits = [];
+          return resolve(values);
+        }
+      });
+    }
+  });
 }
 
 module.exports = new room();
