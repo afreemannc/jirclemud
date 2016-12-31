@@ -165,6 +165,10 @@ user.prototype.passHash = function(salt, password) {
 user.prototype.saveCharacter = function(socket, fieldValues) {
     var salt = crypto.randomBytes(Math.ceil(4)).toString('hex').slice(0, 8);
     // I do not currently understand why this.passHash doesn't work
+    // Edit: I get it now.
+    //
+    // TODO: refactor this mess into a single class.
+    // TODO: unfuck this function so it works for inserts and updates.
     var hashedPassword = global.user.passHash(salt, fieldValues.password);
     var values = {
       name: fieldValues.charactername,
@@ -191,6 +195,7 @@ user.prototype.saveCharacter = function(socket, fieldValues) {
 }
 
 user.prototype.startProperties = function(characterClass) {
+  // TODO: implement some kind of stat system. Probably standard D20 style to start.
   var characterClass = global.classes.classFromSelection(characterClass);
   // TODO: add con bonus once stats are implemented.
   var startingHP = global.dice.roll(characterClass.hitDice);
@@ -204,6 +209,7 @@ user.prototype.startProperties = function(characterClass) {
     currentmana: startingMana,
     xp: 1,
     current_room: global.config.startRoom
+    gold: 0,
   }
 
   return JSON.stringify(properties);
