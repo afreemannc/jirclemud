@@ -39,7 +39,7 @@ var Characters = function(){
     socket.connection.query(sql, function(err, results, fields) {
       if (results.length !== 0) {
         var salt = results[0].salt;
-        var passwordHash = this.passHash(salt, password);
+        var passwordHash = global.characters.passHash(salt, password);
         var sql = "SELECT * FROM ?? WHERE ?? = ? AND ?? = ?";
         var inserts = ['characters', 'name', userName, 'pass', passwordHash];
         sql = global.mysql.format(sql, inserts);
@@ -48,7 +48,7 @@ var Characters = function(){
             var character = results[0];
             socket.playerSession.character = character;
             socket.playerSession.character.currentRoom = character.current_room;
-            this.loadCharacterDetails(socket);
+            global.characters.loadCharacterDetails(socket);
           }
           else {
             // authentication failed, throw error and reset prompt. (add reset method to prompt class)

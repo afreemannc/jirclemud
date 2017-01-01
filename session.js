@@ -68,10 +68,10 @@ function Session(socket) {
 
     var input = fieldValues.start;
     if (input === 'l') {
-      characters.login(socket);
+      global.characters.login(socket);
     }
     else if  (input === 'c') {
-      characters.createCharacter(socket);
+      global.characters.createCharacter(socket);
     }
     else if (input === 'q') {
       socket.write(global.config.quitMessage);
@@ -81,4 +81,6 @@ function Session(socket) {
 }
 
 
-module.exports = new Session();
+module.exports.new = function(socket) {
+  return new Session(socket);
+}

@@ -4,7 +4,7 @@ var colors = require('colors/safe');
 var session = require('./session');
 global.config = require('./config');
 global.commands = require('./commands/commands');
-var characters = require('./characters');
+global.characters = require('./characters');
 var rooms = require('./room');
 var classes = require('./classes');
 var dice = require('./dice');
@@ -26,7 +26,7 @@ global.zones = zones;
 global.tokens = tokens;
 
 function newSocket(socket) {
-  socket.playerSession = new session(socket);
+  socket.playerSession = session.new(socket);
   // TODO: replace this with pooling
   socket.connection = mysql.createConnection({
     host: config.dbHost,
@@ -37,7 +37,7 @@ function newSocket(socket) {
     debug: ['ComQueryPacket', 'RowDataPacket']
   });
   sockets.push(socket);
-  characters.start(socket);
+  socket.playerSession.start(socket);
 
   socket.on('data', function (data) {
     parseData(socket, data);
