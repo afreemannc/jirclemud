@@ -1,5 +1,5 @@
-function Multiselect(socket) {
-  this.socket = socket;
+function Multiselect() {
+
   this.name = '';
   this.type = '';
   this.options = {};
@@ -51,7 +51,7 @@ function Multiselect(socket) {
     return input;
   }
 
-  this.validate = function(socket, input) {
+  this.validate = function(session, input) {
     if (input !== '@@') {
       if (typeof this.options[input] !== 'undefined') {
 
@@ -67,7 +67,7 @@ function Multiselect(socket) {
           value.push(this.options[input]);
         }
         var selected = value.join(', ');
-        socket.write('Currently selected:' + selected + '\n');
+        session.socket.write('Currently selected:' + selected + '\n');
         return true;
       }
       else {
@@ -80,8 +80,8 @@ function Multiselect(socket) {
     }
   };
 
-  this.validationError = function(socket, input) {
-    socket.write('"' + input + '" is not a valid option.\n');
+  this.validationError = function(session, input) {
+    session.socket.write('"' + input + '" is not a valid option.\n');
     global.prompt.promptUser(this);
   };
 

@@ -1,6 +1,5 @@
-function Dice(socket) {
+function Dice() {
 
-  this.socket = socket;
   this.name = '';
   this.options = {};
   this.value = false;
@@ -20,29 +19,29 @@ function Dice(socket) {
     return input;
   }
 
-  this.validate = function(socket, input) {
+  this.validate = function(session, input) {
     parts = input.split('d');
     // incorrectly formatted
     if (parts.length < 2) {
-      this.validationError(socket, input);
+      this.validationError(session, input);
       return false;
     }
     // XdY X is not a number
     if (Number.isInteger(parts[0]) === false) {
-      this.validationError(socket, input);
+      this.validationError(session, input);
       return false;
     }
     // XdY Y is not a number
     if (Number.isInteger(parts[1]) === false) {
-      this.validationError(socket, input);
+      this.validationError(session, input);
       return false;
     }
     return true;
   };
 
 
-  this.validationError = function(socket, input) {
-    socket.write('"' + input + '" is not a valid dice format.\n');
+  this.validationError = function(session, input) {
+    session.socket.write('"' + input + '" is not a valid dice format.\n');
   };
 
   this.cacheInput = function(input) {

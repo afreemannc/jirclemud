@@ -1,6 +1,5 @@
-function Select(socket) {
+function Select() {
 
-  this.socket = socket;
   this.name = '';
   this.options = {};
   this.value = false;
@@ -61,8 +60,8 @@ function Select(socket) {
   };
 
 
-  this.validationError = function(socket, input) {
-    socket.write('"' + input + '" is not a valid option.\n');
+  this.validationError = function(session, input) {
+    session.socket.write('"' + input + '" is not a valid option.\n');
   };
 
   this.cacheInput = function(input) {

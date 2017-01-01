@@ -1,5 +1,5 @@
 function Prompt(socket, completionCallback) {
-  this.socket = socket;
+  this.session = session;
   this.fields = [];
   this.currentField = false;
   this.completionCallback = completionCallback;
@@ -35,14 +35,14 @@ function Prompt(socket, completionCallback) {
       message = message.toString().replace(/(\r\n|\n|\r)/gm,"");
       message += global.colors.yellow(' (@q to quit)\n');
     }
-    this.socket.write(message);
+    this.session.socket.write(message);
     return true;
   }
 
   this.promptHandler = function(input) {
     if (input.toString().replace(/(\r\n|\n|\r)/gm,"") === '@q' && this.quittable === true) {
-      this.socket.playerSession.inputContext = 'command';
-      global.commands.triggers.look(this.socket, '');
+      this.session.inputContext = 'command';
+      global.commands.triggers.look(this.session, '');
       console.log('prompt bailout');
       return;
     }
@@ -53,7 +53,7 @@ function Prompt(socket, completionCallback) {
       }
       // Custom validation handlers can be used by overwriting the default .validate function on the field object.
       if (typeof this.currentField.validate === 'function') {
-        if (this.currentField.validate(socket, input)) {
+        if (this.currentField.validate(session, input)) {
           inputComplete = this.currentField.cacheInput(input);
         }
       }
@@ -102,7 +102,7 @@ function Prompt(socket, completionCallback) {
             fieldValues[this.fields[i].name] = this.fields[i].value;
           }
           fieldValues.fieldGroups = this.fieldGroups;
-          this.completionCallback(this.socket, fieldValues);
+          this.completionCallback(this.session, fieldValues);
         }
       }
     }
@@ -116,21 +116,14 @@ function Prompt(socket, completionCallback) {
   }
 
 
-  this.displayCompletionError = function(socket, error) {
+  this.displayCompletionError = function(error) {
     this.resetPrompt(socket);
-    this.socket.write(color.red(error));
+    this.session.socket.write(color.red(error));
     this.start();
   }
 
   this.newField = function(type) {
-    console.log('type:' + type);
-    console.log('available types');
-    console.log(this.fieldTypes);
-    console.log('type field object:');
-    console.log(this.fieldTypes[type]);
-    field = this.fieldTypes[type].new;
-    console.log('new field:');
-    console.log(field);
+    var field = this.fieldTypes[type].new;
     return field();
   }
 
@@ -162,9 +155,8 @@ function Prompt(socket, completionCallback) {
   }
 
   this.start = function() {
-    console.log('start triggered');
-    this.socket.playerSession.inputContext = 'prompt';
-    this.socket.playerSession.prompt = this;
+    this.session.inputContext = 'prompt';
+    this.session.prompt = this;
     for (i = 0; i < this.fields.length; ++i) {
       // skip value fields
       if (this.fields[i].formatPrompt !== false) {
@@ -176,6 +168,6 @@ function Prompt(socket, completionCallback) {
   }
 }
 
-module.exports.new = function(socket, completionCallback) {
-  return new Prompt(socket, completionCallback);
+module.exports.new = function(session, completionCallback) {
+  return new Prompt(session, completionCallback);
 }

@@ -5,13 +5,12 @@ var crypto = require('crypto');
 
 var Characters = function(){
 
-
   /**
    * Login screen prompt.
    */
-  this.login = function(socket) {
+  this.login = function(session) {
 
-    var loginPrompt = prompt.new(socket, this.loginAuthenticate);
+    var loginPrompt = prompt.new(session, this.loginAuthenticate);
     loginPrompt.quittable = false;
 
     var loginField = loginPrompt.newField('text');
@@ -30,7 +29,7 @@ var Characters = function(){
   /**
    * Login prompt completion handler.
    */
-  this.loginAuthenticate = function(socket, fieldValues) {
+  this.loginAuthenticate = function(session, fieldValues) {
     var userName = fieldValues.username;
     var password = fieldValues.password;
     var sql = "SELECT salt FROM ?? WHERE ?? = ?";
@@ -46,46 +45,46 @@ var Characters = function(){
         global.dbPool.query(sql, function(err, results, fields) {
           if (results.length !== 0) {
             var character = results[0];
-            socket.playerSession.character = character;
-            socket.playerSession.character.currentRoom = character.current_room;
-            global.characters.loadCharacterDetails(socket);
+            session.character = character;
+            session.character.currentRoom = character.current_room;
+            global.characters.loadCharacterDetails(session);
           }
           else {
             // authentication failed, throw error and reset prompt. (add reset method to prompt class)
-            socket.playerSession.prompt.displayCompletionError(socket, 'Login incorrect.\n');
+            session.prompt.displayCompletionError(socket, 'Login incorrect.\n');
           }
         });
       }
       else {
         // TODO: throw error and reset prompt. (add reset method to prompt class)
-        socket.playerSession.prompt.displayCompletionError(socket, 'Login incorrect.\n');
+        session.prompt.displayCompletionError(socket, 'Login incorrect.\n');
       }
     });
   }
 
-  this.loadCharacterDetails = function(socket) {
-    var character = socket.playerSession.character;
+  this.loadCharacterDetails = function(session) {
+    var character = session.character;
     // Unpack stored properties
-    socket.playerSession.character.stats = JSON.parse(character.stats);
-    socket.playerSession.character.affects = JSON.parse(character.affects);
+    session.character.stats = JSON.parse(character.stats);
+    session.character.affects = JSON.parse(character.affects);
     // Initialize empty inventory and then load
-    socket.playerSession.character.inventory = {};
+    session.character.inventory = {};
     var values = {
       containerType: 'player_inventory',
       parentId: character.id
     }
-    global.items.loadInventory(values, socket);
-    // Load current character room if needed.
-    socket.write('Welcome back ' + character.name + '\n');
-    socket.playerSession.inputContext = 'command';
-    global.commands.triggers.look(socket, '');
+    global.items.loadInventory(values, session);
+    // Raw socket write is used here since the command prompt will be displayed after "look" runs.
+    session.socket.write('Welcome back ' + character.name + '\n');
+    session.inputContext = 'command';
+    global.commands.triggers.look(session, '');
   }
 
   /**
    * Character creation prompt.
    */
-  this.createCharacter = function(socket) {
-    var createCharacterPrompt = prompt.new(socket, this.saveCharacter);
+  this.createCharacter = function(session) {
+    var createCharacterPrompt = prompt.new(session, this.saveCharacter);
     createCharacterPrompt.quittable = false;
 
     var characterNameField = createCharacterPrompt.newField('text');
@@ -128,7 +127,7 @@ var Characters = function(){
 
 
   // Save character record.
-  this.saveCharacter = function(socket, fieldValues) {
+  this.saveCharacter = function(session, fieldValues) {
     var salt = crypto.randomBytes(Math.ceil(4)).toString('hex').slice(0, 8);
     // TODO: unfuck this function so it works for inserts and updates.
     var hashedPassword = this.passHash(salt, fieldValues.password);
@@ -146,13 +145,13 @@ var Characters = function(){
     global.dbPool.query('INSERT INTO characters SET ?', values, function (error, result) {
       characterId = result.insertId;
       // TODO: generate default inventory
-      socket.playerSession.character = values;
-      socket.playerSession.character.id = characterId;
-      socket.playerSession.character.currentRoom = global.config.startRoom;
-
-      socket.write('Welcome ' + values.name + '\n');
-      socket.playerSession.inputContext = 'command';
-      global.commands.triggers.look(socket, '');
+      session.character = values;
+      session.character.id = characterId;
+      session.character.currentRoom = global.config.startRoom;
+      // TODO: move this somewhere else.
+      session.socket.write('Welcome ' + values.name + '\n');
+      session.inputContext = 'command';
+      global.commands.triggers.look(session, '');
     });
   }
 
@@ -183,30 +182,31 @@ var Characters = function(){
     return JSON.stringify({sustain:500});
   }
 
- // Validate character name input
- this.validateCharacterName = function(socket, name) {
-   if (name.length === 0) {
-     socket.playerSession.prompt('Character Name:\n', 'name');
-   }
-   global.dbPool.query('SELECT id FROM characters WHERE name = ?', [name],
-     ret = function(error, results, fields) {
-     if (results.length !== 0) {
-       var message = name + ' is already in use. Please select a different character name.\n';
-         socket.playerSession.error(message);
-         return false;
-       }
-       else {
-         return true;
-       }
-     });
+  // Validate character name input
+  this.validateCharacterName = function(session, name) {
+    if (name.length === 0) {
+      session.prompt('Character Name:\n', 'name');
+      return false;
+    }
+    global.dbPool.query('SELECT id FROM characters WHERE name = ?', [name],
+      ret = function(error, results, fields) {
+      if (results.length !== 0) {
+        var message = name + ' is already in use. Please select a different character name.\n';
+        session.error(message);
+        return false;
+      }
+      else {
+       return true;
+      }
+    });
     return ret;
   }
 
   this.searchActiveCharactersByName = function(name) {
-    for (i = 0; i < global.sockets.length; ++i) {
-      check = global.sockets[i];
-      if (check.playerSession.character.name.startsWith(name)) {
-        return check.playerSession.character.id;
+    for (i = 0; i < global.sessions.length; ++i) {
+      check = global.sessions[i];
+      if (check.character.name.startsWith(name)) {
+        return check.character.id;
       }
     }
     return false;

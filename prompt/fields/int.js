@@ -26,18 +26,18 @@ function Int() {
     return parseInt(input);
   }
 
-  this.validate = function(socket, input) {
+  this.validate = function(session, input) {
     if (Number.isInteger(input)) {
       return true;
     }
     else {
-      this.validationError(socket, input);
+      this.validationError(session, input);
       return false;
     }
   }
 
-  this.validationError = function(socket, input) {
-    socket.write('"' + input + '" is not a number.\n');
+  this.validationError = function(session, input) {
+    session.socket.write('"' + input + '" is not a number.\n');
   };
 
 
