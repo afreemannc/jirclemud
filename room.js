@@ -255,32 +255,6 @@ room.prototype.deleteRoom = function(socket, fieldValues) {
   // delete any room exits targeting this room
 }
 
-room.prototype.createPlaceholderExit = function(socket, target_rid, label) {
-  fieldValues = {
-    rid: socket.playerSession.character.currentRoom,
-    target_rid: target_rid,
-    label: label,
-    description: 'Nothing to see here.',
-    properties: [],
-  }
-  args = {target_rid:target_rid, label:label};
-  global.rooms.saveExit(socket, fieldValues, global.rooms.createReciprocalExit, args);
-}
-
-room.prototype.createReciprocalExit = function(socket, args) {
-  label = args.label;
-  rid = args.target_rid;
-
-  fieldValues = {
-    rid: rid,
-    target_rid: socket.playerSession.character.currentRoom,
-    label: global.rooms.invertExitLabel(label),
-    description: 'Nothing to see here.',
-    properties: [],
-  }
-  global.rooms.saveExit(socket, fieldValues, global.user.changeRoom, rid)
-}
-
 room.prototype.invertExitLabel = function(label) {
   var output = '';
   switch (label) {
