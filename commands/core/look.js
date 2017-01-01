@@ -19,7 +19,7 @@ var Command = function() {
       var exits = global.rooms.room[roomId].exits;
       exitKeys = Object.keys(exits);
       if (exitKeys.length > 0) {
-        socket.playerSession.write('Exits: [ ' + exitKeys.join(' ') + ' ]\n');
+        socket.playerSession.write('Exits: [ ' + global.colors.yellow(exitKeys.join(' ')) + ' ]\n');
       }
       else {
         socket.playerSession.write('Exits: [none]\n');

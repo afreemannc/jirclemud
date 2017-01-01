@@ -5,7 +5,7 @@ var Command = function() {
     commandParts = input.split(' ');
     targetCharacterName = commandParts.splice(0, 1);
     message = commandParts.join(' ');
-    targetCharacterId = global.user.searchActiveCharactersByName(targetCharacterName);
+    targetCharacterId = characters.searchActiveCharactersByName(targetCharacterName);
     // Bail if we can't find them.
     // TODO: include mobs in list of findables? Support 2.<thing> notation?
     if (targetCharacterId === false) {

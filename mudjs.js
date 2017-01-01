@@ -4,7 +4,7 @@ var colors = require('colors/safe');
 var session = require('./session');
 global.config = require('./config');
 global.commands = require('./commands/commands');
-var user = require('./user');
+var characters = require('./characters');
 var rooms = require('./room');
 var classes = require('./classes');
 var dice = require('./dice');
@@ -15,7 +15,6 @@ var tokens = require('./tokens');
 global.containers = require('./containers');
 
 global.sockets = [];
-global.user = user;
 global.mysql = mysql;
 global.colors = colors;
 global.dice = dice;
@@ -38,7 +37,7 @@ function newSocket(socket) {
     debug: ['ComQueryPacket', 'RowDataPacket']
   });
   sockets.push(socket);
-  user.start(socket);
+  characters.start(socket);
 
   socket.on('data', function (data) {
     parseData(socket, data);
