@@ -27,7 +27,7 @@ item.prototype.loadItem = function(socket, itemId, callback, args) {
     var sql = "SELECT * FROM ?? WHERE ?? = ?";
     var inserts = ['items',  'iid', itemId];
     sql = global.mysql.format(sql, inserts);
-    socket.connection.query(sql, function(err, results, fields) {
+    global.dbPool.query(sql, function(err, results, fields) {
       if (callball !== false) {
         callback(socket, results);
       }
@@ -164,7 +164,7 @@ item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) 
     callback = global.items.saveItemInstance;
     callbackArgs = false;
   }
-  socket.connection.query('INSERT INTO items SET ?', values, function (error, results) {
+  global.dbPool.query('INSERT INTO items SET ?', values, function (error, results) {
     socket.playerSession.write('Room saved.');
     socket.playerSession.inputContext = 'command';
     if (typeof callback === 'function') {
@@ -183,7 +183,7 @@ item.prototype.saveItemInstance = function(socket, itemId, callback, callbackArg
     iid:itemId,
     properties: JSON.stringify()
   }
-  socket.connection.query('INSERT INTO item_instance SET ?', values, function (error, results) {
+  global.dbPool.query('INSERT INTO item_instance SET ?', values, function (error, results) {
     socket.playerSession.write('Item created.');
     var fieldValues = {
       containerId: socket.playerSession.character.inventory.id,
@@ -198,7 +198,7 @@ item.prototype.saveItemToInventory = function(socket, fieldValues, callback, cal
     cid:fieldValues.containerId,
     instance_id:fieldValues.instanceId
   }
-  socket.connection.query('INSERT INTO container_inventory SET ?', values, function (error, results) {
+  global.dbPool.query('INSERT INTO container_inventory SET ?', values, function (error, results) {
     socket.playerSession.write('Item created.');
     if (typeof callback === 'function') {
       callback(socket, results.insertId, callbackArgs);
@@ -250,12 +250,6 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
     default:
       break;
   }
-  /*
-  var sql = 'UPDATE container_inventory set cid = ? WHERE instance_id = ?';
-  var inserts = [fieldValues.newCid, fieldValues.instanceId];
-  socket.connection.query(sql, inserts, function(err, results, fields) {
-  });
-  */
 }
 
 item.prototype.loadInventory = function(socket, fieldValues) {
@@ -280,7 +274,7 @@ item.prototype.loadInventory = function(socket, fieldValues) {
 
   sql = global.mysql.format(sql, inserts);
 
-  global.connection.query(sql, function(err, results, fields) {
+  global.dbPool.query(sql, function(err, results, fields) {
     switch(fieldValues.containerType) {
       case 'player_inventory':
         socket.playerSession.character.inventory = results;

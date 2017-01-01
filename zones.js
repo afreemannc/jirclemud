@@ -6,7 +6,7 @@ function Zones() {
   //  to work without a bunch of grovelling.
   this.loadZones = function() {
 
-    global.connection.query('SELECT * FROM zones', function(err, results, fields) {
+    global.dbPool.query('SELECT * FROM zones', function(err, results, fields) {
       for(i = 0; i < results.length; ++i) {
         console.log('loading zone ' + results[i].zid);
         var zoneId = results[i].zid;
@@ -188,7 +188,7 @@ function Zones() {
     // are being saved.
     if (typeof fieldValues.zid !== 'undefined') {
       values.zid = fieldValues.zid;
-      socket.connection.query('UPDATE zones SET ? WHERE ZID = ' + values.zid, values, function (error, results) {
+      global.dbPool.query('UPDATE zones SET ? WHERE ZID = ' + values.zid, values, function (error, results) {
         // Update copy loaded in memory
         global.zones.zone[values.zid].name = values.name;
         global.zones.zone[values.zid].description = values.description;
@@ -198,7 +198,7 @@ function Zones() {
     }
     else {
       // If rid is not provided this should be saved as a new zone.
-      socket.connection.query('INSERT INTO zones SET ?', values, function (error, results) {
+      global.dbPool.query('INSERT INTO zones SET ?', values, function (error, results) {
         socket.playerSession.write('New zone saved.');
         socket.playerSession.inputContext = 'command';
         console.log('error:' + error);

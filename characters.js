@@ -36,14 +36,14 @@ var Characters = function(){
     var sql = "SELECT salt FROM ?? WHERE ?? = ?";
     var inserts = ['characters', 'name', fieldValues.username];
     sql = global.mysql.format(sql, inserts);
-    socket.connection.query(sql, function(err, results, fields) {
+    global.dbPool.query(sql, function(err, results, fields) {
       if (results.length !== 0) {
         var salt = results[0].salt;
         var passwordHash = global.characters.passHash(salt, password);
         var sql = "SELECT * FROM ?? WHERE ?? = ? AND ?? = ?";
         var inserts = ['characters', 'name', userName, 'pass', passwordHash];
         sql = global.mysql.format(sql, inserts);
-        socket.connection.query(sql, function(err, results, fields) {
+        global.dbPool.query(sql, function(err, results, fields) {
           if (results.length !== 0) {
             var character = results[0];
             socket.playerSession.character = character;
@@ -143,7 +143,7 @@ var Characters = function(){
       affects: this.startAffects,
     };
 
-    socket.connection.query('INSERT INTO characters SET ?', values, function (error, result) {
+    global.dbPool.query('INSERT INTO characters SET ?', values, function (error, result) {
       characterId = result.insertId;
       // TODO: generate default inventory
       socket.playerSession.character = values;
@@ -188,7 +188,7 @@ var Characters = function(){
    if (name.length === 0) {
      socket.playerSession.prompt('Character Name:\n', 'name');
    }
-   socket.connection.query('SELECT id FROM characters WHERE name = ?', [name],
+   global.dbPool.query('SELECT id FROM characters WHERE name = ?', [name],
      ret = function(error, results, fields) {
      if (results.length !== 0) {
        var message = name + ' is already in use. Please select a different character name.\n';

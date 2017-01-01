@@ -35,7 +35,7 @@ room.prototype.inputIsExit = function(socket, input) {
 room.prototype.loadRooms = function() {
   // Only trigger room load if the target room isn't already loaded.
   var sql = "SELECT * FROM rooms";
-  global.connection.query(sql, function(err, results, fields) {
+  global.dbPool.query(sql, function(err, results, fields) {
     for(i = 0; i < results.length; ++i) {
       console.log('loading room ' + results[i].rid);
       var roomId = results[i].rid;
@@ -61,7 +61,7 @@ room.prototype.exitMessage = function(socket, input) {
 room.prototype.loadExits = function(roomId, callback, callbackArgs) {
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
-  global.connection.query(sql, inserts, function(err, results, fields) {
+  global.dbPool.query(sql, inserts, function(err, results, fields) {
     global.rooms.room[roomId].exits = {};
     for (i = 0; i < results.length; ++i) {
       global.rooms.room[roomId].exits[results[i].label] = results[i];
@@ -306,7 +306,7 @@ room.prototype.saveExit = function(socket, fieldValues) {
       description: fieldValues.description,
       properties: JSON.stringify(properties) // TODO: implement exit properties?
     }
-    socket.connection.query('INSERT INTO room_exits SET ?', values, function (error, results) {
+    global.dbPool.query('INSERT INTO room_exits SET ?', values, function (error, results) {
       if (error) {
         return reject(error);
       }
@@ -344,7 +344,7 @@ room.prototype.saveRoom = function(socket, values) {
     // If rid is passed in with field values this indicates changes to an existing room
     // are being saved.
     if (typeof values.rid !== 'undefined') {
-      socket.connection.query('UPDATE rooms SET ? WHERE RID = ' + values.rid, values, function (error, results) {
+      global.dbPool.query('UPDATE rooms SET ? WHERE RID = ' + values.rid, values, function (error, results) {
         // Update copy loaded in memory
         if (error) {
           return reject(error);
@@ -358,7 +358,7 @@ room.prototype.saveRoom = function(socket, values) {
     }
     else {
       // If rid is not provided this should be saved as a new room.
-      socket.connection.query('INSERT INTO rooms SET ?', values, function (error, results) {
+      global.dbPool.query('INSERT INTO rooms SET ?', values, function (error, results) {
         if (error) {
           return reject(error);
         }

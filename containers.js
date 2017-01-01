@@ -13,7 +13,7 @@ var Containers = function() {
    */
   this.createContainer = function(values) {
     return new Promise((resolve, reject) => {
-      socket.connection.query('INSERT INTO containers SET ?', values, function (error, results) {
+      global.dbPool.query('INSERT INTO containers SET ?', values, function (error, results) {
         if (error) {
           return reject(error);
         }
