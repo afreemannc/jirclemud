@@ -1,12 +1,12 @@
 var Command = function() {
   this.trigger = 'arch';
   this.helpText = 'Access the administrator console';
-  this.callback = function (socket, input) {
+  this.callback = function (session, input) {
     // set NOGOSSIP flag on character session
-    socket.playerSession.nogossip = true;
+    session.nogossip = true;
 
     // change command handler to arch for the duration of this session
-    socket.playerSession.inputContext = 'arch';
+    session.inputContext = 'arch';
     // Display activity dashboard
       // total logged in players
       // runtime

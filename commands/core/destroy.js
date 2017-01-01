@@ -1,10 +1,10 @@
 var Command = function() {
   this.trigger = 'destroy';
   this.helpText = 'Immortals only: destroy a thing (room, item, etc).';
-  this.callback = function(socket, context) {
+  this.callback = function(session, context) {
     // TODO: implement character perms checking
     if (context.length === 0) {
-      socket.playerSession.error("Destroy what??\n");
+      session.error("Destroy what??\n");
     }
     else {
       switch (context) {
@@ -12,13 +12,13 @@ var Command = function() {
           // TODO:
           break;
         case 'room':
-          global.rooms.deleteRoom(socket);
+          global.rooms.deleteRoom(session);
           break;
         case 'item':
           // TODO:
           break;
         default:
-          socket.playerSession.error('Destroy what??\n');
+          session.error('Destroy what??\n');
       }
     }
   }

@@ -1,16 +1,15 @@
 var Command = function() {
   this.trigger = 'bamf';
   this.helpText = 'Immortals only: instantly change rooms.';
-  this.callback = function(socket, input) {
+  this.callback = function(session, input) {
     // TODO: confirm current user has GOD or DEMI flag
-    console.log('bamf input:' + input);
     if (input.length === 0 || typeof global.rooms.room[input] === 'undefined') {
-      socket.playerSession.error("Teleport where??\n");
+      session.error("Bamf where??\n");
     }
     else {
       var exitMessage = 'Bamf!';
-      socket.playerSession.character.currentRoom = input;
-      global.commands.triggers.look(socket, '');
+      session.character.currentRoom = input;
+      global.commands.triggers.look(session, '');
     }
   }
 

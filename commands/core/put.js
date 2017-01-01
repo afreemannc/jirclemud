@@ -1,62 +1,62 @@
 var Command = function() {
   this.trigger = 'put';
   this.helpText = '';
-  this.callback = function(socket, input) {
+  this.callback = function(session, input) {
     // Route command based on input format
     if (input.contains(' in ')) {
-      this.hasIn(socket, input);
+      this.hasIn(session, input);
     }
     else {
-      this.noIn(socket, input);
+      this.noIn(session, input);
     }
   }
 
   // expected command format: put <item name> in <container name>
-  this.hasIn = function(socket, input) {
+  this.hasIn = function(session, input) {
     var commandParts = input.split(' in ');
     // One or more arguments missing
     if (commandParts.length < 2) {
-      socket.playerSession.error('Put what where?');
+      session.error('Put what where?');
       return;
     }
     else {
       var itemName = commandParts[0];
-      var itemIndex = this.findItemInInventory(socket, itemName);
+      var itemIndex = this.findItemInInventory(session, itemName);
       // item doesn't exist
       if (itemIndex === false) {
-        socket.playerSession.error("You don't have a " + itemName);
+        session.error("You don't have a " + itemName);
         return;
       }
 
       var containerName = commandParts[1];
-      var containerDetails = this.findContainer(socket, containerName);
+      var containerDetails = this.findContainer(session, containerName);
       if (containerDetails === false) {
-        socket.playerSession.error("There is no " + containerName + " here to put things in.");
+        session.error("There is no " + containerName + " here to put things in.");
         return;
       }
 
-      if (this.isItem(socket, containerDetails) === false) {
-        socket.playerSession.error("That is not a container.");
+      if (this.isItem(session, containerDetails) === false) {
+        session.error("That is not a container.");
         return;
       }
 
       // Looks like we're out of potential error states, let's transfer this thing already.
       var fieldValues = {
         transferType: 'character-to-container',
-        item: socket.playerSession.character.inventory[itemIndex],
+        item: session.character.inventory[itemIndex],
         index: itemIndex,
         containerIndex: containerDetails.index,
         containerLocation: containerDetails.location
       }
-      global.items.transferItemInstance(socket, fieldValues);
+      global.items.transferItemInstance(session, fieldValues);
 
       // It is disconcerting when commands don't provide some kind of feedback when executed, so:
-      var roomId = socket.playerSession.character.currentRoom;
-      var name = socket.playerSession.character.name;
+      var roomId = session.character.currentRoom;
+      var name = session.character.name;
       // player message
-      socket.playerSession.write('You put a ' + fieldValues.item.name + ' in the ' + inventory[containerIndex].name);
+      session.write('You put a ' + fieldValues.item.name + ' in the ' + inventory[containerIndex].name);
       // room message
-      global.rooms.message(socket, roomId, name + ' puts a ' + fieldValues.item.name + ' in a ' + inventory[containerIndex].name, true);
+      global.rooms.message(session, roomId, name + ' puts a ' + fieldValues.item.name + ' in a ' + inventory[containerIndex].name, true);
 
     }
   }
@@ -69,12 +69,12 @@ var Command = function() {
 
   // check personal inventory for item
   this.findItem = function(socket, itemName) {
-    return global.items.searchInventory(itemName, 'name', socket.playerSession.character.inventory, true);
+    return global.items.searchInventory(itemName, 'name', session.character.inventory, true);
   }
 
-  this.findContainer = function(socket, containerName) {
-    var roomId = socket.playerSession.character.currentRoom;
-    var containerIndex = this.findItem(socket, containerName);
+  this.findContainer = function(session, containerName) {
+    var roomId = session.character.currentRoom;
+    var containerIndex = this.findItem(session, containerName);
     var inventoryType = 'character';
     // If a matching container wasn't found in personal inventory check the current room.
     if (containerIndex === false) {
@@ -89,13 +89,13 @@ var Command = function() {
     }
   }
 
-  this.isContainer = function(socket, containerDetails) {
+  this.isContainer = function(session, containerDetails) {
     switch (containerDetails.location) {
       case 'room':
-        inventory = global.rooms.room[socket.playerSession.character.currentRoom].inventory;
+        inventory = global.rooms.room[session.character.currentRoom].inventory;
         break;
       case 'character':
-        inventory = socket.playerSession.character.inventory;
+        inventory = session.character.inventory;
         break;
       default:
         return false;

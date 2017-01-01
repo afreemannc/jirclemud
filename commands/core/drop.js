@@ -1,24 +1,25 @@
 var Command = function() {
   this.trigger = 'drop';
   this.helpText = '';
-  this.callback = function(socket, input) {
-    var index = global.items.searchInventory(input, 'name', socket.playerSession.character.inventory, true);
+  this.callback = function(session, input) {
+    var index = global.items.searchInventory(input, 'name', session.character.inventory, true);
     if (index !== false) {
       var fieldValues = {
         transferType: 'character-to-room',
-        item: socket.playerSession.character.inventory[index],
+        item: session.character.inventory[index],
         index: index
       }
       global.items.transferItemInstance(socket, fieldValues);
-      var roomId = socket.playerSession.character.currentRoom;
-      var name = socket.playerSession.character.name;
+      var roomId = session.character.currentRoom;
+      var name = session.character.name;
       // player message
-      socket.playerSession.write('You drop a ' + fieldValues.item.name);
+      //TODO: write a thing to determine if a or an is appropriate.
+      session.write('You drop a ' + fieldValues.item.name);
       // room message
-      global.rooms.message(socket, roomId, name + ' drops a ' +fieldValues.item.name, true);
+      global.rooms.message(session, roomId, name + ' drops a ' +fieldValues.item.name, true);
     }
     else {
-      socket.playerSession.error('Drop what??\n');
+      session.error('Drop what??\n');
     }
   }
 

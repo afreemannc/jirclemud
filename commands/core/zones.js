@@ -1,12 +1,10 @@
 var Command = function() {
   this.trigger = 'zones';
   this.helpText = 'List all zones';
-  this.callback = function (socket, input) {
+  this.callback = function (session, input) {
     var output = '';
     // Keys are unpredictable and very likely non-sequential between zone deletes and module imports.
     var difficulty = {};
-    console.log('zones:');
-    console.log(global.zones.zone);
     zoneKeys = Object.keys(global.zones.zone);
     for (i = 0; i < zoneKeys.length; ++i) {
       zone = global.zones.zone[zoneKeys[i]];
@@ -23,7 +21,7 @@ var Command = function() {
         output += '  ' + zoneKeys[j] + ': ' + difficulty[difficultyKeys[i]][zoneKeys[j]] + '\n';
       }
     }
-    socket.playerSession.write(output);
+    session.write(output);
   }
 
 }

@@ -8,13 +8,13 @@ var Command = function() {
   else {
     this.helpText = '';
   }
-  this.callback = function (socket, input) {
-    if (input <= socket.playerSession.character.stats.maxhp / 2) {
-      socket.playerSession.character.stats.wimp = input;
-      socket.playerSession.write('Wimp set to ' + input + ' hitpoints.');
+  this.callback = function (session, input) {
+    if (input <= session.character.stats.maxhp / 2) {
+      session.character.stats.wimp = input;
+      session.write('Wimp set to ' + input + ' hitpoints.');
     }
     else {
-      socket.playerSession.write('Wimp cannot be set to more than half your total hitpoints.');
+      session.write('Wimp cannot be set to more than half your total hitpoints.');
     }
   }
 }

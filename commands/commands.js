@@ -25,7 +25,7 @@ function Commands() {
     this.triggers[command.trigger] = command.callback;
   }
 
-  this.commandHandler  = function(socket, inputRaw, connection) {
+  this.commandHandler  = function(session, inputRaw) {
     var input = inputRaw.toString().toLowerCase().replace(/(\r\n|\n|\r)/gm,"");
     // Prevent user session from dropping into limbo if a blank newline is sent.
     if (input === '') {
@@ -38,8 +38,8 @@ function Commands() {
     var arg = commandSegments.join(' ');
 
     // If input matches an exit label for the current room treat as move.
-    if (global.rooms.inputIsExit(socket, input) === true) {
-      this.triggers.move(socket, input);
+    if (global.rooms.inputIsExit(session, input) === true) {
+      this.triggers.move(session, input);
       return;
     }
     // Otherwise lets check available commands
@@ -47,14 +47,14 @@ function Commands() {
 
     for (i = 0; i < keys.length; ++i) {
       if (keys[i].startsWith(command)) {
-        this.triggers[keys[i]](socket, arg);
+        this.triggers[keys[i]](session, arg);
         commandFound = true;
         break;
       }
     }
 
     if (commandFound === false) {
-      socket.write('wut\n');
+      session.write('Do what??\n');
     }
 
   }
