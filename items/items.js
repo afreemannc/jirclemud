@@ -177,7 +177,7 @@ item.prototype.saveNewItem = function(session, fieldValues) {
         }).catch(function(error) {
           console.log('something has gone wrong adding a new item to inventory:' + error);
         });
-      }).catch(function(error)) {
+      }).catch(function(error) {
         console.log('something has gone wrong saving a new item instance:' + error);
       });
     }
@@ -199,7 +199,7 @@ item.prototype.saveItem = function(values) {
         return resolve(values);
       }
     });
-  }):
+  });
 }
 
 item.prototype.saveItemInstance = function(item) {
@@ -282,8 +282,7 @@ item.prototype.transferItemInstance = function(session, fieldValues) {
   }
 }
 
-item.prototype.loadInventory = function(fieldValues) {
-  return new Promise((resolve, reject) => {
+item.prototype.loadInventory = function(fieldValues, session) {
     var inserts = [fieldValues.containerType, fieldValues.parentId];
     var sql = `
       SELECT
@@ -303,18 +302,26 @@ item.prototype.loadInventory = function(fieldValues) {
         container_type = ?
         AND parent_id = ?`;
 
-      sql = global.mysql.format(sql, inserts);
+    sql = global.mysql.format(sql, inserts);
 
-      global.dbPool.query(sql, function(error, results) {
-        if (error) {
-          return reject(error);
-        }
-        else {
-          return resolve(results);
+    global.dbPool.query(sql, function(error, results) {
+      if (error) {
+        console.log('unable to load inventory:' + inserts);
+      }
+      else {
+        switch (fieldValues.containerType) {
+          case 'player_inventory':
+            session.character.inventory = results;
+            break;
+          case 'room':
+            global.rooms.room[fieldValues.parentId].inventory = results;
+            break;
+          default:
+            console.log('Unknown inventory type specified during load:' + inserts);
+            break;
         }
       }
     });
-  });
 }
 
 /**
@@ -331,9 +338,6 @@ item.prototype.loadInventory = function(fieldValues) {
  */
 
 item.prototype.inventoryDisplay = function(inventory) {
-  if (inventory.length === 0) {
-   return '';
-  }
   var output = '';
   for (i = 0; i < inventory.length; ++i) {
     if (typeof inventory[i] === 'object') {

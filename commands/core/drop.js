@@ -9,7 +9,7 @@ var Command = function() {
         item: session.character.inventory[index],
         index: index
       }
-      global.items.transferItemInstance(socket, fieldValues);
+      global.items.transferItemInstance(session, fieldValues);
       var roomId = session.character.currentRoom;
       var name = session.character.name;
       // player message

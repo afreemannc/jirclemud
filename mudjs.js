@@ -1,5 +1,5 @@
 var net = require('net');
-var mysql = require('mysql');
+global.mysql = require('mysql');
 global.colors = require('colors/safe');
 global.session = require('./session');
 global.config = require('./config');
@@ -60,7 +60,7 @@ function parseData(session, data) {
     case 'command':
       // commands should only every be single line so data is sanitized to remove newline characters.
       var input = cleanInput(data);
-      global.commands.commandHandler(socket, input);
+      global.commands.commandHandler(session, input);
       break;
   }
 }

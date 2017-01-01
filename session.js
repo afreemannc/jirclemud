@@ -22,7 +22,7 @@ function Session() {
   this.characterPrompt = function() {
     // Prompt is configurable in config.js.
     // @see comments in config.js.example for details.
-    var prompt = global.tokens.replace(this.socket, global.config.playerPrompt);
+    var prompt = global.tokens.replace(this, global.config.playerPrompt);
     return "\n" + prompt;
   }
 

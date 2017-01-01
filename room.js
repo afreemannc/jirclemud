@@ -8,7 +8,7 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
   for (i = 0; i < global.sessions.length; ++i) {
     checkSession = global.sessions[i];
     // They ain't here.
-    if (checkSession.characterId.currentRoom !== roomId) {
+    if (checkSession.character.currentRoom !== roomId) {
       return;
     }
     else if (checkSession.character.id === session.character.id && skipCharacter === true) {
@@ -43,14 +43,10 @@ room.prototype.loadRooms = function() {
       global.rooms.room[roomId] = results[i];
       global.rooms.loadExits(roomId);
       var values = {
-        containerType: 'room_inventory',
+        containerType: 'room',
         parentId: roomId
       }
-      global.items.loadInventory(values).then((results) => {
-        global.rooms.room[roomId].inventory = results;
-      }).catch(function(error) {
-        console.log('Problem loading room inventory:' + error);
-      });
+      global.items.loadInventory(values);
     }
     console.log('The world is loaded!');
   });
