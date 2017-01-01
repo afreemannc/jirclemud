@@ -1,13 +1,7 @@
 // Just session things
-var user = require('./user');
-
-function session(socket) {
+function Session(socket) {
   this.inputContext = 'start';
   this.socket = socket;
-  this.mode = false;
-  this.user = false;
-  this.pass = false;
-  this.characterId = '';
 
   this.getInputContext = function() {
     var context = this.inputContext.split(':');
@@ -21,33 +15,13 @@ function session(socket) {
     }
   }
 
+  /**
+   *  Display character command prompt.
+   */
   this.characterPrompt = function() {
     // Prompt is configurable in config.js.
     // @see comments in config.js.example for details.
     var prompt = global.tokens.replace(this.socket, global.config.playerPrompt);
-
-    /*
-    var stats = this.character.stats;
-    console.log(stats);
-    var statKeys = Object.keys(stats);
-    // Replace stat values in prompt
-    for (i = 0; i < statKeys.length; ++i) {
-      stat = statKeys[i];
-      if (prompt.includes('%' + stat + '%')) {
-        prompt = prompt.replace('%' + stat + '%', this.character.stats[stat]);
-      }
-    }
-    // Handle colors style options
-    var colorKeys = Object.keys(global.colors.styles);
-    for (i = 0; i < colorKeys.length; ++i) {
-      style = colorKeys[i];
-      if (prompt.includes('%' + style +'%')) {
-        regex = new RegExp('%' + style +'%([\\w\\s]+)%' + style + '%', 'g');
-        prompt = prompt.replace(regex, function(match, capture) {
-          return colors[style](capture);
-        });
-      }
-    }*/
     return "\n" + prompt;
   }
 
@@ -61,7 +35,50 @@ function session(socket) {
     this.socket.write(this.characterPrompt());
   }
 
+  this.start = function(socket) {
+    var message = colors.green('Welcome to ' + global.config.mudName + "\n");
+    // TODO: display splash screen.
+    var startPrompt = prompt.new(socket, this.startSwitch);
+    // The standard prompt bailout doesn't make sense on this screen.
+    startPrompt.quittable = false;
+
+    var startField = startPrompt.newField('select');
+    startField.name = 'start';
+    startField.options = {l:'l', c:'c', q:'q'};
+    startField.formatPrompt('[::l::]og in, [::c::]reate a character, or [::q::]uit', true);
+    startPrompt.addField(startField);
+
+    startPrompt.start();
+  }
+
+  /**
+   * Start screen prompt callback
+   *
+   * Switches between login and character creation modes based
+   * on user input on the start screen.
+   *
+   * @param socket
+   *   Socket object for the current user.
+   *
+   * @param fieldValues
+   *   user-submitted values for the start prompt
+   *
+   */
+  this.startSwitch = function(socket, fieldValues) {
+
+    var input = fieldValues.start;
+    if (input === 'l') {
+      characters.login(socket);
+    }
+    else if  (input === 'c') {
+      characters.createCharacter(socket);
+    }
+    else if (input === 'q') {
+      socket.write(global.config.quitMessage);
+      global.commands.quit(socket, false);
+    }
+  }
 }
 
 
-module.exports = session;
+module.exports = new Session();
