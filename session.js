@@ -1,8 +1,8 @@
 // Just session things
-function Session(socket) {
+function Session() {
   this.character = {};
   this.inputContext = 'start';
-  this.socket = socket;
+  this.socket = false;
 
   this.getInputContext = function() {
     var context = this.inputContext.split(':');
@@ -39,7 +39,7 @@ function Session(socket) {
   this.start = function() {
     var message = colors.green('Welcome to ' + global.config.mudName + "\n");
     // TODO: display splash screen.
-    var startPrompt = prompt.new(this.socket, this.startSwitch);
+    var startPrompt = prompt.new(this, this.startSwitch);
     // The standard prompt bailout doesn't make sense on this screen.
     startPrompt.quittable = false;
 
@@ -82,6 +82,6 @@ function Session(socket) {
 }
 
 
-module.exports.new = function(socket) {
-  return new Session(socket);
+module.exports.new = function() {
+  return new Session();
 }

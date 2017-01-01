@@ -1,4 +1,4 @@
-function Prompt(socket, completionCallback) {
+function Prompt(session, completionCallback) {
   this.session = session;
   this.fields = [];
   this.currentField = false;
@@ -117,7 +117,7 @@ function Prompt(socket, completionCallback) {
 
 
   this.displayCompletionError = function(error) {
-    this.resetPrompt(socket);
+    this.resetPrompt(session);
     this.session.socket.write(color.red(error));
     this.start();
   }

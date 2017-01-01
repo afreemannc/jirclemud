@@ -1,7 +1,7 @@
 // Token Replacement
 
-module.exports.replace = function(socket, string) {
-  var character = socket.playerSession.character;
+module.exports.replace = function(session, string) {
+  var character = session.character;
   var statKeys = Object.keys(character.stats);
 
   // Replace character stat tokens

@@ -23,21 +23,27 @@ item.prototype.flags = {
   th: 'TWO-HANDED'
 }
 
-item.prototype.loadItem = function(socket, itemId, callback, args) {
+item.prototype.loadItem = function(itemId) {
+  return new Promise((resolve, reject) => {
     var sql = "SELECT * FROM ?? WHERE ?? = ?";
     var inserts = ['items',  'iid', itemId];
     sql = global.mysql.format(sql, inserts);
-    global.dbPool.query(sql, function(err, results, fields) {
-      if (callball !== false) {
-        callback(socket, results);
+    global.dbPool.query(sql, function(error, results, fields) {
+      if (error) {
+        return reject(error);
+      }
+      else {
+        var item = results[0];
+        // TODO: if container load inventory
+        return resolve(item);
       }
     });
-    // TODO: if container load inventory
+  });
 }
 
-item.prototype.createItem = function(socket) {
+item.prototype.createItem = function(session) {
 
-  var itemPrompt = global.prompt.new(socket, this.saveItem);
+  var itemPrompt = global.prompt.new(session, this.saveNewItem);
   var nameField = itemPrompt.newField('text');
   nameField.name = 'name';
   nameField.inputCacheName = 'name';
@@ -144,15 +150,10 @@ item.prototype.createItem = function(socket) {
 item.prototype.setItemProperties = function(fieldValues) {
   var properties = {};
   properties.flags = fieldValues.flags.join(',');
-  // TODO: set container max weight, max item count
-  // TODO: set item weight, size
   return properties;
 }
 
-item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) {
-  console.log('fieldValues in item save');
-  console.log(fieldValues);
-
+item.prototype.saveNewItem = function(session, fieldValues) {
   var properties = {};
   var values = {
     name:fieldValues.name,
@@ -160,71 +161,100 @@ item.prototype.saveItem = function(socket, fieldValues, callback, callbackArgs) 
     full_description:fieldValues.full_description,
     properties: JSON.stringify(global.items.setItemProperties(fieldValues))
   }
-  if (fieldValues.create === 'y') {
-    callback = global.items.saveItemInstance;
-    callbackArgs = false;
-  }
-  global.dbPool.query('INSERT INTO items SET ?', values, function (error, results) {
-    socket.playerSession.write('Room saved.');
-    socket.playerSession.inputContext = 'command';
-    if (typeof callback === 'function') {
-      callback(socket, results.insertId, callbackArgs);
+  global.items.saveItem(values).then((response) => {
+    if (fieldValues.create === 'y') {
+      values = {
+        iid:response.iid,
+        properties: response.properties
+      }
+      global.items.saveItemInstance(values).then((response) => {
+        var values = {
+          cid: session.character.inventory.id,
+          instance_id: response.instance_id
+        }
+        global.items.saveItemToInventory(values).then((response) => {
+          session.write('New item created. Check your inventory.');
+        }).catch(function(error) {
+          console.log('something has gone wrong adding a new item to inventory:' + error);
+        });
+      }).catch(function(error)) {
+        console.log('something has gone wrong saving a new item instance:' + error);
+      });
     }
+  }).catch(function(error) {
+    console.log('something has gone wrong saving an item:' + error);
+  });
+}
+
+item.prototype.saveItem = function(values) {
+  return new Promise((resolve, reject) => {
+    global.dbPool.query('INSERT INTO items SET ?', values, function (error, results) {
+      if (error) {
+        return reject(error);
+      }
+      else {
+        session.write('Room saved.');
+        session.inputContext = 'command';
+        values.iid = results.insertId;
+        return resolve(values);
+      }
+    });
+  }):
+}
+
+item.prototype.saveItemInstance = function(item) {
+  return new Promise((resolve, reject) => {
+    // TODO: this is where the TWEAK happens.
+      // unpack properties
+      // tweak
+      // restringify properties
+
+    global.dbPool.query('INSERT INTO item_instance SET ?', values, function (error, results) {
+      if (error) {
+        return reject(error);
+      }
+      else {
+        values.instance_id = results.insertId;
+        return resolve(values);
+      }
+    });
+  });
+}
+
+item.prototype.saveItemToInventory = function(values) {
+  return new Promise((resolve, reject) => {
+    global.dbPool.query('INSERT INTO container_inventory SET ?', values, function (error, results) {
+      if (error) {
+        return reject(error);
+      }
+      else {
+        values.id = response.insertId;
+        return resolve(values);
+      }
+    });
   });
 }
 
 
-
-
-item.prototype.saveItemInstance = function(socket, itemId, callback, callbackArgs) {
-  // TODO: this is where the TWEAK happens.
-  var properties = {};
-  values = {
-    iid:itemId,
-    properties: JSON.stringify()
-  }
-  global.dbPool.query('INSERT INTO item_instance SET ?', values, function (error, results) {
-    socket.playerSession.write('Item created.');
-    var fieldValues = {
-      containerId: socket.playerSession.character.inventory.id,
-      instanceId:results.insertId
-    }
-    global.items.saveItemToInventory(socket, fieldValues, callback, callbackArgs);
-  });
-}
-
-item.prototype.saveItemToInventory = function(socket, fieldValues, callback, callbackArgs) {
-  var values = {
-    cid:fieldValues.containerId,
-    instance_id:fieldValues.instanceId
-  }
-  global.dbPool.query('INSERT INTO container_inventory SET ?', values, function (error, results) {
-    socket.playerSession.write('Item created.');
-    if (typeof callback === 'function') {
-      callback(socket, results.insertId, callbackArgs);
-    }
-  });
-}
-
-item.prototype.transferItemInstance = function(socket, fieldValues, callback, callbackArgs) {
+item.prototype.transferItemInstance = function(session, fieldValues) {
   // Inventory alterations to containers, rooms, and players must be syncronous to prevent
   // race conditions and item duping.
   switch (fieldValues.transferType) {
     case 'character-to-room':
       // get current room id
-      var roomId = socket.playerSession.character.currentRoom;
+      var roomId = session.character.currentRoom;
       // delete inventory[index] from character inventory
-      delete socket.playerSession.character.inventory[fieldValues.index];
+      delete session.character.inventory[fieldValues.index];
       // add item to room[room id].inventory
       global.rooms.room[roomId].inventory.push(fieldValues.item);
       break;
 
     case 'room-to-character':
-      var roomId = socket.playerSession.character.currentRoom;
+      var roomId = session.character.currentRoom;
       // delete inventory[index] from character inventory
       delete global.rooms.room[roomId].inventory[fieldValues.index];
       // add item to room[room id].inventory
-      socket.playerSession.character.inventory.push(fieldValues.item);
+      session.character.inventory.push(fieldValues.item);
       break;
 
     case 'character-to-character':
@@ -240,7 +270,7 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
       break;
 
     case 'character-to-container':
-      delete socket.playerSession.character.inventory[fieldValues.index];
+      delete session.character.inventory[fieldValues.index];
       if (fieldValues.containerLocation === 'character inventory') {
 
       }
@@ -252,42 +282,38 @@ item.prototype.transferItemInstance = function(socket, fieldValues, callback, ca
   }
 }
 
-item.prototype.loadInventory = function(socket, fieldValues) {
-  var inserts = [fieldValues.containerType, fieldValues.parentId];
-  var sql = `
-    SELECT
-      ii.instance_id,
-      i.name,
-      i.room_description,
-      i.full_description,
-      i.properties
-    FROM item_instance ii
-    INNER JOIN items i
-      ON i.iid = ii.iid
-    INNER JOIN container_inventory ci
-      ON ci.instance_id = ii.instance_id
-    INNER JOIN containers c
-      ON c.cid = ci.cid
-    WHERE
-      container_type = ?
-      AND parent_id = ?`;
+item.prototype.loadInventory = function(fieldValues) {
+  return new Promise((resolve, reject) => {
+    var inserts = [fieldValues.containerType, fieldValues.parentId];
+    var sql = `
+      SELECT
+        ii.instance_id,
+        i.name,
+        i.room_description,
+        i.full_description,
+        i.properties
+      FROM item_instance ii
+      INNER JOIN items i
+        ON i.iid = ii.iid
+      INNER JOIN container_inventory ci
+        ON ci.instance_id = ii.instance_id
+      INNER JOIN containers c
+        ON c.cid = ci.cid
+      WHERE
+        container_type = ?
+        AND parent_id = ?`;
 
-  sql = global.mysql.format(sql, inserts);
+      sql = global.mysql.format(sql, inserts);
 
-  global.dbPool.query(sql, function(err, results, fields) {
-    switch(fieldValues.containerType) {
-      case 'player_inventory':
-        socket.playerSession.character.inventory = results;
-        break;
-      case 'room_inventory':
-        global.rooms.room[fieldValues.parentId].inventory = results;
-        break;
-      default:
-        break;
-    }
-    if (typeof callback === 'function') {
-      callback(socket, '');
-    }
+      global.dbPool.query(sql, function(error, results) {
+        if (error) {
+          return reject(error);
+        }
+        else {
+          return resolve(results);
+        }
+      }
+    });
   });
 }
 
@@ -304,7 +330,7 @@ item.prototype.loadInventory = function(socket, fieldValues) {
  * -  Used by glance skill to display contents of mob/character inventory
  */
 
-item.prototype.inventoryDisplay = function(socket, inventory) {
+item.prototype.inventoryDisplay = function(inventory) {
   if (inventory.length === 0) {
    return '';
   }
@@ -317,6 +343,22 @@ item.prototype.inventoryDisplay = function(socket, inventory) {
   return output;
 }
 
+/**
+ * Search an inventory array for a value in a particular field.
+ *
+ * @param input
+ *   String to search for.
+ *
+ * @param field
+ *   Item field to search in
+ *
+ * @param inventory
+ *   Inventory array to search
+ *
+ * @param like
+ *   Toggle between literal search and search containing.
+ *
+ */
 item.prototype.searchInventory = function(input, field, inventory, like) {
 
   for (i = 0; i < inventory.length; ++i) {
@@ -341,7 +383,7 @@ item.prototype.searchInventory = function(input, field, inventory, like) {
  *  - Used by eq command to display character equipment
  *  - Used by look command to display mob/character equipment
  */
-item.prototype.equipmentDisplay = function(socket, equipment) {
+item.prototype.equipmentDisplay = function(session, equipment) {
   // Empty slot display:
   // (head): - empty
   //

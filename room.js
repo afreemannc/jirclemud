@@ -3,24 +3,25 @@ var room = function(){
   this.room = {};
 };
 
-room.prototype.message = function(socket, roomId, message, skipCharacter) {
-  for (i = 0; i < global.sockets.length; ++i) {
-    playerSession = global.sockets[i].playerSession;
+// TODO: this method should be attached to the actual room object.
+room.prototype.message = function(session, roomId, message, skipCharacter) {
+  for (i = 0; i < global.sessions.length; ++i) {
+    checkSession = global.sessions[i];
     // They ain't here.
-    if (roomId !== false && playerSession.characterId.currentRoom !== roomId) {
+    if (checkSession.characterId.currentRoom !== roomId) {
       return;
     }
-    else if (playerSession.character.id === socket.playerSession.character.id && skipCharacter === true) {
+    else if (checkSession.character.id === session.character.id && skipCharacter === true) {
       return;
     }
     else {
-      playerSession.write(message);
+      session.write(message);
     }
   }
 }
 
-room.prototype.inputIsExit = function(socket, input) {
-  var roomId = socket.playerSession.character.currentRoom;
+room.prototype.inputIsExit = function(session, input) {
+  var roomId = session.character.currentRoom;
   var currentExits = Object.keys(global.rooms.room[roomId].exits);
 
   if (currentExits.includes(input) === true) {
@@ -45,20 +46,24 @@ room.prototype.loadRooms = function() {
         containerType: 'room_inventory',
         parentId: roomId
       }
-      global.items.loadInventory({}, values);
+      global.items.loadInventory(values).then((results) => {
+        global.rooms.room[roomId].inventory = results;
+      }).catch(function(error) {
+        console.log('Problem loading room inventory:' + error);
+      });
     }
     console.log('The world is loaded!');
   });
 }
 
 // TODO: this should be deprecated by room.message
-room.prototype.exitMessage = function(socket, input) {
-  var currentRoomId = socket.playerSession.character.currentRoom;
-  var name = socket.playerSession.character.name;
-  global.rooms.message(socket, currentRoomId, name + " leaves heading " + input, true);
+room.prototype.exitMessage = function(session, input) {
+  var roomId = session.character.currentRoom;
+  var name = session.character.name;
+  global.rooms.message(session, roomId, name + " leaves heading " + input, true);
 }
 
-room.prototype.loadExits = function(roomId, callback, callbackArgs) {
+room.prototype.loadExits = function(roomId) {
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
   global.dbPool.query(sql, inserts, function(err, results, fields) {
@@ -66,19 +71,15 @@ room.prototype.loadExits = function(roomId, callback, callbackArgs) {
     for (i = 0; i < results.length; ++i) {
       global.rooms.room[roomId].exits[results[i].label] = results[i];
     }
-    // TODO ditch this pattern in favor of promises if needed
-    if (typeof callback === 'function') {
-      callback(socket, callbackArgs, global.commands.triggers.look, socket);
-    }
   });
 }
 
-room.prototype.createRoom = function(socket) {
+room.prototype.createRoom = function(session) {
 
-  var roomId = socket.playerSession.character.currentRoom;
+  var roomId = session.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var createRoomPrompt = prompt.new(socket, this.saveRoomChanges);
+  var createRoomPrompt = prompt.new(session, this.saveRoomChanges);
 
   var zoneIdField = createRoomPrompt.newField('value');
   zoneIdField.name = 'zid';
@@ -107,11 +108,11 @@ room.prototype.createRoom = function(socket) {
   createRoomPrompt.start();
 }
 
-room.prototype.editRoomName = function(socket) {
-  var roomId = socket.playerSession.character.currentRoom;
+room.prototype.editRoomName = function(session) {
+  var roomId = session.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editNamePrompt = prompt.new(socket, this.saveRoomChanges);
+  var editNamePrompt = prompt.new(session, this.saveRoomChanges);
 
   var ridField = editNamePrompt.newField('value');
   ridField.name = 'rid';
@@ -143,11 +144,11 @@ room.prototype.editRoomName = function(socket) {
   editNamePrompt.start();
 }
 
-room.prototype.editRoomDesc = function(socket) {
-  var roomId = socket.playerSession.character.currentRoom;
+room.prototype.editRoomDesc = function(session) {
+  var roomId = session.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editDescPrompt = prompt.new(socket, this.saveRoomChanges);
+  var editDescPrompt = prompt.new(session, this.saveRoomChanges);
 
   var ridField = editDescPrompt.newField('value');
   ridField.name = 'rid';
@@ -178,11 +179,11 @@ room.prototype.editRoomDesc = function(socket) {
   editDescPrompt.start();
 }
 
-room.prototype.editRoomFlags = function(socket) {
-  var roomId = socket.playerSession.character.currentRoom;
+room.prototype.editRoomFlags = function(session) {
+  var roomId = session.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editFlagsPrompt = prompt.new(socket, this.saveRoomChanges);
+  var editFlagsPrompt = prompt.new(session, this.saveRoomChanges);
 
   var ridField = editFlagsPrompt.newField('value');
   ridField.name = 'rid';
@@ -217,10 +218,10 @@ room.prototype.editRoomFlags = function(socket) {
   editFlagsPrompt.start();
 }
 
-room.prototype.deleteRoomPrompt = function(socket) {
-  var roomId = socket.playerSession.character.currentRoom;
+room.prototype.deleteRoomPrompt = function(session) {
+  var roomId = session.character.currentRoom;
 
-  var deleteRoomPrompt = prompt.new(socket, this.deleteRoom);
+  var deleteRoomPrompt = prompt.new(session, this.deleteRoom);
 
   var roomIdField = deleteRoomPrompt.newField('value');
   roomIdField.name = 'rid';
@@ -238,8 +239,8 @@ room.prototype.deleteRoomPrompt = function(socket) {
     else {
       // This is unusual for a cache function. Since there is a cancel option we want to gracefully bail out of
       // prompt mode without triggering the prompt completion callback.
-      socket.playerSession.inputContext = 'command';
-      socket.playerSession.write('Primal chaos recedes as you turn your thoughts away from destruction.');
+      session.inputContext = 'command';
+      session.write('Primal chaos recedes as you turn your thoughts away from destruction.');
       return false;
     }
   };
@@ -248,7 +249,7 @@ room.prototype.deleteRoomPrompt = function(socket) {
   deleteRoomPrompt.start();
 }
 
-room.prototype.deleteRoom = function(socket, fieldValues) {
+room.prototype.deleteRoom = function(session, fieldValues) {
   // unload room from memory if present
   // delete db record for room
   // delete all room exits
@@ -296,7 +297,7 @@ room.prototype.invertExitLabel = function(label) {
   return output;
 }
 
-room.prototype.saveExit = function(socket, fieldValues) {
+room.prototype.saveExit = function(session, fieldValues) {
   return new Promise((resolve, reject) => {
     var properties = fieldValues.properties;
     var values = {
@@ -310,8 +311,8 @@ room.prototype.saveExit = function(socket, fieldValues) {
       if (error) {
         return reject(error);
       }
-      socket.playerSession.write('Exit saved.');
-      socket.playerSession.inputContext = 'command';
+      session.write('Exit saved.');
+      session.inputContext = 'command';
       values.eid = results.insertId;
       values.properties = JSON.parse(values.properties);
       // update exit in memory;
@@ -321,16 +322,14 @@ room.prototype.saveExit = function(socket, fieldValues) {
   });
 }
 
-room.prototype.saveRoomChanges = function(socket, fieldValues) {
-  this.saveRoom(socket, fieldValues).then((response) => {
-    console.log('response:');
-    console.log(response);
+room.prototype.saveRoomChanges = function(session, fieldValues) {
+  this.saveRoom(session, fieldValues).then((response) => {
     if (typeof fieldValues.rid !== 'undefined') {
-      socket.write('Room changes saved');
+      session.write('Room changes saved');
       return response;
     }
     else {
-      socket.write('New room created');
+      session.write('New room created');
       return response;
     }
   }).catch(function (error) {
@@ -338,7 +337,7 @@ room.prototype.saveRoomChanges = function(socket, fieldValues) {
   });
 }
 
-room.prototype.saveRoom = function(socket, values) {
+room.prototype.saveRoom = function(session, values) {
   return new Promise((resolve, reject) => {
     values.flags = JSON.stringify(values.flags);
     // If rid is passed in with field values this indicates changes to an existing room

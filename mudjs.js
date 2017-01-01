@@ -17,6 +17,7 @@ global.containers = require('./containers');
 global.sessions = [];
 
 function newSocket(socket) {
+
   var session = global.session.new();
 
   socket.on('data', function (data) {
@@ -24,10 +25,9 @@ function newSocket(socket) {
   });
 
   socket.on('end', function() {
-    closeSocket(socket);
+    closeSession(session);
   });
 
-  var session = global.session.new();
   session.socket = socket;
   global.sessions.push(session);
   session.start();
@@ -72,9 +72,9 @@ function cleanInput(data) {
   return data.toString().replace(/(\r\n|\n|\r)/gm,"");
 }
 
-function closeSocket(socket) {
-  var i = sockets.indexOf(socket);
+function closeSession(session) {
+  var i = global.sessions.indexOf(session);
   if (i !== -1) {
-    sockets.splice(i, 1);
+    global.sessions.splice(i, 1);
   }
 }

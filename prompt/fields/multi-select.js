@@ -71,7 +71,7 @@ function Multiselect() {
         return true;
       }
       else {
-         this.validationError(socket, input);
+         this.validationError(session, input);
          return false;
       }
     }

@@ -13,7 +13,7 @@ var Command = function() {
       // display room description
       session.socket.write(global.tokens.replace(session, global.rooms.room[roomId].full_description) + "\n\n");
       // display room inventory
-      var display = global.items.inventoryDisplay(session, global.rooms.room[roomId].inventory);
+      var display = global.items.inventoryDisplay(global.rooms.room[roomId].inventory);
       session.socket.write(global.tokens.replace(session, display) + "\n\n");
       // display exits
       var exits = global.rooms.room[roomId].exits;

@@ -73,7 +73,11 @@ var Characters = function(){
       containerType: 'player_inventory',
       parentId: character.id
     }
-    global.items.loadInventory(values, session);
+    global.items.loadInventory(values).then((results) => {
+      session.character.inventory = results;
+    }).catch(function(error) {
+      console.log('Problem loading charactr inventory:' + error);
+    });
     // Raw socket write is used here since the command prompt will be displayed after "look" runs.
     session.socket.write('Welcome back ' + character.name + '\n');
     session.inputContext = 'command';

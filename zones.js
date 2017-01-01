@@ -17,14 +17,14 @@ function Zones() {
     });
   }
 
-  this.getCurrentZoneId = function(socket) {
-    var roomId = socket.playerSession.character.currentRoom;
+  this.getCurrentZoneId = function(session) {
+    var roomId = session.character.currentRoom;
     var currentRoom = global.rooms.room[roomId];
     return currentRoom.zid;
   }
 
-  this.createZone = function(socket) {
-    var createZonePrompt = global.prompt.new(socket, this.saveZone);
+  this.createZone = function(session) {
+    var createZonePrompt = global.prompt.new(session, this.saveZone);
 
     // name
     var nameField = createZonePrompt.newField('text');
@@ -70,9 +70,9 @@ function Zones() {
     createZonePrompt.start();
   }
 
-  this.editZoneName = function(socket, zoneId) {
+  this.editZoneName = function(session, zoneId) {
     var zone = global.zones.zone[zoneId];
-    var editZonePrompt = global.prompt.new(socket, this.saveZone);
+    var editZonePrompt = global.prompt.new(session, this.saveZone);
 
     // name
     var currently = 'Currently:' + zone.name;
@@ -97,9 +97,9 @@ function Zones() {
     editZonePrompt.start();
   }
 
-  this.editZoneDescription = function(socket) {
+  this.editZoneDescription = function(session) {
     var zone = global.zones.zone[zoneId];
-    var editZonePrompt = global.prompt.new(socket, this.saveZone);
+    var editZonePrompt = global.prompt.new(session, this.saveZone);
 
     var nameField = createZonePrompt.newField('value');
     nameField.name = 'name';
@@ -120,9 +120,9 @@ function Zones() {
     editZonePrompt.start();
   }
 
-  this.editZoneRating = function(socket) {
+  this.editZoneRating = function(session) {
     var zone = global.zones.zone[zoneId];
-    var editZonePrompt = global.prompt.new(socket, this.saveZone);
+    var editZonePrompt = global.prompt.new(session, this.saveZone);
 
     var nameField = createZonePrompt.newField('value');
     nameField.name = 'name';
@@ -168,7 +168,7 @@ function Zones() {
 
   }
 
-  this.validateZoneName = function(socket, zoneName) {
+  this.validateZoneName = function(session, zoneName) {
     for (i = 0; i < global.zones.zone.length; ++i) {
       zone = global.zones.zone[i];
       if (zone.name = zoneName) {
@@ -178,7 +178,7 @@ function Zones() {
     return true;
   }
 
-  this.saveZone = function(socket, fieldValues) {
+  this.saveZone = function(session, fieldValues) {
     var values = {
       name:fieldValues.name,
       description:fieldValues.description,
@@ -192,16 +192,15 @@ function Zones() {
         // Update copy loaded in memory
         global.zones.zone[values.zid].name = values.name;
         global.zones.zone[values.zid].description = values.description;
-        socket.playerSession.write('Zone changes saved.');
-        socket.playerSession.inputContext = 'command';
+        session.write('Zone changes saved.');
+        session.inputContext = 'command';
       });
     }
     else {
       // If rid is not provided this should be saved as a new zone.
       global.dbPool.query('INSERT INTO zones SET ?', values, function (error, results) {
-        socket.playerSession.write('New zone saved.');
-        socket.playerSession.inputContext = 'command';
-        console.log('error:' + error);
+        session.write('New zone saved.');
+        session.inputContext = 'command';
         // Once a new zone is created we will need to also create a starter room so
         // construction can start. Otherwise I'm stuck adding a zone selection field to the
         // room creation and edit forms to no good purpose. Much simpler to make a room and then
@@ -212,10 +211,10 @@ function Zones() {
           full_description: '... there was naught but darkness and chaos.',
           flags: [],
         }
-        console.log('values going into room:');
-        console.log(roomValues);
-        global.rooms.saveRoom(socket, roomValues, global.commands.triggers.bamf, false).then((response) => {
-          global.commands.triggers.bamf(socket, response.rid);
+        global.rooms.saveRoom(session, roomValues).then((response) => {
+          global.commands.triggers.bamf(session, response.rid);
+        }).catch(function(error) {
+          console.log('something has gone terribly wrong with zone save:' + error);
         });
       });
     }

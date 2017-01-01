@@ -49,12 +49,12 @@ function Select() {
     return input;
   }
 
-  this.validate = function(socket, input) {
+  this.validate = function(session, input) {
     if (typeof this.options[input] !== 'undefined') {
         return true;
     }
     else {
-      this.validationError(socket, input);
+      this.validationError(session, input);
       return false;
     }
   };
