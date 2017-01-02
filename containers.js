@@ -67,7 +67,42 @@ var Containers = function() {
         }
       }
     });
-}
+  }
+
+  /**
+   * Search an inventory array for a value in a particular field.
+   *
+   * @param input
+   *   String to search for.
+   *
+   * @param field
+   *   Item field to search in
+   *
+   * @param inventory
+   *   Inventory array to search
+   *
+   * @param like
+   *   Toggle between literal search and search containing.
+   *
+   */
+  this.findItemInContainer = function(input, field, inventory, like) {
+
+    for (i = 0; i < inventory.length; ++i) {
+      item = inventory[i];
+      // Weird things happen after a drop command has been executed but before
+      if (like === true) {
+        if (item[field].includes(input)  === true) {
+          return i;
+        }
+      }
+      else {
+        if (item[field] === input) {
+          return i;
+        }
+      }
+    }
+    return false;
+  }
 }
 
 module.exports = new Containers();

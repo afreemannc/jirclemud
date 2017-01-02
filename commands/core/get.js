@@ -3,7 +3,8 @@ var Command = function() {
   this.helpText = 'Get an item (ex: get ye flask)';
   this.callback = function(session, input) {
     var roomId = session.character.currentRoom;
-    var index = global.items.searchInventory(input, 'name', global.rooms.room[roomId].inventory, true);
+    var name = session.character.name;
+    var index = global.containers.findItemInContainer(input, 'name', global.rooms.room[roomId].inventory, true);
     if (index !== false) {
       var fieldValues = {
         transferType: 'room-to-character',
@@ -11,8 +12,6 @@ var Command = function() {
         index: index
       }
       global.items.transferItemInstance(session, fieldValues);
-      var roomId = session.character.currentRoom;
-      var name = session.character.name;
       // player message
       session.write('You pick up a ' + fieldValues.item.name);
       // room message

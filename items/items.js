@@ -244,15 +244,15 @@ item.prototype.transferItemInstance = function(session, fieldValues) {
       // get current room id
       var roomId = session.character.currentRoom;
       // delete inventory[index] from character inventory
-      delete session.character.inventory[fieldValues.index];
+      session.character.inventory.splice(fieldValues.index, 1);
       // add item to room[room id].inventory
       global.rooms.room[roomId].inventory.push(fieldValues.item);
       break;
 
     case 'room-to-character':
       var roomId = session.character.currentRoom;
-      // delete inventory[index] from character inventory
-      delete global.rooms.room[roomId].inventory[fieldValues.index];
+      // delete inventory[index] from room inventory
+      global.rooms.room[roomId].inventory.splice(fieldValues.index, 1);
       // add item to room[room id].inventory
       session.character.inventory.push(fieldValues.item);
       break;

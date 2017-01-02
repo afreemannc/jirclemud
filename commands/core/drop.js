@@ -2,7 +2,7 @@ var Command = function() {
   this.trigger = 'drop';
   this.helpText = '';
   this.callback = function(session, input) {
-    var index = global.items.searchInventory(input, 'name', session.character.inventory, true);
+    var index = global.containers.findItemInContainer(input, 'name', session.character.inventory, true);
     if (index !== false) {
       var fieldValues = {
         transferType: 'character-to-room',
