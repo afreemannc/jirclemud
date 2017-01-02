@@ -46,7 +46,7 @@ room.prototype.loadRooms = function() {
         containerType: 'room',
         parentId: roomId
       }
-      global.items.loadInventory(values);
+      global.containers.loadInventory(values);
     }
     console.log('The world is loaded!');
   });

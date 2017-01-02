@@ -7,8 +7,6 @@ var Command = function() {
     if (input === '') {
       var roomId = session.character.currentRoom;
       var room = global.rooms.room[roomId];
-      console.log(global.colors.yellow('Room in look:'));
-      console.log(room);
       // display room title
       session.socket.write(global.colors.bold(global.tokens.replace(session, room.name)) + "\n");
       // display room description
@@ -29,10 +27,22 @@ var Command = function() {
       }
     }
     else {
+      var roomId = session.character.currentRoom;
+      var room = global.rooms.room[roomId];
       // Check personal inventory
-      var itemIndex = global.items.searchInventory(input, 'name', session.character.inventory, true);
+      var itemIndex = global.containers.findItemInContainer(input, 'name', session.character.inventory, true);
       if (itemIndex !== false) {
-        console.log(session.character.inventory[itemIndex]);
+        session.write(session.character.inventory[itemIndex].full_description);
+      }
+      else {
+        // Check the room
+        itemIndex = global.containers.findItemInContainer(input, 'name', room.inventory, true);
+        if (itemIndex !== false) {
+          session.write(room.inventory[itemIndex].full_description);
+        }
+        else {
+          session.error('You do not see one of those here.');
+        }
       }
     }
   }
