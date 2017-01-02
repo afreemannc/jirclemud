@@ -17,10 +17,11 @@ var Command = function() {
     }
     if (typeof global.commands.commands[input] !== 'undefined') {
       var command = global.commands.commands[input];
-      var helpText = command.helpText;
       // Valid commands may have their help text intentionally blanked
       if (command.helpText !== '') {
-        session.write(helpText);
+        var helpText = '%cyan%Help topic [' + input + ']%cyan%\n';
+        helpText += command.helpText;
+        session.write(global.tokens.replace(session, helpText));
       }
       else {
         session.write('There is no help for that term.');
