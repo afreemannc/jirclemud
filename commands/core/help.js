@@ -12,7 +12,7 @@ var Command = function() {
           output += command.trigger.toUpperCase() + '\n';
         }
       }
-      socket.playerSession.write(output);
+      session.write(output);
       return;
     }
     if (typeof global.commands.commands[input] !== 'undefined') {
