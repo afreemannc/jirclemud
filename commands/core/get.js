@@ -19,7 +19,7 @@ var Command = function() {
   `;
   this.callback = function(session, input) {
     if (input === 'ye flask') {
-      session.write(global.colors.bold('Ye cannot get ye flask.');
+      session.write(global.colors.bold('Ye cannot get ye flask.'));
       return true;
     }
     var roomId = session.character.currentRoom;
@@ -33,9 +33,9 @@ var Command = function() {
       }
       global.containers.transferItemInstance(session, transferDetails);
       // player message
-      session.write('You pick up a ' + fieldValues.item.name);
+      session.write('You pick up a ' + transferDetails.item.name);
       // room message
-      global.rooms.message(session, roomId, name + ' picks up a ' + fieldValues.item.name, true);
+      global.rooms.message(session, roomId, name + ' picks up a ' + transferDetails.item.name, true);
     }
     else {
       session.error('Get what??\n');

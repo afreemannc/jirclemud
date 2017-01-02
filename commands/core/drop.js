@@ -25,9 +25,9 @@ var Command = function() {
       var name = session.character.name;
       // player message
       //TODO: write a thing to determine if a or an is appropriate.
-      session.write('You drop a ' + fieldValues.item.name);
+      session.write('You drop a ' + transferDetails.item.name);
       // room message
-      global.rooms.message(session, roomId, name + ' drops a ' +fieldValues.item.name, true);
+      global.rooms.message(session, roomId, name + ' drops a ' + transferDetails.item.name, true);
     }
     else {
       session.error('Drop what??\n');
