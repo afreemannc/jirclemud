@@ -6,12 +6,12 @@ var Command = function() {
     var name = session.character.name;
     var index = global.containers.findItemInContainer(input, 'name', global.rooms.room[roomId].inventory, true);
     if (index !== false) {
-      var fieldValues = {
+      var transferDetails = {
         transferType: 'room-to-character',
         item: global.rooms.room[roomId].inventory[index],
         index: index
       }
-      global.items.transferItemInstance(session, fieldValues);
+      global.containers.transferItemInstance(session, transferDetails);
       // player message
       session.write('You pick up a ' + fieldValues.item.name);
       // room message

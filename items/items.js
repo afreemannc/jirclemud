@@ -236,52 +236,6 @@ item.prototype.saveItemToInventory = function(values) {
 }
 
 
-item.prototype.transferItemInstance = function(session, fieldValues) {
-  // Inventory alterations to containers, rooms, and players must be syncronous to prevent
-  // race conditions and item duping.
-  switch (fieldValues.transferType) {
-    case 'character-to-room':
-      // get current room id
-      var roomId = session.character.currentRoom;
-      // delete inventory[index] from character inventory
-      session.character.inventory.splice(fieldValues.index, 1);
-      // add item to room[room id].inventory
-      global.rooms.room[roomId].inventory.push(fieldValues.item);
-      break;
-
-    case 'room-to-character':
-      var roomId = session.character.currentRoom;
-      // delete inventory[index] from room inventory
-      global.rooms.room[roomId].inventory.splice(fieldValues.index, 1);
-      // add item to room[room id].inventory
-      session.character.inventory.push(fieldValues.item);
-      break;
-
-    case 'character-to-character':
-
-      break;
-
-    case 'room-to-room':
-
-      break;
-
-    case 'container-to-character':
-
-      break;
-
-    case 'character-to-container':
-      delete session.character.inventory[fieldValues.index];
-      if (fieldValues.containerLocation === 'character inventory') {
-
-      }
-
-      break;
-
-    default:
-      break;
-  }
-}
-
 /**
  * Provides a list of the content of an inventory.
  *

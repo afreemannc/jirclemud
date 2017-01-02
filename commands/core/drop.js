@@ -4,12 +4,12 @@ var Command = function() {
   this.callback = function(session, input) {
     var index = global.containers.findItemInContainer(input, 'name', session.character.inventory, true);
     if (index !== false) {
-      var fieldValues = {
+      var transferDetails = {
         transferType: 'character-to-room',
         item: session.character.inventory[index],
         index: index
       }
-      global.items.transferItemInstance(session, fieldValues);
+      global.containers.transferItemInstance(session, transferDetails);
       var roomId = session.character.currentRoom;
       var name = session.character.name;
       // player message

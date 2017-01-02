@@ -103,6 +103,64 @@ var Containers = function() {
     }
     return false;
   }
+
+  /**
+   * Transfer an item from one container to another (ex: from player inventory to room via drop, etc)
+   *
+   * @param session
+   *   Player session object for the individual performing the transfer.
+   *
+   * @param transferDetails
+   *   Object containing the following keys:
+   *   - transferType: which type of transfer to perform.
+   *   - index: array index of the item being transferred.
+   *   - item: item object being transfered.
+   *
+   */
+  this.transferItemInstance = function(session, transferDetails) {
+    // Note: inventory alterations to containers, rooms, and players must be syncronous to prevent
+    // race conditions and item duping.
+    switch (transferDetails.transferType) {
+      // "drop" command
+      case 'character-to-room':
+        var roomId = session.character.currentRoom;
+        // delete inventory[index] from character inventory
+        session.character.inventory.splice(transferDetails.index, 1);
+        // add item to room[room id].inventory
+        global.rooms.room[roomId].inventory.push(transferDetails.item);
+        break;
+      // "get" command
+      case 'room-to-character':
+        var roomId = session.character.currentRoom;
+        // delete inventory[index] from room inventory
+        global.rooms.room[roomId].inventory.splice(transferDetails.index, 1);
+        // add item to room[room id].inventory
+        session.character.inventory.push(transferDetails.item);
+        break;
+      // "give" command
+      case 'character-to-character':
+
+        break;
+      // ???
+      case 'room-to-room':
+
+        break;
+      // "get <item> from <container>" command
+      case 'container-to-character':
+
+        break;
+      // "put <item> in <container>" command
+      case 'character-to-container':
+        delete session.character.inventory[fieldValues.index];
+        if (fieldValues.containerLocation === 'character inventory') {
+
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
 }
 
 module.exports = new Containers();
