@@ -283,6 +283,9 @@ item.prototype.inventoryDisplay = function(inventory) {
       }
       output += item.name + "\n";
     }
+    else if (item === false && numericKeys === false) {
+      output += '%cyan%<worn on ' + keys[i] + '>%cyan%  nothing\n';
+    }
   }
   return output;
 }
