@@ -20,7 +20,8 @@ item.prototype.flags = {
   t:  'TAKE',
   wi: 'WIELD',
   h:  'HOLD',
-  th: 'TWO-HANDED'
+  th: 'TWO-HANDED',
+  po: 'PORTAL',
 }
 
 item.prototype.loadItem = function(itemId) {
@@ -67,6 +68,16 @@ item.prototype.createItem = function(session) {
   itemPrompt.addField(flagsField);
 
   // Conditional fields
+
+  // PORTAL destination room id
+  var portalDestinationField = itemPrompt.newField('int');
+  portalDestinationField.name = 'target_rid',
+  portalDestinationField.conditional = {
+    field: 'flags',
+    value: 'PORTAL',
+  }
+  portalDestinationField.formatPrompt('Enter numeric room id this portal should lead to.');
+  itemPrompt.addField(portalDestinationField);
 
   // container size
   var containerSizeField = itemPrompt.newField('int');
