@@ -1,6 +1,23 @@
 var Command = function() {
   this.trigger = 'link';
-  this.helpText = 'Link the current room to another room. Syntax: link <direction> <target room id>. Ex: link e 110';
+  this.helpText = `
+  Create an exit leading from the current room to another room.
+  Note: this command only creates a single exit pointing to the target room.
+  This is vital when creating maze walks and the like.
+
+  %yellow%Usage:%yellow%
+         link <direction> <target room id>
+
+  %yellow%Example:%yellow%
+         > link e 110
+         >
+         > %bold%Exit saved.%bold%
+         >
+         > look
+         >
+         > %bold%Exits: [ e ]%bold%
+
+  `;
   this.callback = function (session, input) {
     var inputParts = input.split(' ');
 

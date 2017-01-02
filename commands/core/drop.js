@@ -1,6 +1,17 @@
 var Command = function() {
   this.trigger = 'drop';
-  this.helpText = '';
+  this.helpText = `
+  Drop an item that you are holding or carrying in your inventory.
+  Once dropped an item can be retrieved from the room by anyone.
+
+  %yellow%Usage:%yellow%
+         drop <item>
+
+  %yellow%Example:%yellow%
+         > drop waybread
+         >
+         > %bold%You drop a waybread.%bold%
+  `;
   this.callback = function(session, input) {
     var index = global.containers.findItemInContainer(input, 'name', session.character.inventory, true);
     if (index !== false) {

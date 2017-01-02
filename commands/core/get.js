@@ -1,7 +1,27 @@
 var Command = function() {
   this.trigger = 'get';
-  this.helpText = 'Get an item (ex: get ye flask)';
+  this.helpText = `
+  Get an item from the room or a container.
+
+  %yellow%Usage:%yellow%
+         get <thing>
+         get <thing> from <container>
+
+  %yellow%Example:%yellow%
+         > look
+         >
+         > %bold%Someone has left a battered old hat lying here.%bold%
+         >
+         > get hat
+         >
+         > %bold%You pick up a battered old hat%bold%
+
+  `;
   this.callback = function(session, input) {
+    if (input === 'ye flask') {
+      session.write(global.colors.bold('Ye cannot get ye flask.');
+      return true;
+    }
     var roomId = session.character.currentRoom;
     var name = session.character.name;
     var index = global.containers.findItemInContainer(input, 'name', global.rooms.room[roomId].inventory, true);

@@ -1,6 +1,19 @@
 var Command = function() {
   this.trigger = 'dig';
-  this.helpText = '';
+  this.helpText = `
+    The dig command is used to add rooms to a zone..
+    When used several things happen in order:
+      - a new empty room is created
+      - exits are created linking the room you are in to this new room
+      - you are moved to the new room
+
+    %yellow%Usage:%yellow%
+           dig <direction>
+
+    %yellow%Example:%yellow%
+          > dig e
+          > dig d
+  `;
   this.callback = function(session, input) {
     if (input.length === 0) {
       session.error('Dig where??\n');
@@ -35,6 +48,7 @@ var Command = function() {
         exitValues.target_rid = session.character.currentRoom;
         exitValues.label = global.rooms.invertExitLabel(input);
         global.rooms.saveExit(socket, exitValues).then((response) => {
+          // once exits are saved move the character to the new room.
           global.commands.triggers.move(session, input);
        });
       }).catch(function(e) {

@@ -1,6 +1,18 @@
 var Command = function() {
   this.trigger = 'look';
-  this.helpText = '';
+  this.helpText = `
+  Look at things in your surroundings.
+
+  %yellow%Usage:%yellow%
+         look (displays current room)
+         look <item> (displays item description)
+         look <character> (displays character description and worn equipment)
+
+  %yellow%Example:%yellow%
+         > look waterskin
+         >
+         > %bold% This is a well worn waterskin. It is currently half full and contains water.%bold%
+  `;
   this.synonyms = ['examine'];
   this.callback = function (session, input) {
     // Room look, aka look with no additional arguments passed.

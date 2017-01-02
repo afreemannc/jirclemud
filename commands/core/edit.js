@@ -1,6 +1,26 @@
 var Command = function() {
   this.trigger = 'edit';
-  this.helpText = 'Builder only: universal in-game editing command for world building. Great for editing rooms and items.';
+  this.helpText = `
+  Builder only: universal in-game editing command for world building. Great for editing rooms and items.
+
+  %yellow%Usage:%yellow%
+         edit room name (change room name)
+         edit room desc (change room description)
+         edit room flags (change room flags)
+
+  %yellow%Example:%yellow%
+         > edit room name
+         >
+         > %bold%'Enter room name. (This is displayed at the top of the room description)'%bold%
+         >
+         > MacGrave's World of Pants
+         >
+         > %bold%Room changes saved%bold%
+         >
+         > look
+         >
+         > %bold%MacGrave's World of Pants%bold%
+  `;
   this.callback = function (session, input) {
     commandArgs = input.split(' ');
     switch (commandArgs[0]) {

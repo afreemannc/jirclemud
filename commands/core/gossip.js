@@ -1,6 +1,18 @@
 var Command = function() {
   this.trigger = 'gossip';
-  this.helpText = '';
+  this.helpText = `
+  Send a chat message to everyone in the game. Note: players who have NO GOSSIP turned on will not hear you.
+
+  %yellow%Usage:%yellow%
+         gossip <message>
+
+  %yellow%Example:%yellow%
+         > %yellow%Mourn: Derp has been killed by a boiling river of blood and fire%yellow%
+         >
+         > gossip LOL RIP
+         >
+         > %magenta%Dent gossips: LOL RIP%magenta%
+  `;
   this.callback = function (session, input) {
     var message = global.colors.magenta("[gossip] " + session.character.name + ": " + input + "\n");
     global.rooms.message(session, false, message, false);
