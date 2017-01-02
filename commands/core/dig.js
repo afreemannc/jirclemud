@@ -32,7 +32,6 @@ var Command = function() {
       }
       global.rooms.saveRoom(session, fieldValues).then((response) => {
       var newRoom = response;
-      console.log('newRoom:' + newRoom);
       // create exit from current room to new room.
       var exitValues = {
         rid: session.character.currentRoom,

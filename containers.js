@@ -54,6 +54,9 @@ var Containers = function() {
         console.log('unable to load inventory:' + inserts);
       }
       else {
+        for (i = 0; i < results.length; ++i) {
+          results[i].properties = JSON.parse(results[i].properties);
+        }
         switch (fieldValues.containerType) {
           case 'player_inventory':
             session.character.inventory = results;
@@ -86,22 +89,49 @@ var Containers = function() {
    *
    */
   this.findItemInContainer = function(input, field, inventory, like) {
+    var foundIndex = false;
+    // Standard container inventories are arrays.
+    if (Array.isArray(inventory)) {
+      var numericKeys = true;
+      var length = inventory.length
+    }
+    // Player equipment inventories are objects keyed by eq slot.
+    else {
+      var numericKeys = false;
+      var keys = Object.keys(inventory);
+      var length = keys.length;
+    }
 
-    for (i = 0; i < inventory.length; ++i) {
-      item = inventory[i];
+    for (i = 0; i < length; ++i) {
+      if (numericKeys) {
+        item = inventory[i];
+      }
+      else {
+        item = inventory[keys[i]];
+      }
+      // Player equipment inventories frequently have empty slots which should be skipped.
+      if (item === false) {
+        continue;
+      }
       // Weird things happen after a drop command has been executed but before
       if (like === true) {
-        if (item[field].includes(input)  === true) {
-          return i;
+        if (item[field].includes(input) === true) {
+          foundIndex = i;
+          break;
         }
       }
       else {
         if (item[field] === input) {
-          return i;
+          foundIndex = i;
         }
       }
     }
-    return false;
+    if (numericKeys) {
+      return foundIndex;
+    }
+    else {
+      return keys[foundIndex];
+    }
   }
 
   /**
@@ -151,12 +181,30 @@ var Containers = function() {
         break;
       // "put <item> in <container>" command
       case 'character-to-container':
-        delete session.character.inventory[fieldValues.index];
-        if (fieldValues.containerLocation === 'character inventory') {
+       // delete session.character.inventory[transferDetails.index];
+       // if (transferDetails.containerLocation === 'character inventory') {
 
-        }
+       // }
         break;
-
+      // wear command
+      case 'character-to-equipped':
+        console.log(transferDetails.item.properties);
+        var equipmentSlot = transferDetails.item.properties.equipmentSlot;
+        console.log('equipment slot:' + equipmentSlot);
+        if (typeof session.character.equipment[equipmentSlot] !== false) {
+          // transfer equipment already in this slot to inventory
+          // if transfer fails due to flag effects (CURSE) halt transfer and show message.
+        }
+        session.character.inventory.splice(transferDetails.index, 1);
+        session.character.equipment[equipmentSlot] = transferDetails.item;
+        break;
+      // remove command
+      case 'equipped-to-character':
+        var equipmentSlot = transferDetails.item.properties.equipmentSlot;
+        session.character.equipment[equipmentSlot] = false;
+        console.log(transferDetails);
+        session.character.inventory.push(transferDetails.item);
+        break;
       default:
         break;
     }

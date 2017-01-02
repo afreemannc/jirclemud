@@ -159,7 +159,7 @@ item.prototype.createItem = function(session) {
 }
 
 item.prototype.setItemProperties = function(fieldValues) {
-  var properties = {};
+  var properties = fieldValues;
   properties.flags = fieldValues.flags.join(',');
   return properties;
 }
@@ -204,7 +204,6 @@ item.prototype.saveItem = function(values) {
         return reject(error);
       }
       else {
-        session.write('Room saved.');
         session.inputContext = 'command';
         values.iid = results.insertId;
         return resolve(values);
@@ -262,9 +261,27 @@ item.prototype.saveItemToInventory = function(values) {
 
 item.prototype.inventoryDisplay = function(inventory) {
   var output = '';
-  for (i = 0; i < inventory.length; ++i) {
-    if (typeof inventory[i] === 'object') {
-      output += inventory[i].name + "\n";
+  if (Array.isArray(inventory) === true) {
+    var numericKeys = true;
+    var length = inventory.length;
+  }
+  else {
+    var numericKeys = false;
+    var keys = Object.keys(inventory);
+    var length = keys.length;
+  }
+  for (i = 0; i < length; ++i) {
+    if (numericKeys) {
+      item = inventory[i];
+    }
+    else {
+      item = inventory[keys[i]];
+    }
+    if (typeof item === 'object') {
+      if (numericKeys === false) {
+        output += '%cyan%<worn on ' + keys[i] + '>%cyan% '
+      }
+      output += item.name + "\n";
     }
   }
   return output;

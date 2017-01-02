@@ -51,13 +51,13 @@ var Characters = function(){
           }
           else {
             // authentication failed, throw error and reset prompt. (add reset method to prompt class)
-            session.prompt.displayCompletionError(socket, 'Login incorrect.\n');
+            session.prompt.displayCompletionError(session, 'Login incorrect.\n');
           }
         });
       }
       else {
         // TODO: throw error and reset prompt. (add reset method to prompt class)
-        session.prompt.displayCompletionError(socket, 'Login incorrect.\n');
+        session.prompt.displayCompletionError(session, 'Login incorrect.\n');
       }
     });
   }
@@ -67,6 +67,10 @@ var Characters = function(){
     // Unpack stored properties
     session.character.stats = JSON.parse(character.stats);
     session.character.affects = JSON.parse(character.affects);
+    // Initialize empty equipment slots and then load
+    session.character.equipment = global.characters.initialzeEqSlots();
+    // TODO: load saved equipment
+
     // Initialize empty inventory and then load
     session.character.inventory = {};
     var values = {
@@ -78,6 +82,18 @@ var Characters = function(){
     session.socket.write('Welcome back ' + character.name + '\n');
     session.inputContext = 'command';
     global.commands.triggers.look(session, '');
+  }
+
+  this.initialzeEqSlots = function() {
+    var slotKeys = Object.keys(config.equipmentSlots);
+    var equipment = {};
+    var slot = '';
+
+    for (i = 0; i < slotKeys.length; ++i) {
+      slot = config.equipmentSlots[slotKeys[i]];
+      equipment[slot] = false;
+    }
+    return equipment;
   }
 
   /**
