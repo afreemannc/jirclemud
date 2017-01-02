@@ -21,7 +21,7 @@ module.exports.replace = function(session, string) {
 
     if (string.includes('%' + style +'%')) {
       // Ex: %red%30H%red% should result in "30H" piped through colors.red()
-      regex = new RegExp('%' + style +'%([\\w\\s]+)%' + style + '%', 'g');
+      regex = new RegExp('%' + style +'%([\\w?\\s?\\S?]+?)%' + style + '%', 'g');
       // Match: entire string matching the regex above
       // Capture: the portion of the match between the color tokens.
       string = string.replace(regex, function(match, capture) {
