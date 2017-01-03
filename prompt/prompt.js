@@ -18,6 +18,7 @@ function Prompt(session, completionCallback) {
   },
 
   this.promptUser = function() {
+    console.log(this.currentField);
     // Skip prompting on conditional fields where condition is not met
     if (typeof this.currentField.conditional === 'object') {
       var field = this.currentField.conditional.field;
@@ -32,7 +33,6 @@ function Prompt(session, completionCallback) {
     }
     var message = this.currentField.promptMessage;
     if (this.quittable === true) {
-      message = message.toString().replace(/(\r\n|\n|\r)/gm,"");
       message += global.colors.yellow(' (@q to quit)\n');
     }
     this.session.socket.write(message);
@@ -46,6 +46,59 @@ function Prompt(session, completionCallback) {
       console.log('prompt bailout');
       return;
     }
+    // Special handling for fieldGroup placeholder fields.
+    if (this.getFieldIndex(this.currentField.name) === false) {
+      // Placeholder found
+      var fieldGroup = this.currentField.name;
+      input = this.currentField.sanitizeInput(input);
+      if (input === 'y') {
+        for (i = 0; i < this.fields.length; ++i) {
+          field = this.fields[i];
+          if (field.fieldGroup === fieldGroup) {
+            this.fieldGroups[fieldGroup][delta]++;
+            this.currentField = field;
+            this.promptUser(field);
+            return true;
+          }
+        }
+      }
+      else if (input === 'n') {
+        var endOn = this.fieldGroups[this.currentField.name].endOn;
+        fieldIndex =  this.getFieldIndex(endOn);
+        if (fieldIndex < this.fields.length - 1) {
+          while (fieldIndex < this.fields.length - 1) {
+            ++fieldIndex;
+            var field = this.fields[fieldIndex];
+            this.currentField = field;
+            if (this.currentField.promptMessage !== false) {
+              // Conditional fields may not prompt if conditions are not met.
+              // In this case promptUser returns false and the current field
+              // is skipped.
+              prompted = this.promptUser(field);
+              if (prompted === true) {
+                return;
+              }
+            }
+          }
+        }
+        else {
+          // Complete form submission if we have reached the last available field.
+          if (typeof this.completionCallback === 'function') {
+            var fieldValues = {};
+            for (i = 0; i < this.fields.length; ++i) {
+              fieldValues[this.fields[i].name] = this.fields[i].value;
+            }
+            fieldValues.fieldGroups = this.fieldGroups;
+            this.completionCallback(this.session, fieldValues);
+            return true;
+          }
+        }
+        return true;
+      }
+
+    }
+
+
     var inputComplete = false;
     if (typeof this.currentField !== 'undefined') {
       if (typeof this.currentField.sanitizeInput === 'function') {
@@ -67,16 +120,17 @@ function Prompt(session, completionCallback) {
         // to the field group values
         if (this.currentField.fieldGroup !== false) {
           fieldGroup = this.currentField.fieldGroup;
-          console.log('fieldGroup:' + fieldGroup);
           delta = this.fieldGroups[fieldGroup].delta;
-          console.log('delta:' + delta);
-          console.log('field:' + this.currentField.name);
-          console.log('value:' + this.currentField.value);
-          console.log(this.fieldGroups);
           if (typeof this.fieldGroups[fieldGroup].values[delta] === 'undefined') {
             this.fieldGroups[fieldGroup].values[delta] = {};
           }
           this.fieldGroups[fieldGroup].values[delta][this.currentField.name] = this.currentField.value;
+
+          if (this.fieldGroups[fieldGroup].endOn === this.currentField.name) {
+            // Set current field to a placeholder so user input doesn't overwrite prior data entered.
+             this.fieldGroupPrompt(session, fieldGroup);
+             return true;
+          }
         }
 
         fieldIndex = this.getFieldIndex(this.currentField.name);
@@ -102,17 +156,34 @@ function Prompt(session, completionCallback) {
             fieldValues[this.fields[i].name] = this.fields[i].value;
           }
           fieldValues.fieldGroups = this.fieldGroups;
+          console.log('field values:');
+          console.log(fieldValues);
           this.completionCallback(this.session, fieldValues);
         }
       }
     }
   }
 
-  this.resetPrompt = function() {
-    for (i = 0; i < this.fields.length; ++i) {
-      this.fields[i].value = false;
+  this.fieldGroupPrompt = function(session, fieldGroup) {
+    var placeHolderField = this.newField('select');
+    placeHolderField.name = fieldGroup;
+    placeHolderField.checkConditional = false;
+    placeHolderField.options = {y:'yes', n:'no'},
+    placeHolderField.formatPrompt('Add another?\n[::y::]es, [::n::]o', true);
+    this.currentField = placeHolderField;
+    session.prompt.promptUser(placeHolderField);
+  }
+
+  this.resetPrompt = function(fieldIndex) {
+    if (typeof fieldIndex === 'undefined') {
+      for (i = 0; i < this.fields.length; ++i) {
+        this.fields[i].value = false;
+      }
+      this.currentField = this.fields[0];
     }
-    this.currentField = this.fields[0];
+    else {
+      this.currentField = this.fields[fieldIndex];
+    }
   }
 
 
@@ -134,6 +205,7 @@ function Prompt(session, completionCallback) {
         this.fieldGroups[field.fieldGroup] = {
           delta: 0,
           values: [],
+          endOn: field.name
         }
       }
       else {

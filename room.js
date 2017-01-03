@@ -95,10 +95,9 @@ room.prototype.createRoom = function(session) {
 
   var flagsField = createRoomPrompt.newField('multiselect');
   var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
-  message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
   flagsField.name = 'flags';
-  flagsField.options = {0:'none', s:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP'};
-  flagsField.formatPrompt(message, true);
+  flagsField.options = {0:'none', sh:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DARK', sa:'SAVEPOINT', sm:'SMALL', rip:'DEATHTRAP'};
+  flagsField.formatPrompt(message);
   createRoomPrompt.addField(flagsField);
 
   createRoomPrompt.start();

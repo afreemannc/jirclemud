@@ -1,12 +1,5 @@
 var item = function(){};
 
-// TODO: refactor this mess. Item types should be a single list.
-
-item.prototype.listTypes = function() {
-  var list = ['weapon','equipment','misc','container','food'];
-  return list;
-}
-
 // TODO: replace with flag objects that include effect callbacks?
 item.prototype.flags = {
   0:  'NONE',
@@ -22,6 +15,11 @@ item.prototype.flags = {
   h:  'HOLD',
   th: 'TWO-HANDED',
   po: 'PORTAL',
+}
+
+item.prototype.applyEffects = function(session, item) {
+  effects = item.properties.effects;
+  // TODO: apply effect
 }
 
 item.prototype.loadItem = function(itemId) {
@@ -116,7 +114,7 @@ item.prototype.createItem = function(session) {
       // strength ??
     // additional effects
   var selectEffectField = itemPrompt.newField('select');
-  selectEffectField.name = 'effects';
+  selectEffectField.name = 'effectType';
   selectEffectField.options = {d:'dam', h:'hit', a:'ac', s:'stat'};
   selectEffectField.formatPrompt('What additional effects does this equipment have?');
   selectEffectField.conditional = {
@@ -127,11 +125,11 @@ item.prototype.createItem = function(session) {
   itemPrompt.addField(selectEffectField);
 
   var statField = itemPrompt.newField('select');
-  statField.name = 'effectedStat';
+  statField.name = 'affectedStat';
   statField.options = {i:'int', w:'wis', ch:'cha', s:'str', co:'con', d:'dex'};
   statField.formatPrompt('Select a stat to buff');
   statField.conditional = {
-    field: 'effects',
+    field: 'effectType',
     value: 'stat',
   }
   statField.fieldGroup = 'effects';
@@ -141,7 +139,7 @@ item.prototype.createItem = function(session) {
   bonusField.name = 'bonus';
   bonusField.formatPrompt('Effect bonus (positive or negative numbers only)');
   bonusField.conditional = {
-    field: 'effects',
+    field: 'effectType',
     value: ['dam', 'hit', 'ac', 'stat']
   }
   bonusField.fieldGroup = 'effects';
@@ -172,6 +170,8 @@ item.prototype.saveNewItem = function(session, fieldValues) {
     full_description:fieldValues.full_description,
     properties: JSON.stringify(global.items.setItemProperties(fieldValues))
   }
+  console.log('values:');
+  console.log(values);
   global.items.saveItem(values).then((response) => {
     if (fieldValues.create === 'y') {
       values = {
@@ -198,6 +198,8 @@ item.prototype.saveNewItem = function(session, fieldValues) {
 }
 
 item.prototype.saveItem = function(values) {
+  console.log('values in saveItem:');
+  console.log(values);
   return new Promise((resolve, reject) => {
     global.dbPool.query('INSERT INTO items SET ?', values, function (error, results) {
       if (error) {

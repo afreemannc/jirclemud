@@ -60,6 +60,10 @@ var Containers = function() {
         switch (fieldValues.containerType) {
           case 'player_inventory':
             session.character.inventory = results;
+            for (i = 0; i < results.length; ++i) {
+              global.items.applyEffects(session, results[i]);
+            }
+            session.character.inventory = results;
             break;
           case 'room':
             global.rooms.room[fieldValues.parentId].inventory = results;
