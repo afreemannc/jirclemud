@@ -7,7 +7,7 @@ function Zones() {
   this.loadZones = function() {
 
     global.dbPool.query('SELECT * FROM zones', function(err, results, fields) {
-      for(i = 0; i < results.length; ++i) {
+      for(var i = 0; i < results.length; ++i) {
         console.log('loading zone ' + results[i].zid);
         var zoneId = results[i].zid;
         if (zoneId > 0) {
@@ -169,7 +169,7 @@ function Zones() {
   }
 
   this.validateZoneName = function(session, zoneName) {
-    for (i = 0; i < global.zones.zone.length; ++i) {
+    for (var i = 0; i < global.zones.zone.length; ++i) {
       zone = global.zones.zone[i];
       if (zone.name = zoneName) {
         return false;

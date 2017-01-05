@@ -5,7 +5,7 @@ var room = function(){
 
 // TODO: this method should be attached to the actual room object.
 room.prototype.message = function(session, roomId, message, skipCharacter) {
-  for (i = 0; i < global.sessions.length; ++i) {
+  for (var i = 0; i < global.sessions.length; ++i) {
     checkSession = global.sessions[i];
     // They ain't here.
     if (checkSession.character.currentRoom !== roomId) {
@@ -37,7 +37,7 @@ room.prototype.loadRooms = function() {
   // Only trigger room load if the target room isn't already loaded.
   var sql = "SELECT * FROM rooms";
   global.dbPool.query(sql, function(err, results, fields) {
-    for(i = 0; i < results.length; ++i) {
+    for(var i = 0; i < results.length; ++i) {
       console.log('loading room ' + results[i].rid);
       var roomId = results[i].rid;
       global.rooms.room[roomId] = results[i];
@@ -64,7 +64,7 @@ room.prototype.loadExits = function(roomId) {
   var inserts = ['room_exits', 'rid', roomId];
   global.dbPool.query(sql, inserts, function(err, results, fields) {
     global.rooms.room[roomId].exits = {};
-    for (i = 0; i < results.length; ++i) {
+    for (var i = 0; i < results.length; ++i) {
       global.rooms.room[roomId].exits[results[i].label] = results[i];
     }
   });

@@ -54,13 +54,13 @@ var Containers = function() {
         console.log('unable to load inventory:' + inserts);
       }
       else {
-        for (i = 0; i < results.length; ++i) {
+        for (var i = 0; i < results.length; ++i) {
           results[i].properties = JSON.parse(results[i].properties);
         }
         switch (fieldValues.containerType) {
           case 'player_inventory':
             session.character.inventory = results;
-            for (i = 0; i < results.length; ++i) {
+            for (var i = 0; i < results.length; ++i) {
               global.items.applyEffects(session, results[i]);
             }
             session.character.inventory = results;
@@ -106,7 +106,7 @@ var Containers = function() {
       var length = keys.length;
     }
 
-    for (i = 0; i < length; ++i) {
+    for (var i = 0; i < length; ++i) {
       if (numericKeys) {
         item = inventory[i];
       }

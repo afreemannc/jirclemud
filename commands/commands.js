@@ -5,7 +5,7 @@ function Commands() {
   var normalizedPath = require("path").join(__dirname, "core");
 
   var coreCommands = require("fs").readdirSync(normalizedPath)
-  for(i = 0; i < coreCommands.length; ++i) {
+  for (var i = 0; i < coreCommands.length; ++i) {
     command = require("./core/" + coreCommands[i]);
     this.commands[command.trigger] = command;
     this.triggers[command.trigger] = command.callback;
@@ -15,7 +15,7 @@ function Commands() {
   normalizedPath = require("path").join(__dirname, "plugins");
 
   var pluginCommands = require("fs").readdirSync(normalizedPath);
-  for(i = 0; i < pluginCommands.length; ++i) {
+  for (var i = 0; i < pluginCommands.length; ++i) {
     command = require("./plugin/" + pluginCommands[i]);
     // Intentionally skipping checks for pre-existing commands.
     // This permits individual implementations to override core command
@@ -45,7 +45,7 @@ function Commands() {
     // Otherwise lets check available commands
     var keys = Object.keys(this.commands);
 
-    for (i = 0; i < keys.length; ++i) {
+    for (var i = 0; i < keys.length; ++i) {
       if (keys[i].startsWith(command)) {
         this.triggers[keys[i]](session, arg);
         commandFound = true;

@@ -5,7 +5,7 @@ module.exports.replace = function(session, string) {
   var statKeys = Object.keys(character.stats);
 
   // Replace character stat tokens
-  for (i = 0; i < statKeys.length; ++i) {
+  for (var i = 0; i < statKeys.length; ++i) {
     stat = statKeys[i];
 
     if (string.includes('%' + stat + '%')) {
@@ -16,7 +16,7 @@ module.exports.replace = function(session, string) {
   var colorKeys = Object.keys(global.colors.styles);
 
   // Handle colors style options
-  for (i = 0; i < colorKeys.length; ++i) {
+  for (var i = 0; i < colorKeys.length; ++i) {
     style = colorKeys[i];
 
     if (string.includes('%' + style +'%')) {

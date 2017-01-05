@@ -82,7 +82,7 @@ function Multiselect() {
 
   this.validationError = function(session, input) {
     session.socket.write('"' + input + '" is not a valid option.\n');
-    global.prompt.promptUser(this);
+    session.prompt.promptUser(this);
   };
 
   this.cacheInput = function(input) {

@@ -143,19 +143,20 @@ item.prototype.createItem = function(session) {
   itemPrompt.addField(bonusField);
   // bonus reiteration handled by fieldGroup processing code. No need to add
   // additional prompt logic here.
-  var bonusFieldGroup = itemPrompt.newField('field-group');
+  var bonusFieldGroup = itemPrompt.newField('fieldgroup');
   bonusFieldGroup.name = 'effects',
   bonusFieldGroup.fields = ['effectType', 'affectedStat', 'bonus'],
-  bonusField.formatPrompt('Do you wish to add another effect to this item?');
-  bonusField.conditional = {
+  bonusFieldGroup.formatPrompt('Do you wish to add another effect to this item?');
+  bonusFieldGroup.conditional = {
     field: 'effectType',
     value: ['dam', 'hit', 'ac', 'stat']
   }
+  itemPrompt.addField(bonusFieldGroup);
 
   var createItemField = itemPrompt.newField('select');
   createItemField.name = 'create',
-  createItemField.options = {y:'y', n:'n'},
-  createItemField.formatPrompt(':: [::y::]es or [::n::]o ::', true);
+  createItemField.options = {y:'Yes', n:'No'},
+  createItemField.formatPrompt('Create an instance of this item?');
   itemPrompt.addField(createItemField);
 
   itemPrompt.start();
@@ -168,6 +169,10 @@ item.prototype.setItemProperties = function(fieldValues) {
 }
 
 item.prototype.saveNewItem = function(session, fieldValues) {
+  // Whatever happens next the prompt that got us here has
+  // completed so we need to switch input context to escape the
+  // prompt system
+  session.inputContext = 'command';
   var properties = {};
   var values = {
     name:fieldValues.name,
@@ -277,7 +282,7 @@ item.prototype.inventoryDisplay = function(inventory) {
     var keys = Object.keys(inventory);
     var length = keys.length;
   }
-  for (i = 0; i < length; ++i) {
+  for (var i = 0; i < length; ++i) {
     if (numericKeys) {
       item = inventory[i];
     }

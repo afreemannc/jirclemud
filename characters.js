@@ -89,7 +89,7 @@ var Characters = function(){
     var equipment = {};
     var slot = '';
 
-    for (i = 0; i < slotKeys.length; ++i) {
+    for (var i = 0; i < slotKeys.length; ++i) {
       slot = config.equipmentSlots[slotKeys[i]];
       equipment[slot] = false;
     }

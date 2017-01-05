@@ -15,11 +15,10 @@ function Prompt(session, completionCallback) {
     value: require('./fields/value.js'),
     int: require('./fields/int.js'),
     dice: require('./fields/dice.js'),
-    field-group: require('./fields/fieldgroup.js')
+    fieldgroup: require('./fields/fieldgroup.js')
   },
 
   this.promptUser = function() {
-    console.log(this.currentField);
     // Skip prompting on conditional fields where condition is not met
     if (typeof this.currentField.conditional === 'object') {
       var field = this.currentField.conditional.field;
@@ -44,7 +43,6 @@ function Prompt(session, completionCallback) {
     if (input.toString().replace(/(\r\n|\n|\r)/gm,"") === '@q' && this.quittable === true) {
       this.session.inputContext = 'command';
       global.commands.triggers.look(this.session, '');
-      console.log('prompt bailout');
       return;
     }
 
@@ -61,7 +59,6 @@ function Prompt(session, completionCallback) {
       }
       else {
         inputComplete = this.currentField.cacheInput(input);
-        console.log('inputComplete: ' + inputComplete);
       }
       // The current field has completed gathering input.
       if (inputComplete) {
@@ -84,7 +81,7 @@ function Prompt(session, completionCallback) {
         // Complete form submission if we have reached the last available field.
         if (fieldIndex === (this.fields.length - 1) && typeof this.completionCallback === 'function') {
           var fieldValues = {};
-          for (i = 0; i < this.fields.length; ++i) {
+          for (var i = 0; i < this.fields.length; ++i) {
             fieldValues[this.fields[i].name] = this.fields[i].value;
           }
           this.completionCallback(this.session, fieldValues);
@@ -95,7 +92,7 @@ function Prompt(session, completionCallback) {
 
   this.resetPrompt = function(fieldIndex) {
     if (typeof fieldIndex === 'undefined') {
-      for (i = 0; i < this.fields.length; ++i) {
+      for (var i = 0; i < this.fields.length; ++i) {
         this.fields[i].value = false;
       }
       this.currentField = this.fields[0];
@@ -137,7 +134,7 @@ function Prompt(session, completionCallback) {
 
 
   this.getFieldIndex = function(name) {
-    for (i = 0; i < this.fields.length; ++i) {
+    for (var i = 0; i < this.fields.length; ++i) {
       if (this.fields[i].name === name) {
         return i;
       }
@@ -148,7 +145,7 @@ function Prompt(session, completionCallback) {
   this.start = function() {
     this.session.inputContext = 'prompt';
     this.session.prompt = this;
-    for (i = 0; i < this.fields.length; ++i) {
+    for (var i = 0; i < this.fields.length; ++i) {
       // skip value fields
       if (this.fields[i].formatPrompt !== false) {
         this.currentField = this.fields[i];

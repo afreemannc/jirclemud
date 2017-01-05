@@ -61,7 +61,7 @@ classes.prototype.thief = {
 classes.prototype.selectionOptions = function() {
   var list = this.list();
   var options = [];
-  for (i = 0; i < list.length; ++i) {
+  for (var i = 0; i < list.length; ++i) {
     className = list[i];
     currentClass = this[className];
     options.push(currentClass.selectOption);
@@ -72,7 +72,7 @@ classes.prototype.selectionOptions = function() {
 classes.prototype.selectionPrompt = function() {
   var list = this.list();
   var prompt = ':: ';
-  for (i = 0; i < list.length; ++i) {
+  for (var i = 0; i < list.length; ++i) {
     className = list[i];
     currentClass = this[className];
     prompt += currentClass.label + ' :: ';
@@ -83,7 +83,7 @@ classes.prototype.selectionPrompt = function() {
 classes.prototype.classFromSelection = function(selection) {
   var list = this.list();
   var options = [];
-  for (i = 0; i < list.length; ++i) {
+  for (var i = 0; i < list.length; ++i) {
     className = list[i];
     currentClass = this[className];
     if (currentClass.selectOption === selection) {
