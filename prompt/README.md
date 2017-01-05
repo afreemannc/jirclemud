@@ -35,6 +35,8 @@ Currently supported:
   - multi-select: select field, accepts one or more input options from predefined list
   - value: hidden field designed to pass a set value straight through to fieldValues
   - int: single value numeric field
+  - dice: text field that accepts dice format (<number of>d<dice size> ex: 2d6)
+  - fieldgroup: a logical grouping of fields that have data stored in a group and accept multiple values.
 
 ### Text field
 Single line text field
@@ -126,6 +128,30 @@ validation error: Displays "INPUT is not a number."
 
 input caching: saves sanitized input to the .value property of this field
 
+### Dice field
+Single value text field
+
+Prompt: displays prefix plus details on correct dice notation (eg: 2d6, 1d10)
+
+input sanitation: strips newline and carriage return, converts input to lower case
+
+validation: in XdY format confirms X and Y are positive integers, confirms "d" separator is present in string
+
+input caching: saves sanitized input to .value property of this field
+
+### Fieldgroup field
+Single value select style field with Y/N options
+
+Prompt: displays prefix plus Y/N select options
+
+input sanitation: strips newline and carriage return, converts input to lower case
+
+validation: special. If input is y caches values in all fields listed in this.fields to this.value, grouped by this field's current delta value. Once
+  constituent field data is cached, the prompt is reset to the first field in the fieldgroup and the user is prompted for input.
+
+  If input is n cache values of constituent components and let prompt system continue to the next field, effectively exiting the fieldgroup.
+
+input caching: none, see validation.
 
 ## Conditional fields
 
@@ -148,6 +174,7 @@ testConditionalField.conditional = {
 ## Additional field properties
 
 ### replaceInPrefix (select types only)
+
 
 
 

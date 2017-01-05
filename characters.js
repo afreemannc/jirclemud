@@ -62,6 +62,9 @@ var Characters = function(){
     });
   }
 
+  /**
+   * Load additional character details like stats, spell effects, and item inventory.
+   */
   this.loadCharacterDetails = function(session) {
     var character = session.character;
     // Unpack stored properties
@@ -84,6 +87,9 @@ var Characters = function(){
     global.commands.triggers.look(session, '');
   }
 
+  /**
+   * Create an empty data structure to hold character equipment.
+   */
   this.initialzeEqSlots = function() {
     var slotKeys = Object.keys(config.equipmentSlots);
     var equipment = {};
@@ -143,6 +149,7 @@ var Characters = function(){
 
 
   // Save character record.
+  // TODO: convert to Promise
   this.saveCharacter = function(session, fieldValues) {
     var salt = crypto.randomBytes(Math.ceil(4)).toString('hex').slice(0, 8);
     // TODO: unfuck this function so it works for inserts and updates.
@@ -171,6 +178,9 @@ var Characters = function(){
     });
   }
 
+  /**
+   * Build starting character properties based on initial class selection during character creation.
+   */
   this.startProperties = function(characterClass) {
     // TODO: implement some kind of stat system. Probably standard D20 style to start.
     var characterClass = global.classes.classFromSelection(characterClass);
@@ -192,13 +202,28 @@ var Characters = function(){
     return JSON.stringify(properties);
   }
 
+  /**
+   * If a character should begin the game with starting spell effects
+   * this is how they are applied.
+   */
   this.startAffects = function() {
     // Currently no starting affects, will add
     // sustain and others as needed later.
     return JSON.stringify({sustain:500});
   }
 
-  // Validate character name input
+  /**
+   * Test if a given character name is already in use.
+   *
+   * @param session
+   *   Session object
+   *
+   * @param name
+   *   String containing the character name to look for.
+   *
+   * @return
+   *   Returns boolean: false if character name is already in use, otherwise true.
+   */
   this.validateCharacterName = function(session, name) {
     if (name.length === 0) {
       session.prompt('Character Name:\n', 'name');
@@ -218,6 +243,16 @@ var Characters = function(){
     return ret;
   }
 
+  /**
+   * Search current active characters by character name.
+   *
+   * @param name
+   *   Character name (or name fragment) to search for.
+   *
+   * @return
+   *  If found returns the numeric character id of the character found.
+   *  Otherwise returns false;
+   */
   this.searchActiveCharactersByName = function(name) {
     for (i = 0; i < global.sessions.length; ++i) {
       check = global.sessions[i];

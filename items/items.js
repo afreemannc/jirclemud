@@ -183,12 +183,14 @@ item.prototype.saveNewItem = function(session, fieldValues) {
   console.log('values:');
   console.log(values);
   global.items.saveItem(values).then((response) => {
-    if (fieldValues.create === 'y') {
+    session.write('New item type saved.');
+    if (fieldValues.create === 'Yes') {
       values = {
         iid:response.iid,
         properties: response.properties
       }
       global.items.saveItemInstance(values).then((response) => {
+        session.write('New instance of item saved.');
         var values = {
           cid: session.character.inventory.id,
           instance_id: response.instance_id
