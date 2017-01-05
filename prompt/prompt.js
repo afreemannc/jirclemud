@@ -14,7 +14,8 @@ function Prompt(session, completionCallback) {
     multiselect: require('./fields/multi-select.js'),
     value: require('./fields/value.js'),
     int: require('./fields/int.js'),
-    dice: require('./fields/dice.js')
+    dice: require('./fields/dice.js'),
+    field-group: require('./fields/fieldgroup.js')
   },
 
   this.promptUser = function() {
@@ -46,58 +47,6 @@ function Prompt(session, completionCallback) {
       console.log('prompt bailout');
       return;
     }
-    // Special handling for fieldGroup placeholder fields.
-    if (this.getFieldIndex(this.currentField.name) === false) {
-      // Placeholder found
-      var fieldGroup = this.currentField.name;
-      input = this.currentField.sanitizeInput(input);
-      if (input === 'y') {
-        for (i = 0; i < this.fields.length; ++i) {
-          field = this.fields[i];
-          if (field.fieldGroup === fieldGroup) {
-            this.fieldGroups[fieldGroup][delta]++;
-            this.currentField = field;
-            this.promptUser(field);
-            return true;
-          }
-        }
-      }
-      else if (input === 'n') {
-        var endOn = this.fieldGroups[this.currentField.name].endOn;
-        fieldIndex =  this.getFieldIndex(endOn);
-        if (fieldIndex < this.fields.length - 1) {
-          while (fieldIndex < this.fields.length - 1) {
-            ++fieldIndex;
-            var field = this.fields[fieldIndex];
-            this.currentField = field;
-            if (this.currentField.promptMessage !== false) {
-              // Conditional fields may not prompt if conditions are not met.
-              // In this case promptUser returns false and the current field
-              // is skipped.
-              prompted = this.promptUser(field);
-              if (prompted === true) {
-                return;
-              }
-            }
-          }
-        }
-        else {
-          // Complete form submission if we have reached the last available field.
-          if (typeof this.completionCallback === 'function') {
-            var fieldValues = {};
-            for (i = 0; i < this.fields.length; ++i) {
-              fieldValues[this.fields[i].name] = this.fields[i].value;
-            }
-            fieldValues.fieldGroups = this.fieldGroups;
-            this.completionCallback(this.session, fieldValues);
-            return true;
-          }
-        }
-        return true;
-      }
-
-    }
-
 
     var inputComplete = false;
     if (typeof this.currentField !== 'undefined') {
@@ -116,23 +65,6 @@ function Prompt(session, completionCallback) {
       }
       // The current field has completed gathering input.
       if (inputComplete) {
-        // If this field is in a field group the current field value needs to be added
-        // to the field group values
-        if (this.currentField.fieldGroup !== false) {
-          fieldGroup = this.currentField.fieldGroup;
-          delta = this.fieldGroups[fieldGroup].delta;
-          if (typeof this.fieldGroups[fieldGroup].values[delta] === 'undefined') {
-            this.fieldGroups[fieldGroup].values[delta] = {};
-          }
-          this.fieldGroups[fieldGroup].values[delta][this.currentField.name] = this.currentField.value;
-
-          if (this.fieldGroups[fieldGroup].endOn === this.currentField.name) {
-            // Set current field to a placeholder so user input doesn't overwrite prior data entered.
-             this.fieldGroupPrompt(session, fieldGroup);
-             return true;
-          }
-        }
-
         fieldIndex = this.getFieldIndex(this.currentField.name);
         // Iterate past hidden fields if needed.
         while (fieldIndex < this.fields.length - 1) {
@@ -155,23 +87,10 @@ function Prompt(session, completionCallback) {
           for (i = 0; i < this.fields.length; ++i) {
             fieldValues[this.fields[i].name] = this.fields[i].value;
           }
-          fieldValues.fieldGroups = this.fieldGroups;
-          console.log('field values:');
-          console.log(fieldValues);
           this.completionCallback(this.session, fieldValues);
         }
       }
     }
-  }
-
-  this.fieldGroupPrompt = function(session, fieldGroup) {
-    var placeHolderField = this.newField('select');
-    placeHolderField.name = fieldGroup;
-    placeHolderField.checkConditional = false;
-    placeHolderField.options = {y:'yes', n:'no'},
-    placeHolderField.formatPrompt('Add another?\n[::y::]es, [::n::]o', true);
-    this.currentField = placeHolderField;
-    session.prompt.promptUser(placeHolderField);
   }
 
   this.resetPrompt = function(fieldIndex) {

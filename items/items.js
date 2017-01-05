@@ -121,7 +121,6 @@ item.prototype.createItem = function(session) {
     field: 'flags',
     value: ['WIELD', 'HOLD', 'WEARABLE']
   }
-  selectEffectField.fieldGroup = 'effects';
   itemPrompt.addField(selectEffectField);
 
   var statField = itemPrompt.newField('select');
@@ -132,7 +131,6 @@ item.prototype.createItem = function(session) {
     field: 'effectType',
     value: 'stat',
   }
-  statField.fieldGroup = 'effects';
   itemPrompt.addField(statField);
 
   var bonusField = itemPrompt.newField('int');
@@ -142,10 +140,17 @@ item.prototype.createItem = function(session) {
     field: 'effectType',
     value: ['dam', 'hit', 'ac', 'stat']
   }
-  bonusField.fieldGroup = 'effects';
   itemPrompt.addField(bonusField);
   // bonus reiteration handled by fieldGroup processing code. No need to add
   // additional prompt logic here.
+  var bonusFieldGroup = itemPrompt.newField('field-group');
+  bonusFieldGroup.name = 'effects',
+  bonusFieldGroup.fields = ['effectType', 'affectedStat', 'bonus'],
+  bonusField.formatPrompt('Do you wish to add another effect to this item?');
+  bonusField.conditional = {
+    field: 'effectType',
+    value: ['dam', 'hit', 'ac', 'stat']
+  }
 
   var createItemField = itemPrompt.newField('select');
   createItemField.name = 'create',
