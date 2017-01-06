@@ -5,10 +5,10 @@ Config = require('./config/config.js');
 Commands = require('./core/commands');
 Characters = require('./core/characters');
 Rooms = require('./core/rooms');
-global.classes = require('./classes');
-global.items = require('./core/items');
+Classes = require('./core/classes');
+Items = require('./core/items');
 Prompt = require('./core/prompt');
-global.zones = require('./core/zones');
+Zones = require('./core/zones');
 Tokens = require('./core/tokens');
 Containers = require('./core/containers');
 
