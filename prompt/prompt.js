@@ -42,7 +42,7 @@ function Prompt(session, completionCallback) {
   this.promptHandler = function(input) {
     if (input.toString().replace(/(\r\n|\n|\r)/gm,"") === '@q' && this.quittable === true) {
       this.session.inputContext = 'command';
-      global.commands.triggers.look(this.session, '');
+      Commands.triggers.look(this.session, '');
       return;
     }
 

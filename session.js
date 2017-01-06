@@ -76,7 +76,7 @@ function Session() {
     }
     else if (input === 'q') {
       this.socket.write(Config.quitMessage);
-      global.commands.quit(socket, false);
+      Commands.triggers.quit(socket, false);
     }
   }
 }

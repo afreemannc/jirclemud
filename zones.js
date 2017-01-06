@@ -212,7 +212,7 @@ function Zones() {
           flags: [],
         }
         global.rooms.saveRoom(session, roomValues).then((response) => {
-          global.commands.triggers.bamf(session, response.rid);
+          Commands.triggers.bamf(session, response.rid);
         }).catch(function(error) {
           console.log('something has gone terribly wrong with zone save:' + error);
         });

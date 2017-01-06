@@ -48,7 +48,7 @@ var Command = function() {
         exitValues.label = global.rooms.invertExitLabel(input);
         global.rooms.saveExit(socket, exitValues).then((response) => {
           // once exits are saved move the character to the new room.
-          global.commands.triggers.move(session, input);
+          Commands.triggers.move(session, input);
        });
       }).catch(function(e) {
         console.log('reciprocal fail:' + e);

@@ -4,10 +4,10 @@ var Command = function() {
   this.callback = function (session, input) {
     if (input === '') {
       var output = 'There is help for the following commands:\n\n';
-      var keys = Object.keys(global.commands.commands);
+      var keys = Object.keys(Commands.commands);
 
-      for (i = 0; i < keys.length; ++i) {
-        command = global.commands.commands[keys[i]];
+      for (var i = 0; i < keys.length; ++i) {
+        command = Commands.commands[keys[i]];
         if (command.helpText !== '') {
           output += command.trigger.toUpperCase() + '\n';
         }
@@ -15,8 +15,8 @@ var Command = function() {
       session.write(output);
       return;
     }
-    if (typeof global.commands.commands[input] !== 'undefined') {
-      var command = global.commands.commands[input];
+    if (typeof Commands.commands[input] !== 'undefined') {
+      var command = Commands.commands[input];
       // Valid commands may have their help text intentionally blanked
       if (command.helpText !== '') {
         var helpText = '%cyan%Help topic [' + input + ']%cyan%\n';

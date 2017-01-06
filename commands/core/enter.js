@@ -45,7 +45,7 @@ var Command = function() {
         else {
           session.character.currentRoom = target_rid;
           session.socket.write('You step into the ' + portal.name + ' and disappear.');
-          global.commands.triggers.look(session, '');
+          Commands.triggers.look(session, '');
         }
       }
     }

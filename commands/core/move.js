@@ -27,7 +27,7 @@ var Command = function() {
     else {
       var currentExit = currentExits[input];
       session.character.currentRoom = currentExit.target_rid;
-      global.commands.triggers.look(session, '');
+      Commands.triggers.look(session, '');
     }
   }
 }

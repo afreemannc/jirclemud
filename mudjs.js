@@ -2,7 +2,7 @@ var net = require('net');
 global.mysql = require('mysql');
 Session = require('./session');
 Config = require('./config');
-global.commands = require('./commands/commands');
+Commands = require('./commands/commands');
 global.characters = require('./characters');
 global.rooms = require('./room');
 global.classes = require('./classes');
@@ -59,7 +59,7 @@ function parseData(session, data) {
     case 'command':
       // commands should only every be single line so data is sanitized to remove newline characters.
       var input = cleanInput(data);
-      global.commands.commandHandler(session, input);
+      Commands.commandHandler(session, input);
       break;
   }
 }

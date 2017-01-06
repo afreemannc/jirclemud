@@ -84,7 +84,7 @@ var Characters = function(){
     // Raw socket write is used here since the command prompt will be displayed after "look" runs.
     session.socket.write('Welcome back ' + character.name + '\n');
     session.inputContext = 'command';
-    global.commands.triggers.look(session, '');
+    Commands.triggers.look(session, '');
   }
 
   /**
@@ -174,7 +174,7 @@ var Characters = function(){
       // TODO: move this somewhere else.
       session.socket.write('Welcome ' + values.name + '\n');
       session.inputContext = 'command';
-      global.commands.triggers.look(session, '');
+      Commands.triggers.look(session, '');
     });
   }
 
