@@ -13,7 +13,7 @@ var Command = function() {
          > Connection closed by foreign host.
   `;
   this.callback = function (session, input) {
-    var quitMessage = global.config.quitMessage;
+    var quitMessage = Config.quitMessage;
     session.socket.end(quitMessage);
   }
 

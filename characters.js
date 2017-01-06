@@ -160,7 +160,7 @@ var Characters = function(){
       salt: salt,
       last_login: 0,
       status: 1,
-      current_room: global.config.startRoomId,
+      current_room: Config.startRoomId,
       stats: this.startProperties(fieldValues.characterclass),
       affects: this.startAffects,
     };
@@ -170,7 +170,7 @@ var Characters = function(){
       // TODO: generate default inventory
       session.character = values;
       session.character.id = characterId;
-      session.character.currentRoom = global.config.startRoom;
+      session.character.currentRoom = Config.startRoom;
       // TODO: move this somewhere else.
       session.socket.write('Welcome ' + values.name + '\n');
       session.inputContext = 'command';
@@ -195,7 +195,7 @@ var Characters = function(){
       maxmana: startingMana,
       currentmana: startingMana,
       xp: 1,
-      current_room: global.config.startRoom
+      current_room: Config.startRoom
     }
     // TODO: add stats based on stat system
     // TODO: add currency placeholders based on currency system

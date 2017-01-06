@@ -1,7 +1,7 @@
 var net = require('net');
 global.mysql = require('mysql');
 global.session = require('./session');
-global.config = require('./config');
+Config = require('./config');
 global.commands = require('./commands/commands');
 global.characters = require('./characters');
 global.rooms = require('./room');
@@ -34,16 +34,16 @@ function newSocket(socket) {
 
 // Initialize service and set listening port
 var server = net.createServer(newSocket);
-server.listen(config.port);
+server.listen(Config.port);
 
 // Create a pool of db connections for later use.
 global.dbPool = mysql.createPool({
     connectionLimit: 10,
-    host: config.dbHost,
-    user: config.dbUser,
-    password: config.dbPass,
-    database: config.dbName,
-    port: config.dbPort
+    host: Config.dbHost,
+    user: Config.dbUser,
+    password: Config.dbPass,
+    database: Config.dbName,
+    port: Config.dbPort
 });
 
 global.rooms.loadRooms();

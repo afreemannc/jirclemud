@@ -2,7 +2,7 @@ var Command = function() {
   this.trigger = 'wimp';
 
   // This command should only show up in help if characters are allowed to wimp
-  if (global.config.wimpEnabled === true) {
+  if (Config.wimpEnabled === true) {
     this.helpText = `
   Use the wimp command to automatically flee a fight when your character's hitpoints drop below a certain level.
   Note: wimp may not be set higher than half your total hitpoints. For example, if your character has 500 hp,

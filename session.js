@@ -22,7 +22,7 @@ function Session() {
   this.characterPrompt = function() {
     // Prompt is configurable in config.js.
     // @see comments in config.js.example for details.
-    var prompt = Tokens.replace(this, global.config.playerPrompt);
+    var prompt = Tokens.replace(this, Config.playerPrompt);
     return "\n" + prompt;
   }
 
@@ -37,7 +37,7 @@ function Session() {
   }
 
   this.start = function() {
-    var message = colors.green('Welcome to ' + global.config.mudName + "\n");
+    var message = 'Welcome to ' + Config.mudName + '\n';
     // TODO: display splash screen.
     var startPrompt = prompt.new(this, this.startSwitch);
     // The standard prompt bailout doesn't make sense on this screen.
@@ -75,7 +75,7 @@ function Session() {
       global.characters.createCharacter(socket);
     }
     else if (input === 'q') {
-      this.socket.write(global.config.quitMessage);
+      this.socket.write(Config.quitMessage);
       global.commands.quit(socket, false);
     }
   }

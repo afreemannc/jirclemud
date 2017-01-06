@@ -90,7 +90,7 @@ item.prototype.createItem = function(session) {
   // Wear slot
   var wearSlotField = itemPrompt.newField('select');
   wearSlotField.name = 'equipmentSlot';
-  wearSlotField.options = global.config.equipmentSlots;
+  wearSlotField.options = Config.equipmentSlots;
   wearSlotField.conditional = {
     field: 'flags',
     value: 'WEARABLE',
