@@ -1,0 +1,29 @@
+{
+  "name": "mudjs",
+  "version": "0.0.1",
+  "description": "A NodeJS based multiplayer text-based gaming engine.",
+  "main": "index.js",
+  "dependencies": {
+    "colors":"1.1.2",
+    "mysql":"^2.12.0",
+    "sequelize":"^3.28.0"
+  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afreemannc/mudjs.git"
+  },
+  "keywords": [
+    "MUD",
+    "Multi-user",
+    "Dungeon"
+  ],
+  "author": "Allen Freeman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/afreemannc/mudjs/issues"
+  },
+  "homepage": "https://github.com/afreemannc/mudjs#readme"
+}
