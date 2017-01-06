@@ -221,4 +221,4 @@ function zones() {
   }
 }
 
-module.exports = new Zones();
+module.exports = new zones();

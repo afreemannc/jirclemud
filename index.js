@@ -1,7 +1,16 @@
+var fs = require("fs");
+var path = require("path");
 var net = require('net');
-global.mysql = require('mysql');
-Session = require('./core/session');
 Config = require('./config/config.js');
+Sequelize = require('sequelize');
+sequelize = new Sequelize(
+  Config.dbName,
+  Config.dbUser,
+  Config.dbPass
+);
+
+
+Session = require('./core/session');
 Commands = require('./core/commands');
 Characters = require('./core/characters');
 Rooms = require('./core/rooms');
@@ -12,6 +21,7 @@ Zones = require('./core/zones');
 Tokens = require('./core/tokens');
 Containers = require('./core/containers');
 
+Models = {};
 Sessions = [];
 
 function newSocket(socket) {
@@ -31,22 +41,16 @@ function newSocket(socket) {
   session.start();
 }
 
+// Load data models
+loadModels('core');
+console.log('models:');
+console.log(Models);
 // Initialize service and set listening port
 var server = net.createServer(newSocket);
 server.listen(Config.port);
 
-// Create a pool of db connections for later use.
-global.dbPool = mysql.createPool({
-    connectionLimit: 10,
-    host: Config.dbHost,
-    user: Config.dbUser,
-    password: Config.dbPass,
-    database: Config.dbName,
-    port: Config.dbPort
-});
-
-global.rooms.loadRooms();
-global.zones.loadZones();
+//Rooms.loadRooms();
+//Zones.loadZones();
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(session, data) {
   inputContext = session.getInputContext();
@@ -63,16 +67,32 @@ function parseData(session, data) {
   }
 }
 
-/*
- * Cleans the input of carriage return, newline
- */
-function cleanInput(data) {
-  return data.toString().replace(/(\r\n|\n|\r)/gm,"");
-}
-
 function closeSession(session) {
   var i = Sessions.indexOf(session);
   if (i !== -1) {
     Sessions.splice(i, 1);
   }
+}
+
+/**
+ * Recursively scan for and load Sequilize data models.
+ *
+ * @param dir
+ *  string directory name to scan.
+ */
+function loadModels(dir) {
+  fs.readdirSync(dir)
+    .filter(function(file) {
+      var filepath = path.join(dir, file);
+      if(fs.statSync(filepath).isDirectory()) {
+        loadModels(filepath);
+      }
+      return (file.endsWith("Model.js"));
+    })
+    .forEach(function(file) {
+      var model = require('./' + path.join(dir, file));
+      console.log('model:');
+      console.log(model);
+      Models[model.name] = sequelize.define(model.name, model.fields);
+    });
 }
