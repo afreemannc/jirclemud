@@ -6,7 +6,6 @@ Commands = require('./commands/commands');
 Characters = require('./characters');
 global.rooms = require('./room');
 global.classes = require('./classes');
-global.dice = require('./dice');
 global.items = require('./items/items');
 global.prompt = require('./prompt/prompt.js');
 global.zones = require('./zones');

@@ -1,5 +1,5 @@
 // user stuff
-
+var dice = require('./dice');
 var crypto = require('crypto');
 // Session mode handler for login
 
@@ -185,7 +185,7 @@ var Characters = function(){
     // TODO: implement some kind of stat system. Probably standard D20 style to start.
     var characterClass = global.classes.classFromSelection(characterClass);
     // TODO: add con bonus once stats are implemented.
-    var startingHP = global.dice.roll(characterClass.hitDice);
+    var startingHP = dice.roll(characterClass.hitDice);
     var startingMana = 10; //TODO: implement some mana thing once casters are in.
     var properties = {
       class: characterClass.name,
