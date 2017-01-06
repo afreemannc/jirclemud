@@ -3,7 +3,7 @@ var dice = require('./dice');
 var crypto = require('crypto');
 // Session mode handler for login
 
-var Characters = function(){
+var characters = function(){
 
   /**
    * Login screen prompt.
@@ -69,7 +69,7 @@ var Characters = function(){
     var character = session.character;
     // Unpack stored properties
     session.character.stats = JSON.parse(character.stats);
-    session.character.affects = JSON.parse(character.affects);
+    session.character.effects = JSON.parse(character.effects);
     // Initialize empty equipment slots and then load
     session.character.equipment = Characters.initialzeEqSlots();
     // TODO: load saved equipment
@@ -91,12 +91,12 @@ var Characters = function(){
    * Create an empty data structure to hold character equipment.
    */
   this.initialzeEqSlots = function() {
-    var slotKeys = Object.keys(config.equipmentSlots);
+    var slotKeys = Object.keys(Config.equipmentSlots);
     var equipment = {};
     var slot = '';
 
     for (var i = 0; i < slotKeys.length; ++i) {
-      slot = config.equipmentSlots[slotKeys[i]];
+      slot = Config.equipmentSlots[slotKeys[i]];
       equipment[slot] = false;
     }
     return equipment;
@@ -264,4 +264,4 @@ var Characters = function(){
   }
 }
 
-module.exports = new Characters();
+module.exports = new characters();
