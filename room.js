@@ -5,8 +5,8 @@ var room = function(){
 
 // TODO: this method should be attached to the actual room object.
 room.prototype.message = function(session, roomId, message, skipCharacter) {
-  for (var i = 0; i < global.sessions.length; ++i) {
-    checkSession = global.sessions[i];
+  for (var i = 0; i < Sessions.length; ++i) {
+    checkSession = Sessions[i];
     // They ain't here.
     if (checkSession.character.currentRoom !== roomId) {
       return;

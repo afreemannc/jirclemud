@@ -254,8 +254,8 @@ var Characters = function(){
    *  Otherwise returns false;
    */
   this.searchActiveCharactersByName = function(name) {
-    for (i = 0; i < global.sessions.length; ++i) {
-      check = global.sessions[i];
+    for (var i = 0; i < Sessions.length; ++i) {
+      check = Sessions[i];
       if (check.character.name.startsWith(name)) {
         return check.character.id;
       }

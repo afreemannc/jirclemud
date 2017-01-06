@@ -21,8 +21,8 @@ var Command = function() {
     if (targetCharacterId === false) {
       session.error('There is nobody around with that name.');
     }
-    for (i = 0; i < global.sessions.length; ++i) {
-      targetSession = global.sessions[i];
+    for (i = 0; i < Sessions.length; ++i) {
+      targetSession = Sessions[i];
       if (targetSession.character.id === targetCharacterId) {
         var senderName = session.character.name;
         var recipientName = targetSession.character.name;

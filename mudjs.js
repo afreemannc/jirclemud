@@ -1,6 +1,6 @@
 var net = require('net');
 global.mysql = require('mysql');
-global.session = require('./session');
+Session = require('./session');
 Config = require('./config');
 global.commands = require('./commands/commands');
 global.characters = require('./characters');
@@ -13,11 +13,11 @@ global.zones = require('./zones');
 Tokens = require('./tokens');
 global.containers = require('./containers');
 
-global.sessions = [];
+Sessions = [];
 
 function newSocket(socket) {
 
-  var session = global.session.new();
+  var session = Session.new();
 
   socket.on('data', function (data) {
     parseData(session, data);
@@ -28,7 +28,7 @@ function newSocket(socket) {
   });
 
   session.socket = socket;
-  global.sessions.push(session);
+  Sessions.push(session);
   session.start();
 }
 
@@ -72,8 +72,8 @@ function cleanInput(data) {
 }
 
 function closeSession(session) {
-  var i = global.sessions.indexOf(session);
+  var i = Sessions.indexOf(session);
   if (i !== -1) {
-    global.sessions.splice(i, 1);
+    Sessions.splice(i, 1);
   }
 }
