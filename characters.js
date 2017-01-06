@@ -38,7 +38,7 @@ var Characters = function(){
     global.dbPool.query(sql, function(err, results, fields) {
       if (results.length !== 0) {
         var salt = results[0].salt;
-        var passwordHash = global.characters.passHash(salt, password);
+        var passwordHash = Characters.passHash(salt, password);
         var sql = "SELECT * FROM ?? WHERE ?? = ? AND ?? = ?";
         var inserts = ['characters', 'name', userName, 'pass', passwordHash];
         sql = global.mysql.format(sql, inserts);
@@ -47,7 +47,7 @@ var Characters = function(){
             var character = results[0];
             session.character = character;
             session.character.currentRoom = character.current_room;
-            global.characters.loadCharacterDetails(session);
+            Characters.loadCharacterDetails(session);
           }
           else {
             // authentication failed, throw error and reset prompt. (add reset method to prompt class)
@@ -71,7 +71,7 @@ var Characters = function(){
     session.character.stats = JSON.parse(character.stats);
     session.character.affects = JSON.parse(character.affects);
     // Initialize empty equipment slots and then load
-    session.character.equipment = global.characters.initialzeEqSlots();
+    session.character.equipment = Characters.initialzeEqSlots();
     // TODO: load saved equipment
 
     // Initialize empty inventory and then load

@@ -69,10 +69,10 @@ function Session() {
 
     var input = fieldValues.start;
     if (input === 'l') {
-      global.characters.login(socket);
+      Characters.login(socket);
     }
     else if  (input === 'c') {
-      global.characters.createCharacter(socket);
+      Characters.createCharacter(socket);
     }
     else if (input === 'q') {
       this.socket.write(Config.quitMessage);
