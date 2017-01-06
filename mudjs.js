@@ -10,7 +10,7 @@ global.items = require('./core/items');
 Prompt = require('./core/prompt');
 global.zones = require('./zones');
 Tokens = require('./core/tokens');
-Containers = require('./containers');
+Containers = require('./core/containers');
 
 Sessions = [];
 
