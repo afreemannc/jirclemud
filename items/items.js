@@ -42,7 +42,7 @@ item.prototype.loadItem = function(itemId) {
 
 item.prototype.createItem = function(session) {
 
-  var itemPrompt = global.prompt.new(session, this.saveNewItem);
+  var itemPrompt = Prompt.new(session, this.saveNewItem);
   var nameField = itemPrompt.newField('text');
   nameField.name = 'name';
   nameField.inputCacheName = 'name';

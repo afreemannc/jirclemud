@@ -75,7 +75,7 @@ room.prototype.createRoom = function(session) {
   var roomId = session.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var createRoomPrompt = prompt.new(session, this.saveRoomChanges);
+  var createRoomPrompt = Prompt.new(session, this.saveRoomChanges);
 
   var zoneIdField = createRoomPrompt.newField('value');
   zoneIdField.name = 'zid';
@@ -107,7 +107,7 @@ room.prototype.editRoomName = function(session) {
   var roomId = session.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editNamePrompt = prompt.new(session, this.saveRoomChanges);
+  var editNamePrompt = Prompt.new(session, this.saveRoomChanges);
 
   var ridField = editNamePrompt.newField('value');
   ridField.name = 'rid';
@@ -143,7 +143,7 @@ room.prototype.editRoomDesc = function(session) {
   var roomId = session.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editDescPrompt = prompt.new(session, this.saveRoomChanges);
+  var editDescPrompt = Prompt.new(session, this.saveRoomChanges);
 
   var ridField = editDescPrompt.newField('value');
   ridField.name = 'rid';
@@ -178,7 +178,7 @@ room.prototype.editRoomFlags = function(session) {
   var roomId = session.character.currentRoom;
   var currentRoom = global.rooms.room[roomId];
 
-  var editFlagsPrompt = prompt.new(session, this.saveRoomChanges);
+  var editFlagsPrompt = Prompt.new(session, this.saveRoomChanges);
 
   var ridField = editFlagsPrompt.newField('value');
   ridField.name = 'rid';
@@ -216,7 +216,7 @@ room.prototype.editRoomFlags = function(session) {
 room.prototype.deleteRoomPrompt = function(session) {
   var roomId = session.character.currentRoom;
 
-  var deleteRoomPrompt = prompt.new(session, this.deleteRoom);
+  var deleteRoomPrompt = Prompt.new(session, this.deleteRoom);
 
   var roomIdField = deleteRoomPrompt.newField('value');
   roomIdField.name = 'rid';

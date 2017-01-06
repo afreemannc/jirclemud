@@ -5,7 +5,7 @@
 
   Start by creating a new prompt. Pass in the user's socket object and a function to call when the last field in the prompt has been completed.
 
-    var myPrompt = prompt.new(socket, my.completionCallbackFunction);
+    var myPrompt = Prompt.new(socket, my.completionCallbackFunction);
 
 
   Define one or more fields as needed:

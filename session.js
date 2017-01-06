@@ -39,7 +39,7 @@ function Session() {
   this.start = function() {
     var message = 'Welcome to ' + Config.mudName + '\n';
     // TODO: display splash screen.
-    var startPrompt = prompt.new(this, this.startSwitch);
+    var startPrompt = Prompt.new(this, this.startSwitch);
     // The standard prompt bailout doesn't make sense on this screen.
     startPrompt.quittable = false;
 

@@ -24,7 +24,7 @@ function Zones() {
   }
 
   this.createZone = function(session) {
-    var createZonePrompt = global.prompt.new(session, this.saveZone);
+    var createZonePrompt = Prompt.new(session, this.saveZone);
 
     // name
     var nameField = createZonePrompt.newField('text');
@@ -72,7 +72,7 @@ function Zones() {
 
   this.editZoneName = function(session, zoneId) {
     var zone = global.zones.zone[zoneId];
-    var editZonePrompt = global.prompt.new(session, this.saveZone);
+    var editZonePrompt = Prompt.new(session, this.saveZone);
 
     // name
     var currently = 'Currently:' + zone.name;
@@ -99,7 +99,7 @@ function Zones() {
 
   this.editZoneDescription = function(session) {
     var zone = global.zones.zone[zoneId];
-    var editZonePrompt = global.prompt.new(session, this.saveZone);
+    var editZonePrompt = Prompt.new(session, this.saveZone);
 
     var nameField = createZonePrompt.newField('value');
     nameField.name = 'name';
@@ -122,7 +122,7 @@ function Zones() {
 
   this.editZoneRating = function(session) {
     var zone = global.zones.zone[zoneId];
-    var editZonePrompt = global.prompt.new(session, this.saveZone);
+    var editZonePrompt = Prompt.new(session, this.saveZone);
 
     var nameField = createZonePrompt.newField('value');
     nameField.name = 'name';

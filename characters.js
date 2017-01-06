@@ -10,7 +10,7 @@ var characters = function(){
    */
   this.login = function(session) {
 
-    var loginPrompt = prompt.new(session, this.loginAuthenticate);
+    var loginPrompt = Prompt.new(session, this.loginAuthenticate);
     loginPrompt.quittable = false;
 
     var loginField = loginPrompt.newField('text');
@@ -106,7 +106,7 @@ var characters = function(){
    * Character creation prompt.
    */
   this.createCharacter = function(session) {
-    var createCharacterPrompt = prompt.new(session, this.saveCharacter);
+    var createCharacterPrompt = Prompt.new(session, this.saveCharacter);
     createCharacterPrompt.quittable = false;
 
     var characterNameField = createCharacterPrompt.newField('text');
