@@ -20,7 +20,7 @@ var Command = function() {
       var roomId = session.character.currentRoom;
       var room = global.rooms.room[roomId];
       // display room title
-      session.socket.write(Tokens.replace(session, '%bold' + room.name + '%bold')) + "\n");
+      session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold%')+ "\n");
       // display room description
       session.socket.write(Tokens.replace(session, room.full_description) + "\n\n");
       // display room inventory
