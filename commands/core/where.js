@@ -6,8 +6,8 @@ var Command = function() {
     var room = global.rooms.room[roomId];
     var zoneId = room.zid;
     var zone = global.zones.zone[zoneId];
-    var output = global.colors.cyan(zone.name) + '\n';
-    output += global.colors.yellow('Difficulty:' + zone.rating) + '\n';
+    var output = Tokens.replace(session, '%cyan%' + zone.name + '%cyan%') + '\n';
+    output += Tokens.replace(session, '%yellow%Difficulty:' + zone.rating + '%yellow%') + '\n';
     output += zone.description;
     session.write(output);
   }

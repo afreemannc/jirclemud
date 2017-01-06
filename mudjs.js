@@ -1,6 +1,5 @@
 var net = require('net');
 global.mysql = require('mysql');
-global.colors = require('colors/safe');
 global.session = require('./session');
 global.config = require('./config');
 global.commands = require('./commands/commands');
@@ -11,7 +10,7 @@ global.dice = require('./dice');
 global.items = require('./items/items');
 global.prompt = require('./prompt/prompt.js');
 global.zones = require('./zones');
-global.tokens = require('./tokens');
+Tokens = require('./tokens');
 global.containers = require('./containers');
 
 global.sessions = [];

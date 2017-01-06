@@ -27,9 +27,9 @@ var Command = function() {
         var senderName = session.character.name;
         var recipientName = targetSession.character.name;
         // tell them
-        targetSession.write(global.colors.red(senderName + " tells you:" + message));
+        targetSession.write(Tokens.replace(session, '%red%' + senderName + " tells you:" + message + '%red%'));
         // echo to sender
-        session.write(global.colors.red("You tell " + recipientName + ": " + message));
+        session.write(Tokens.replace(session, "%red%You tell " + recipientName + ": " + message + '%red%'));
         break;
       }
     }

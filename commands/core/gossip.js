@@ -14,7 +14,7 @@ var Command = function() {
          > %magenta%Dent gossips: LOL RIP%magenta%
   `;
   this.callback = function (session, input) {
-    var message = global.colors.magenta("[gossip] " + session.character.name + ": " + input + "\n");
+    var message = Tokens.replace(session, "%magenta%[gossip] " + session.character.name + ": " + input + "%magenta%\n");
     global.rooms.message(session, false, message, false);
   }
 

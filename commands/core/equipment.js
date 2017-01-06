@@ -16,7 +16,7 @@ var Command = function() {
   this.callback = function (session, input) {
     var display = global.items.inventoryDisplay(session.character.equipment);
     var output = 'Currently worn:\n' + display + '\n';
-    session.write(global.tokens.replace(session, output));
+    session.write(Tokens.replace(session, output));
   }
 }
 

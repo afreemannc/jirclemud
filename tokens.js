@@ -1,4 +1,5 @@
 // Token Replacement
+var colors = require('colors/safe');
 
 module.exports.replace = function(session, string) {
   var character = session.character;
@@ -13,7 +14,7 @@ module.exports.replace = function(session, string) {
     }
   }
 
-  var colorKeys = Object.keys(global.colors.styles);
+  var colorKeys = Object.keys(colors.styles);
 
   // Handle colors style options
   for (var i = 0; i < colorKeys.length; ++i) {
@@ -25,7 +26,7 @@ module.exports.replace = function(session, string) {
       // Match: entire string matching the regex above
       // Capture: the portion of the match between the color tokens.
       string = string.replace(regex, function(match, capture) {
-        return global.colors[style](capture);
+        return colors[style](capture);
       });
     }
   }

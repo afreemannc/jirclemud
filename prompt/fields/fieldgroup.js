@@ -50,7 +50,7 @@ function FieldGroup() {
           values[field.name] = field.value;
         }
         else {
-          console.log('field not found:' + global.colors.red(this.fields[j]));
+          console.log('field not found:' + this.fields[j]);
         }
       }
       this.value.push(values);

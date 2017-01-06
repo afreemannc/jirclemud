@@ -20,19 +20,19 @@ var Command = function() {
       var roomId = session.character.currentRoom;
       var room = global.rooms.room[roomId];
       // display room title
-      session.socket.write(global.colors.bold(global.tokens.replace(session, room.name)) + "\n");
+      session.socket.write(Tokens.replace(session, '%bold' + room.name + '%bold')) + "\n");
       // display room description
-      session.socket.write(global.tokens.replace(session, room.full_description) + "\n\n");
+      session.socket.write(Tokens.replace(session, room.full_description) + "\n\n");
       // display room inventory
       if (room.inventory.length > 0) {
         var display = global.items.inventoryDisplay(global.rooms.room[roomId].inventory);
-        session.socket.write(global.tokens.replace(session, display) + "\n\n");
+        session.socket.write(Tokens.replace(session, display) + "\n\n");
       }
       // display exits
       var exits = global.rooms.room[roomId].exits;
       exitKeys = Object.keys(exits);
       if (exitKeys.length > 0) {
-        session.write('Exits: [ ' + global.colors.yellow(exitKeys.join(' ')) + ' ]\n');
+        session.write('Exits: [ ' + Tokens.replace(session, '%yellow%' + exitKeys.join(' ') + '%yellow%') + ' ]\n');
       }
       else {
         session.write('Exits: [none]\n');
