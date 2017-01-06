@@ -25,7 +25,7 @@ var Command = function() {
   this.callback = function (session, input) {
     var roomId = session.character.currentRoom;
     var name = session.character.name;
-    var itemIndex = global.containers.findItemInContainer(input, 'name', global.rooms.room[roomId].inventory, true);
+    var itemIndex = Containers.findItemInContainer(input, 'name', global.rooms.room[roomId].inventory, true);
     if (itemIndex === false) {
       session.error('There is nothing like that here for you to enter.');
     }

@@ -24,14 +24,14 @@ var Command = function() {
     }
     var roomId = session.character.currentRoom;
     var name = session.character.name;
-    var index = global.containers.findItemInContainer(input, 'name', global.rooms.room[roomId].inventory, true);
+    var index = Containers.findItemInContainer(input, 'name', global.rooms.room[roomId].inventory, true);
     if (index !== false) {
       var transferDetails = {
         transferType: 'room-to-character',
         item: global.rooms.room[roomId].inventory[index],
         index: index
       }
-      global.containers.transferItemInstance(session, transferDetails);
+      Containers.transferItemInstance(session, transferDetails);
       // player message
       session.write('You pick up a ' + transferDetails.item.name);
       // room message

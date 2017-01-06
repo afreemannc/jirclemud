@@ -46,7 +46,7 @@ room.prototype.loadRooms = function() {
         containerType: 'room',
         parentId: roomId
       }
-      global.containers.loadInventory(values);
+      Containers.loadInventory(values);
     }
     console.log('The world is loaded!');
   });
@@ -369,7 +369,7 @@ room.prototype.saveRoom = function(session, values) {
             max_size: -1,
             max_weight: -1
           }
-          global.containers.createContainer(values);
+          Containers.createContainer(values);
           return resolve(values);
         }
       });

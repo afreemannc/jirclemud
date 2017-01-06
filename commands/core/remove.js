@@ -14,14 +14,14 @@ var Command = function() {
          > %bold% Dent says 'OMG MY EYES MAKE IT STOP'%bold%
   `;
   this.callback = function(session, input) {
-    var index = global.containers.findItemInContainer(input, 'name', session.character.equipment, true);
+    var index = Containers.findItemInContainer(input, 'name', session.character.equipment, true);
     if (index !== false) {
       var transferDetails = {
         transferType: 'equipped-to-character',
         item: session.character.equipment[index],
         index: index
       }
-      global.containers.transferItemInstance(session, transferDetails);
+      Containers.transferItemInstance(session, transferDetails);
       var roomId = session.character.currentRoom;
       var name = session.character.name;
       // player message

@@ -12,14 +12,14 @@ var Command = function() {
          > %bold%You wear a colorful codpiece around your waist.%bold%
   `;
   this.callback = function(session, input) {
-    var index = global.containers.findItemInContainer(input, 'name', session.character.inventory, true);
+    var index = Containers.findItemInContainer(input, 'name', session.character.inventory, true);
     if (index !== false) {
       var transferDetails = {
         transferType: 'character-to-equipped',
         item: session.character.inventory[index],
         index: index
       }
-      global.containers.transferItemInstance(session, transferDetails);
+      Containers.transferItemInstance(session, transferDetails);
       var roomId = session.character.currentRoom;
       var name = session.character.name;
       // player message

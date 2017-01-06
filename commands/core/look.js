@@ -42,13 +42,13 @@ var Command = function() {
       var roomId = session.character.currentRoom;
       var room = global.rooms.room[roomId];
       // Check personal inventory
-      var itemIndex = global.containers.findItemInContainer(input, 'name', session.character.inventory, true);
+      var itemIndex = Containers.findItemInContainer(input, 'name', session.character.inventory, true);
       if (itemIndex !== false) {
         session.write(session.character.inventory[itemIndex].full_description);
       }
       else {
         // Check the room
-        itemIndex = global.containers.findItemInContainer(input, 'name', room.inventory, true);
+        itemIndex = Containers.findItemInContainer(input, 'name', room.inventory, true);
         if (itemIndex !== false) {
           session.write(room.inventory[itemIndex].full_description);
         }

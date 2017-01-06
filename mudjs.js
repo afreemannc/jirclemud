@@ -10,7 +10,7 @@ global.items = require('./items/items');
 global.prompt = require('./prompt/prompt.js');
 global.zones = require('./zones');
 Tokens = require('./tokens');
-global.containers = require('./containers');
+Containers = require('./containers');
 
 Sessions = [];
 
