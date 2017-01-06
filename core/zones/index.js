@@ -1,6 +1,6 @@
 // Zone CRUD
 
-function Zones() {
+function zones() {
   this.zone = {};
   // Zone details need to be in memory for "where", help <zone>, and zone <zone id> commands
   //  to work without a bunch of grovelling.
@@ -11,7 +11,7 @@ function Zones() {
         console.log('loading zone ' + results[i].zid);
         var zoneId = results[i].zid;
         if (zoneId > 0) {
-          global.zones.zone[zoneId] = results[i];
+          Zones.zone[zoneId] = results[i];
         }
       }
     });
@@ -19,7 +19,7 @@ function Zones() {
 
   this.getCurrentZoneId = function(session) {
     var roomId = session.character.currentRoom;
-    var currentRoom = global.rooms.room[roomId];
+    var currentRoom = Rooms.room[roomId];
     return currentRoom.zid;
   }
 
@@ -71,7 +71,7 @@ function Zones() {
   }
 
   this.editZoneName = function(session, zoneId) {
-    var zone = global.zones.zone[zoneId];
+    var zone = Zones.zone[zoneId];
     var editZonePrompt = Prompt.new(session, this.saveZone);
 
     // name
@@ -98,7 +98,7 @@ function Zones() {
   }
 
   this.editZoneDescription = function(session) {
-    var zone = global.zones.zone[zoneId];
+    var zone = Zones.zone[zoneId];
     var editZonePrompt = Prompt.new(session, this.saveZone);
 
     var nameField = createZonePrompt.newField('value');
@@ -121,7 +121,7 @@ function Zones() {
   }
 
   this.editZoneRating = function(session) {
-    var zone = global.zones.zone[zoneId];
+    var zone = Zones.zone[zoneId];
     var editZonePrompt = Prompt.new(session, this.saveZone);
 
     var nameField = createZonePrompt.newField('value');
@@ -169,8 +169,8 @@ function Zones() {
   }
 
   this.validateZoneName = function(session, zoneName) {
-    for (var i = 0; i < global.zones.zone.length; ++i) {
-      zone = global.zones.zone[i];
+    for (var i = 0; i < Zones.zone.length; ++i) {
+      var zone = Zones.zone[i];
       if (zone.name = zoneName) {
         return false;
       }
@@ -190,8 +190,8 @@ function Zones() {
       values.zid = fieldValues.zid;
       global.dbPool.query('UPDATE zones SET ? WHERE ZID = ' + values.zid, values, function (error, results) {
         // Update copy loaded in memory
-        global.zones.zone[values.zid].name = values.name;
-        global.zones.zone[values.zid].description = values.description;
+        Zones.zone[values.zid].name = values.name;
+        Zones.zone[values.zid].description = values.description;
         session.write('Zone changes saved.');
         session.inputContext = 'command';
       });
@@ -211,7 +211,7 @@ function Zones() {
           full_description: '... there was naught but darkness and chaos.',
           flags: [],
         }
-        global.rooms.saveRoom(session, roomValues).then((response) => {
+        Rooms.saveRoom(session, roomValues).then((response) => {
           Commands.triggers.bamf(session, response.rid);
         }).catch(function(error) {
           console.log('something has gone terribly wrong with zone save:' + error);

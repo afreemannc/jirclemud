@@ -22,7 +22,7 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
 
 room.prototype.inputIsExit = function(session, input) {
   var roomId = session.character.currentRoom;
-  var currentExits = Object.keys(global.rooms.room[roomId].exits);
+  var currentExits = Object.keys(Rooms.room[roomId].exits);
 
   if (currentExits.includes(input) === true) {
     return true;
@@ -40,8 +40,8 @@ room.prototype.loadRooms = function() {
     for(var i = 0; i < results.length; ++i) {
       console.log('loading room ' + results[i].rid);
       var roomId = results[i].rid;
-      global.rooms.room[roomId] = results[i];
-      global.rooms.loadExits(roomId);
+      Rooms.room[roomId] = results[i];
+      Rooms.loadExits(roomId);
       var values = {
         containerType: 'room',
         parentId: roomId
@@ -56,16 +56,16 @@ room.prototype.loadRooms = function() {
 room.prototype.exitMessage = function(session, input) {
   var roomId = session.character.currentRoom;
   var name = session.character.name;
-  global.rooms.message(session, roomId, name + " leaves heading " + input, true);
+  Rooms.message(session, roomId, name + " leaves heading " + input, true);
 }
 
 room.prototype.loadExits = function(roomId) {
   var sql = 'SELECT * FROM ?? WHERE ?? = ?';
   var inserts = ['room_exits', 'rid', roomId];
   global.dbPool.query(sql, inserts, function(err, results, fields) {
-    global.rooms.room[roomId].exits = {};
+    Rooms.room[roomId].exits = {};
     for (var i = 0; i < results.length; ++i) {
-      global.rooms.room[roomId].exits[results[i].label] = results[i];
+      Rooms.room[roomId].exits[results[i].label] = results[i];
     }
   });
 }
@@ -73,7 +73,7 @@ room.prototype.loadExits = function(roomId) {
 room.prototype.createRoom = function(session) {
 
   var roomId = session.character.currentRoom;
-  var currentRoom = global.rooms.room[roomId];
+  var currentRoom = Rooms.room[roomId];
 
   var createRoomPrompt = Prompt.new(session, this.saveRoomChanges);
 
@@ -105,7 +105,7 @@ room.prototype.createRoom = function(session) {
 
 room.prototype.editRoomName = function(session) {
   var roomId = session.character.currentRoom;
-  var currentRoom = global.rooms.room[roomId];
+  var currentRoom = Rooms.room[roomId];
 
   var editNamePrompt = Prompt.new(session, this.saveRoomChanges);
 
@@ -141,7 +141,7 @@ room.prototype.editRoomName = function(session) {
 
 room.prototype.editRoomDesc = function(session) {
   var roomId = session.character.currentRoom;
-  var currentRoom = global.rooms.room[roomId];
+  var currentRoom = Rooms.room[roomId];
 
   var editDescPrompt = Prompt.new(session, this.saveRoomChanges);
 
@@ -176,7 +176,7 @@ room.prototype.editRoomDesc = function(session) {
 
 room.prototype.editRoomFlags = function(session) {
   var roomId = session.character.currentRoom;
-  var currentRoom = global.rooms.room[roomId];
+  var currentRoom = Rooms.room[roomId];
 
   var editFlagsPrompt = Prompt.new(session, this.saveRoomChanges);
 
@@ -207,7 +207,7 @@ room.prototype.editRoomFlags = function(session) {
   flagsField.name = 'flags';
   flagsField.options = {0:'none', s:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP', m:'!MAGIC'};
   flagsField.formatPrompt(currently + message, true);
-  flagsField.value = global.rooms.room[roomId].flags;
+  flagsField.value = Rooms.room[roomId].flags;
   editFlagsPrompt.addField(flagsField);
 
   editFlagsPrompt.start();
@@ -311,7 +311,7 @@ room.prototype.saveExit = function(session, fieldValues) {
       values.eid = results.insertId;
       values.properties = JSON.parse(values.properties);
       // update exit in memory;
-      global.rooms.room[values.rid].exits[values.label] = values;
+      Rooms.room[values.rid].exits[values.label] = values;
       return resolve(values);
     });
   });
@@ -344,8 +344,8 @@ room.prototype.saveRoom = function(session, values) {
           return reject(error);
         }
         else {
-          global.rooms.room[values.rid].name = values.name;
-          global.rooms.room[values.rid].full_description = values.full_description;
+          Rooms.room[values.rid].name = values.name;
+          Rooms.room[values.rid].full_description = values.full_description;
           return resolve(values);
         }
       });
@@ -358,9 +358,9 @@ room.prototype.saveRoom = function(session, values) {
         }
         else {
           values.rid = results.insertId;
-          global.rooms.room[results.insertId] = values;
-          global.rooms.room[results.insertId].inventory = [];
-          global.rooms.room[results.insertId].exits = [];
+          Rooms.room[results.insertId] = values;
+          Rooms.room[results.insertId].inventory = [];
+          Rooms.room[results.insertId].exits = [];
           // A container entry for the new room needs to be created so the room can
           // hold items.
           var containerValues = {

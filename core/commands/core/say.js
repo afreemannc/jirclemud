@@ -17,7 +17,7 @@ var Command = function() {
     var characterID = session.character.id;
     var playerMessage = "You say:" + input + "\n";
     var roomMessage = name + " says:" + input + "\n";
-    global.rooms.message(session, roomId, roomMessage, true);
+    Rooms.message(session, roomId, roomMessage, true);
     session.write(playerMessage);
   }
 

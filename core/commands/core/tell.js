@@ -16,13 +16,14 @@ var Command = function() {
     var targetCharacterName = commandParts.splice(0, 1);
     var message = commandParts.join(' ');
     var targetCharacterId = characters.searchActiveCharactersByName(targetCharacterName);
+
     // Bail if we can't find them.
     // TODO: include mobs in list of findables? Support 2.<thing> notation?
     if (targetCharacterId === false) {
       session.error('There is nobody around with that name.');
     }
-    for (i = 0; i < Sessions.length; ++i) {
-      targetSession = Sessions[i];
+    for (var i = 0; i < Sessions.length; ++i) {
+      var targetSession = Sessions[i];
       if (targetSession.character.id === targetCharacterId) {
         var senderName = session.character.name;
         var recipientName = targetSession.character.name;

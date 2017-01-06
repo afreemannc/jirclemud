@@ -61,12 +61,12 @@ var Containers = function() {
           case 'player_inventory':
             session.character.inventory = results;
             for (var i = 0; i < results.length; ++i) {
-              global.items.applyEffects(session, results[i]);
+              Items.applyEffects(session, results[i]);
             }
             session.character.inventory = results;
             break;
           case 'room':
-            global.rooms.room[fieldValues.parentId].inventory = results;
+            Rooms.room[fieldValues.parentId].inventory = results;
             break;
           default:
             console.log('Unknown inventory type specified during load:' + inserts);
@@ -161,13 +161,13 @@ var Containers = function() {
         // delete inventory[index] from character inventory
         session.character.inventory.splice(transferDetails.index, 1);
         // add item to room[room id].inventory
-        global.rooms.room[roomId].inventory.push(transferDetails.item);
+        Rooms.room[roomId].inventory.push(transferDetails.item);
         break;
       // "get" command
       case 'room-to-character':
         var roomId = session.character.currentRoom;
         // delete inventory[index] from room inventory
-        global.rooms.room[roomId].inventory.splice(transferDetails.index, 1);
+        Rooms.room[roomId].inventory.splice(transferDetails.index, 1);
         // add item to room[room id].inventory
         session.character.inventory.push(transferDetails.item);
         break;

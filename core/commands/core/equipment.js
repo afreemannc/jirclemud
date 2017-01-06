@@ -14,7 +14,7 @@ var Command = function() {
          > %red%Dent tells you 'Ghaa would you put on some pants or something?'%red%
   `;
   this.callback = function (session, input) {
-    var display = global.items.inventoryDisplay(session.character.equipment);
+    var display = Items.inventoryDisplay(session.character.equipment);
     var output = 'Currently worn:\n' + display + '\n';
     session.write(Tokens.replace(session, output));
   }

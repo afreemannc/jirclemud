@@ -24,18 +24,18 @@ var Command = function() {
     }
     var roomId = session.character.currentRoom;
     var name = session.character.name;
-    var index = Containers.findItemInContainer(input, 'name', global.rooms.room[roomId].inventory, true);
+    var index = Containers.findItemInContainer(input, 'name', Rooms.room[roomId].inventory, true);
     if (index !== false) {
       var transferDetails = {
         transferType: 'room-to-character',
-        item: global.rooms.room[roomId].inventory[index],
+        item: Rooms.room[roomId].inventory[index],
         index: index
       }
       Containers.transferItemInstance(session, transferDetails);
       // player message
       session.write('You pick up a ' + transferDetails.item.name);
       // room message
-      global.rooms.message(session, roomId, name + ' picks up a ' + transferDetails.item.name, true);
+      Rooms.message(session, roomId, name + ' picks up a ' + transferDetails.item.name, true);
     }
     else {
       session.error('Get what??\n');

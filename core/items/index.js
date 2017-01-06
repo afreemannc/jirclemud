@@ -61,7 +61,7 @@ item.prototype.createItem = function(session) {
 
   var flagsField = itemPrompt.newField('multiselect');
   flagsField.name = 'flags';
-  flagsField.options = global.items.flags;
+  flagsField.options = Items.flags;
   flagsField.formatPrompt('Select one or more flags to assign to this item');
   itemPrompt.addField(flagsField);
 
@@ -180,22 +180,21 @@ item.prototype.saveNewItem = function(session, fieldValues) {
     full_description:fieldValues.full_description,
     properties: JSON.stringify(global.items.setItemProperties(fieldValues))
   }
-  console.log('values:');
-  console.log(values);
-  global.items.saveItem(values).then((response) => {
+
+  Items.saveItem(values).then((response) => {
     session.write('New item type saved.');
     if (fieldValues.create === 'Yes') {
       values = {
         iid:response.iid,
         properties: response.properties
       }
-      global.items.saveItemInstance(values).then((response) => {
+      Items.saveItemInstance(values).then((response) => {
         session.write('New instance of item saved.');
         var values = {
           cid: session.character.inventory.id,
           instance_id: response.instance_id
         }
-        global.items.saveItemToInventory(values).then((response) => {
+        Items.saveItemToInventory(values).then((response) => {
           session.write('New item created. Check your inventory.');
         }).catch(function(error) {
           console.log('something has gone wrong adding a new item to inventory:' + error);
@@ -210,8 +209,6 @@ item.prototype.saveNewItem = function(session, fieldValues) {
 }
 
 item.prototype.saveItem = function(values) {
-  console.log('values in saveItem:');
-  console.log(values);
   return new Promise((resolve, reject) => {
     global.dbPool.query('INSERT INTO items SET ?', values, function (error, results) {
       if (error) {

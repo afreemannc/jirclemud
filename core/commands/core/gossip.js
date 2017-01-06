@@ -15,7 +15,7 @@ var Command = function() {
   `;
   this.callback = function (session, input) {
     var message = Tokens.replace(session, "%magenta%[gossip] " + session.character.name + ": " + input + "%magenta%\n");
-    global.rooms.message(session, false, message, false);
+    Rooms.message(session, false, message, false);
   }
 
 }

@@ -32,17 +32,17 @@ var Command = function() {
         }
         // room name (ex: 'edit room name')
         if (commandArgs[1] === 'name') {
-          global.rooms.editRoomName(session);
+          Rooms.editRoomName(session);
           break;
         }
         // long desc (ex: 'edit room desc')
         if (commandArgs[1] === 'desc') {
-          global.rooms.editRoomDesc(session);
+          Rooms.editRoomDesc(session);
           break;
         }
         // flags (ex: 'edit room flags')
         if (commandArgs[1] === 'flags') {
-          global.rooms.editRoomFlags(session);
+          Rooms.editRoomFlags(session);
           break;
         }
         // Garbled 2nd arg

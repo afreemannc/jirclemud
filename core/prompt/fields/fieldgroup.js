@@ -20,14 +20,14 @@ function FieldGroup() {
     this.promptMessage = prefix + '\n';
     var keys = Object.keys(staticOptions);
 
-    for (i = 0; i < keys.length; ++i) {
+    for (var i = 0; i < keys.length; ++i) {
       if (replaceInPrefix === true) {
         pattern = '[::' + keys[i] + '::]';
-        replacement = '[' + global.color.yellow(keys[i].toUpperCase()) + ']';
+        replacement = '[%yellow%' + keys[i].toUpperCase() + '%yellow%]';
         this.promptMessage = this.promptMessage.replace(pattern, replacement);
       }
       else {
-        this.promptMessage += '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + staticOptions[keys[i]] + '\n';
+        this.promptMessage += '[%yellow%' + keys[i].toUpperCase() + '%yellow%] ' + staticOptions[keys[i]] + '\n';
       }
     }
   };

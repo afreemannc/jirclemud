@@ -18,18 +18,18 @@ var Command = function() {
     // Room look, aka look with no additional arguments passed.
     if (input === '') {
       var roomId = session.character.currentRoom;
-      var room = global.rooms.room[roomId];
+      var room = Rooms.room[roomId];
       // display room title
       session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold%')+ "\n");
       // display room description
       session.socket.write(Tokens.replace(session, room.full_description) + "\n\n");
       // display room inventory
       if (room.inventory.length > 0) {
-        var display = global.items.inventoryDisplay(global.rooms.room[roomId].inventory);
+        var display = Items.inventoryDisplay(Rooms.room[roomId].inventory);
         session.socket.write(Tokens.replace(session, display) + "\n\n");
       }
       // display exits
-      var exits = global.rooms.room[roomId].exits;
+      var exits = Rooms.room[roomId].exits;
       exitKeys = Object.keys(exits);
       if (exitKeys.length > 0) {
         session.write('Exits: [ ' + Tokens.replace(session, '%yellow%' + exitKeys.join(' ') + '%yellow%') + ' ]\n');
@@ -40,7 +40,7 @@ var Command = function() {
     }
     else {
       var roomId = session.character.currentRoom;
-      var room = global.rooms.room[roomId];
+      var room = Rooms.room[roomId];
       // Check personal inventory
       var itemIndex = Containers.findItemInContainer(input, 'name', session.character.inventory, true);
       if (itemIndex !== false) {

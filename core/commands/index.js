@@ -38,7 +38,7 @@ function Commands() {
     var arg = commandSegments.join(' ');
 
     // If input matches an exit label for the current room treat as move.
-    if (global.rooms.inputIsExit(session, input) === true) {
+    if (Rooms.inputIsExit(session, input) === true) {
       this.triggers.move(session, input);
       return;
     }

@@ -26,7 +26,7 @@ var Command = function() {
       //TODO: write a thing to determine if a or an is appropriate.
       session.write('You wear ' + transferDetails.item.name);
       // room message
-      global.rooms.message(session, roomId, name + ' wears ' + transferDetails.item.name, true);
+      Rooms.message(session, roomId, name + ' wears ' + transferDetails.item.name, true);
     }
     else {
       session.error('Wear what??\n');

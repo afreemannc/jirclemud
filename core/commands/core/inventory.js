@@ -15,7 +15,7 @@ var Command = function() {
          > %bold%an unlit torch%bold%
   `;
   this.callback = function (session, input) {
-    var display = global.items.inventoryDisplay(session.character.inventory);
+    var display = Items.inventoryDisplay(session.character.inventory);
     var output = 'You are carrying:\n' + display + '\n';
     session.write(output);
   }

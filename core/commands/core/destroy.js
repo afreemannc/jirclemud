@@ -12,7 +12,7 @@ var Command = function() {
           // TODO:
           break;
         case 'room':
-          global.rooms.deleteRoom(session);
+          Rooms.deleteRoom(session);
           break;
         case 'item':
           // TODO:

@@ -28,14 +28,13 @@ var Command = function() {
     }
     else {
       var roomId = session.character.currentRoom;
-      var currentRoom = global.rooms.room[roomId];
+      var currentRoom = Rooms.room[roomId];
       var exitLabel = inputParts[0];
       var targetRid = inputParts[1];
     }
     // link direction already occupied with an exit
-    console.log('current room:');
-    console.log(currentRoom);
-    for (i = 0; i < currentRoom.exits.length; ++i) {
+    var currentExit = false;
+    for (var i = 0; i < currentRoom.exits.length; ++i) {
       currentExit = currentRoom.exits[i];
       if (currentExit.label === exitLabel) {
         session.error('There is already an exit in that direction.');
@@ -49,7 +48,7 @@ var Command = function() {
     }
 
     // link attempt to a nonexistent room id
-    if (typeof global.rooms.room[targetRid] === 'undefined') {
+    if (typeof Rooms.room[targetRid] === 'undefined') {
       session.error('Room ' + targetRid + ' does not exist.');
       return false;
     }
@@ -60,9 +59,7 @@ var Command = function() {
       label: exitLabel,
       description: '',
     }
-    //global.rooms.saveExit(socket, fieldValues, false, false);
   }
-
 }
 
 module.exports = new Command();

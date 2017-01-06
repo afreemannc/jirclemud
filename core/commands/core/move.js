@@ -19,7 +19,7 @@ var Command = function() {
   this.callback = function (session, input) {
     var roomId = session.character.currentRoom;
     var characterId = session.character.id;
-    var currentExits = global.rooms.room[roomId].exits;
+    var currentExits = Rooms.room[roomId].exits;
 
     if (typeof currentExits[input] === 'undefined') {
       session.error('Alas, you cannot go that way.');

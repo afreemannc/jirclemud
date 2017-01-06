@@ -9,13 +9,13 @@ var Command = function() {
     else {
       switch (context) {
         case 'zone':
-          global.zones.createZone(session);
+          Zones.createZone(session);
           break;
         case 'room':
-          global.rooms.createRoom(session);
+          Rooms.createRoom(session);
           break;
         case 'item':
-          global.items.createItem(session);
+          Items.createItem(session);
           break;
         default:
           session.error('Create what??\n');

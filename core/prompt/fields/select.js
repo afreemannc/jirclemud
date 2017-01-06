@@ -10,7 +10,7 @@ function Select() {
 
   this.checkConditional = function(input) {
     if (Array.isArray(input)) {
-      for (i = 0; i < input.length; ++i) {
+      for (var i = 0; i < input.length; ++i) {
         if (this.value === input[i]) {
           return true;
         }
@@ -31,14 +31,14 @@ function Select() {
     this.promptMessage = prefix + '\n';
     var keys = Object.keys(this.options);
 
-    for (i = 0; i < keys.length; ++i) {
+    for (var i = 0; i < keys.length; ++i) {
       if (replaceInPrefix === true) {
         pattern = '[::' + keys[i] + '::]';
-        replacement = '[' + global.color.yellow(keys[i].toUpperCase()) + ']';
+        replacement = '[%yellow%' + keys[i].toUpperCase() + '%yellow%]';
         this.promptMessage = this.promptMessage.replace(pattern, replacement);
       }
       else {
-        this.promptMessage += '[' + global.color.yellow(keys[i].toUpperCase()) + '] ' + this.options[keys[i]] + '\n';
+        this.promptMessage += '[%yellow%' + keys[i].toUpperCase()) + '%yellow%] ' + this.options[keys[i]] + '\n';
       }
     }
   };

@@ -122,7 +122,7 @@ var characters = function(){
 
     var classField = createCharacterPrompt.newField('select');
     classField.name = 'characterclass';
-    classField.options = global.classes.selectionOptions();
+    classField.options = Classes.selectionOptions();
     classField.formatPrompt('Please select a character class:');
     createCharacterPrompt.addField(classField);
 
@@ -183,7 +183,7 @@ var characters = function(){
    */
   this.startProperties = function(characterClass) {
     // TODO: implement some kind of stat system. Probably standard D20 style to start.
-    var characterClass = global.classes.classFromSelection(characterClass);
+    var characterClass = Classes.classFromSelection(characterClass);
     // TODO: add con bonus once stats are implemented.
     var startingHP = dice.roll(characterClass.hitDice);
     var startingMana = 10; //TODO: implement some mana thing once casters are in.

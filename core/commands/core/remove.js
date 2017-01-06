@@ -27,7 +27,7 @@ var Command = function() {
       // player message
       session.write('You take off ' + transferDetails.item.name);
       // room message
-      global.rooms.message(session, roomId, name + ' takes off ' + transferDetails.item.name, true);
+      Rooms.message(session, roomId, name + ' takes off ' + transferDetails.item.name, true);
     }
     else {
       session.error('Remove what??\n');
