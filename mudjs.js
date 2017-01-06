@@ -1,14 +1,14 @@
 var net = require('net');
 global.mysql = require('mysql');
-Session = require('./session');
+Session = require('./core/session');
 Config = require('./config/config.js');
 Commands = require('./core/commands');
 Characters = require('./core/characters');
-global.rooms = require('./room');
+global.rooms = require('./core/room');
 global.classes = require('./classes');
 global.items = require('./core/items');
 Prompt = require('./core/prompt');
-global.zones = require('./zones');
+global.zones = require('./core/zones');
 Tokens = require('./core/tokens');
 Containers = require('./core/containers');
 
