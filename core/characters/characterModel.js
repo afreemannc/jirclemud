@@ -2,6 +2,7 @@ module.exports.name = 'Character';
 module.exports.fields = {
     id: {
       type: Sequelize.INTEGER.UNSIGNED,
+      autoIncrement: true,
       primaryKey: true
     },
 
@@ -38,6 +39,10 @@ module.exports.fields = {
     },
 
     effects: {
+      type: Sequelize.TEXT
+    },
+
+    equipment: {
       type: Sequelize.TEXT
     }
 };

@@ -38,7 +38,7 @@ function Select() {
         this.promptMessage = this.promptMessage.replace(pattern, replacement);
       }
       else {
-        this.promptMessage += '[%yellow%' + keys[i].toUpperCase()) + '%yellow%] ' + this.options[keys[i]] + '\n';
+        this.promptMessage += '[%yellow%' + keys[i].toUpperCase() + '%yellow%] ' + this.options[keys[i]] + '\n';
       }
     }
   };

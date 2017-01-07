@@ -2,6 +2,7 @@ module.exports.name = 'Zone';
 module.exports.fields = {
   zid: {
     type: Sequelize.INTEGER.UNSIGNED,
+    autoIncrement: true,
     primaryKey: true
   },
 

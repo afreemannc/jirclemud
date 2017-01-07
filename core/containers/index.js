@@ -1,28 +1,4 @@
 var Containers = function() {
-  /**
-   * Create a new container entry for the parent object (room, character, item)
-   *
-   * @param values
-   *   Object: {
-   *     container_type: <room, character_inventory, item>
-   *     parent_id: <unique id of the parent object. rid for room, id for character, instance_id for container items>
-   *   }
-   *
-   * @return Promise
-   *   resolve returns the container id if insert was successful, otherwise reject returns the error encountered.
-   */
-  this.createContainer = function(values) {
-    return new Promise((resolve, reject) => {
-      global.dbPool.query('INSERT INTO containers SET ?', values, function (error, results) {
-        if (error) {
-          return reject(error);
-        }
-        else {
-          return resolve(results.insertId);
-        }
-      });
-    });
-  }
 
   /**
    * Load inventory contents
@@ -157,7 +133,7 @@ var Containers = function() {
     switch (transferDetails.transferType) {
       // "drop" command
       case 'character-to-room':
-        var roomId = session.character.currentRoom;
+        var roomId = session.character.current_room;
         // delete inventory[index] from character inventory
         session.character.inventory.splice(transferDetails.index, 1);
         // add item to room[room id].inventory
@@ -165,7 +141,7 @@ var Containers = function() {
         break;
       // "get" command
       case 'room-to-character':
-        var roomId = session.character.currentRoom;
+        var roomId = session.character.current_room;
         // delete inventory[index] from room inventory
         Rooms.room[roomId].inventory.splice(transferDetails.index, 1);
         // add item to room[room id].inventory

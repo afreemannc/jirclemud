@@ -17,7 +17,7 @@ var Command = function() {
   this.callback = function (session, input) {
     // Room look, aka look with no additional arguments passed.
     if (input === '') {
-      var roomId = session.character.currentRoom;
+      var roomId = session.character.current_room;
       var room = Rooms.room[roomId];
       // display room title
       session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold%')+ "\n");
@@ -39,7 +39,7 @@ var Command = function() {
       }
     }
     else {
-      var roomId = session.character.currentRoom;
+      var roomId = session.character.current_room;
       var room = Rooms.room[roomId];
       // Check personal inventory
       var itemIndex = Containers.findItemInContainer(input, 'name', session.character.inventory, true);

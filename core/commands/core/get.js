@@ -22,7 +22,7 @@ var Command = function() {
       session.write(Tokens.replace(session, '%bold%Ye cannot get ye flask.%bold%'));
       return true;
     }
-    var roomId = session.character.currentRoom;
+    var roomId = session.character.current_room;
     var name = session.character.name;
     var index = Containers.findItemInContainer(input, 'name', Rooms.room[roomId].inventory, true);
     if (index !== false) {

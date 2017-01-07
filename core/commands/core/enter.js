@@ -23,7 +23,7 @@ var Command = function() {
 
   `;
   this.callback = function (session, input) {
-    var roomId = session.character.currentRoom;
+    var roomId = session.character.current_room;
     var name = session.character.name;
     var itemIndex = Containers.findItemInContainer(input, 'name', Rooms.room[roomId].inventory, true);
     if (itemIndex === false) {
@@ -43,7 +43,7 @@ var Command = function() {
           return false;
         }
         else {
-          session.character.currentRoom = target_rid;
+          session.character.current_room = target_rid;
           session.socket.write('You step into the ' + portal.name + ' and disappear.');
           Commands.triggers.look(session, '');
         }

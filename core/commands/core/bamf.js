@@ -25,7 +25,7 @@ var Command = function() {
     }
     else {
       var exitMessage = 'Bamf!';
-      session.character.currentRoom = input;
+      session.character.current_room = input;
       Commands.triggers.look(session, '');
     }
   }

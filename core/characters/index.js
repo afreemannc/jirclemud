@@ -38,33 +38,31 @@ var characters = function(){
       where: {
         name:userName
       }
-    }).then(function(results) {
-      if (results) {
-        var salt = results.dataValues.salt;
+    }).then(function(result) {
+      if (result) {
+        var salt = result.get('salt');
+        var passwordHash = Characters.passHash(salt, password);
+       // Attempt authentication
+        Character.findOne({
+          where: {
+            name:userName,
+            pass:passwordHash
+          }
+        }).then(function(results) {
+          if (results) {
+            // Authentication successful, load character details.
+            var character = results.dataValues;
+            session.character = character;
+            Characters.loadCharacterDetails(session);
+          }
+          else {
+            // Authentication failed.
+            session.prompt.displayCompletionError(session, 'Login incorrect.\n');
+          }
+        });
       }
       else {
         // Salt not found, this suggests the character name doesn't exist.
-        session.prompt.displayCompletionError(session, 'Login incorrect.\n');
-      }
-    });
-
-    var passwordHash = this.passHash(salt, password);
-    // Attempt authentication
-    Character.findOne({
-      where: {
-        name:userName,
-        pass:passwordHash
-      }
-    }).then(function(results) {
-      if (results) {
-        // Authentication successful, load character details.
-        var character = results.dataValues;
-        session.character = character;
-        session.character.currentRoom = character.current_room;
-        this.loadCharacterDetails(session);
-      }
-      else {
-        // Authentication failed.
         session.prompt.displayCompletionError(session, 'Login incorrect.\n');
       }
     });
@@ -113,8 +111,13 @@ var characters = function(){
    * Character creation prompt.
    */
   this.createCharacter = function(session) {
-    var createCharacterPrompt = Prompt.new(session, this.saveCharacter);
+    var createCharacterPrompt = Prompt.new(session, this.saveNewCharacter);
     createCharacterPrompt.quittable = false;
+
+    var saltField = createCharacterPrompt.newField('value');
+    saltField.name = 'salt';
+    saltField.value = crypto.randomBytes(Math.ceil(4)).toString('hex').slice(0, 8);
+    createCharacterPrompt.addField(saltField);
 
     var characterNameField = createCharacterPrompt.newField('text');
     characterNameField.name = 'charactername';
@@ -154,34 +157,55 @@ var characters = function(){
     return hash.digest('hex');
   }
 
-
-  // Save character record.
-  // TODO: convert to Promise
-  this.saveCharacter = function(session, fieldValues) {
-    var salt = crypto.randomBytes(Math.ceil(4)).toString('hex').slice(0, 8);
-    // TODO: unfuck this function so it works for inserts and updates.
-    var hashedPassword = this.passHash(salt, fieldValues.password);
+  this.saveNewCharacter = function(session, fieldValues) {
+    var Character = Models.Character;
+    var hashedPassword = Characters.passHash(fieldValues.salt, fieldValues.password);
     var values = {
+      id: '',
       name: fieldValues.charactername,
       pass: hashedPassword,
-      salt: salt,
+      salt: fieldValues.salt,
       last_login: 0,
       status: 1,
       current_room: Config.startRoomId,
-      stats: this.startProperties(fieldValues.characterclass),
-      affects: this.startAffects,
+      stats: Characters.startProperties(fieldValues.characterclass),
+      effects: Characters.starteffects,
+      equipment: JSON.stringify(Characters.initializeEqSlots),
     };
 
-    global.dbPool.query('INSERT INTO characters SET ?', values, function (error, result) {
-      characterId = result.insertId;
-      // TODO: generate default inventory
-      session.character = values;
-      session.character.id = characterId;
-      session.character.currentRoom = Config.startRoom;
-      // TODO: move this somewhere else.
+    Character.create(values).then(function(instance) {
+      var Container = Models.Container;
+      var values = {
+        cid: '',
+        container_type: 'character',
+        parent_id: instance.get('id'),
+        max_size: 20,
+        max_weight: 200 // TODO: alter based on str
+      }
+      Container.create(values).then(function(instance) {
+
+      });
+      session.character = instance.dataValues;
       session.socket.write('Welcome ' + values.name + '\n');
       session.inputContext = 'command';
+      console.log('session.character:');
+      console.log(session.character);
       Commands.triggers.look(session, '');
+    });
+  }
+
+  // Save character record.
+  // TODO: convert to Promise
+  this.saveCharacter = function(session, values) {
+    var Character = Models.Character;
+
+    Character.upsert(values).then(function (created) {
+      if (created) {
+        console.log('new character record created');
+      }
+      else {
+        console.log('character record updated');
+      }
     });
   }
 
@@ -232,22 +256,35 @@ var characters = function(){
    *   Returns boolean: false if character name is already in use, otherwise true.
    */
   this.validateCharacterName = function(session, name) {
+    var Character = Models.Character;
+    console.log('name validation triggered');
     if (name.length === 0) {
       session.prompt('Character Name:\n', 'name');
       return false;
     }
-    global.dbPool.query('SELECT id FROM characters WHERE name = ?', [name],
-      ret = function(error, results, fields) {
-      if (results.length !== 0) {
+
+    Character.findOne({
+     attributes:['id'],
+      where: {
+        name:name
+      }
+    }).then(function (character) {
+      // Since we can't just return true or false from the parent function
+      // there's some manual form handling that has to take place.
+      console.log('response:' + character);
+      if (character !== null) {
         var message = name + ' is already in use. Please select a different character name.\n';
-        session.error(message);
-        return false;
+        session.socket.write(message);
+        this.promptUser(session.prompt.currentField);
       }
       else {
-       return true;
+        session.prompt.currentField.cacheInput(name);
+        var fieldIndex = session.prompt.getFieldIndex(session.prompt.currentField.name);
+        session.prompt.currentField = session.prompt.fields[fieldIndex + 1];
+        session.prompt.promptUser();
       }
     });
-    return ret;
+    return null;
   }
 
   /**
@@ -262,9 +299,9 @@ var characters = function(){
    */
   this.searchActiveCharactersByName = function(name) {
     for (var i = 0; i < Sessions.length; ++i) {
-      check = Sessions[i];
-      if (check.character.name.startsWith(name)) {
-        return check.character.id;
+      var session = Sessions[i];
+      if (session.character.name.startsWith(name)) {
+        return session.character.id;
       }
     }
     return false;

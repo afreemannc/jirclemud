@@ -17,7 +17,7 @@ var Command = function() {
     > You travel west.
   `;
   this.callback = function (session, input) {
-    var roomId = session.character.currentRoom;
+    var roomId = session.character.current_room;
     var characterId = session.character.id;
     var currentExits = Rooms.room[roomId].exits;
 
@@ -26,7 +26,7 @@ var Command = function() {
     }
     else {
       var currentExit = currentExits[input];
-      session.character.currentRoom = currentExit.target_rid;
+      session.character.current_room = currentExit.target_rid;
       Commands.triggers.look(session, '');
     }
   }

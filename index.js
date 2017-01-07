@@ -6,7 +6,12 @@ Sequelize = require('sequelize');
 sequelize = new Sequelize(
   Config.dbName,
   Config.dbUser,
-  Config.dbPass
+  Config.dbPass,
+  {
+    dialectOptions: {
+      socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
+    }
+  }
 );
 
 
@@ -61,7 +66,6 @@ function parseData(session, data) {
       break;
     case 'command':
       // commands should only every be single line so data is sanitized to remove newline characters.
-      var input = cleanInput(data);
       Commands.commandHandler(session, input);
       break;
   }
@@ -96,3 +100,5 @@ function loadModels(dir) {
       Models[model.name] = sequelize.define(model.name, model.fields);
     });
 }
+
+sequelize.sync({force:true});

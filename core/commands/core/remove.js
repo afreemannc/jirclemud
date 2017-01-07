@@ -22,7 +22,7 @@ var Command = function() {
         index: index
       }
       Containers.transferItemInstance(session, transferDetails);
-      var roomId = session.character.currentRoom;
+      var roomId = session.character.current_room;
       var name = session.character.name;
       // player message
       session.write('You take off ' + transferDetails.item.name);

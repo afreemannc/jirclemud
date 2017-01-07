@@ -8,7 +8,7 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
   for (var i = 0; i < Sessions.length; ++i) {
     checkSession = Sessions[i];
     // They ain't here.
-    if (checkSession.character.currentRoom !== roomId) {
+    if (checkSession.character.current_room !== roomId) {
       return;
     }
     else if (checkSession.character.id === session.character.id && skipCharacter === true) {
@@ -21,7 +21,7 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
 }
 
 room.prototype.inputIsExit = function(session, input) {
-  var roomId = session.character.currentRoom;
+  var roomId = session.character.current_room;
   var currentExits = Object.keys(Rooms.room[roomId].exits);
 
   if (currentExits.includes(input) === true) {
@@ -32,29 +32,19 @@ room.prototype.inputIsExit = function(session, input) {
   }
 }
 
-// Load all zones into memory
+// Load all rooms into memory
 room.prototype.loadRooms = function() {
-  // Only trigger room load if the target room isn't already loaded.
-  var sql = "SELECT * FROM rooms";
-  global.dbPool.query(sql, function(err, results, fields) {
-    for(var i = 0; i < results.length; ++i) {
-      console.log('loading room ' + results[i].rid);
-      var roomId = results[i].rid;
-      Rooms.room[roomId] = results[i];
-      Rooms.loadExits(roomId);
-      var values = {
-        containerType: 'room',
-        parentId: roomId
-      }
-      Containers.loadInventory(values);
-    }
-    console.log('The world is loaded!');
-  });
+  var Room = Models.Room;
+  Room.findAll().then(function(instances)) {
+    instances.forEach(function(instance) {
+      Rooms.room[instance.get('rid')] = instance.dataValues;
+    });
+  }
 }
 
 // TODO: this should be deprecated by room.message
 room.prototype.exitMessage = function(session, input) {
-  var roomId = session.character.currentRoom;
+  var roomId = session.character.current_room;
   var name = session.character.name;
   Rooms.message(session, roomId, name + " leaves heading " + input, true);
 }
@@ -72,14 +62,14 @@ room.prototype.loadExits = function(roomId) {
 
 room.prototype.createRoom = function(session) {
 
-  var roomId = session.character.currentRoom;
-  var currentRoom = Rooms.room[roomId];
+  var roomId = session.character.current_room;
+  var current_room = Rooms.room[roomId];
 
   var createRoomPrompt = Prompt.new(session, this.saveRoomChanges);
 
   var zoneIdField = createRoomPrompt.newField('value');
   zoneIdField.name = 'zid';
-  zoneIdField.value = currentRoom.zid;
+  zoneIdField.value = current_room.zid;
   createRoomPrompt.addField(zoneIdField);
 
   var nameField = createRoomPrompt.newField('text');
@@ -104,8 +94,8 @@ room.prototype.createRoom = function(session) {
 }
 
 room.prototype.editRoomName = function(session) {
-  var roomId = session.character.currentRoom;
-  var currentRoom = Rooms.room[roomId];
+  var roomId = session.character.current_room;
+  var current_room = Rooms.room[roomId];
 
   var editNamePrompt = Prompt.new(session, this.saveRoomChanges);
 
@@ -116,10 +106,10 @@ room.prototype.editRoomName = function(session) {
 
   var zoneIdField = editNamePrompt.newField('value');
   zoneIdField.name = 'zid';
-  zoneIdField.value = currentRoom.zid;
+  zoneIdField.value = current_room.zid;
   editNamePrompt.addField(zoneIdField);
 
-  var currently =  'Currently:\n' + Tokens.replace(session, '%cyan%' + currentRoom.name + '%cyan%') + '\n\n';
+  var currently =  'Currently:\n' + Tokens.replace(session, '%cyan%' + current_room.name + '%cyan%') + '\n\n';
   var nameField = editNamePrompt.newField('text');
   nameField.name = 'name';
   nameField.formatPrompt(currently + 'Enter room name. (This is displayed at the top of the room description)');
@@ -128,20 +118,20 @@ room.prototype.editRoomName = function(session) {
 
   var descField = editNamePrompt.newField('value');
   descField.name = 'full_description';
-  descField.value = currentRoom.full_description;
+  descField.value = current_room.full_description;
   editNamePrompt.addField(descField);
 
   var flagsField = editNamePrompt.newField('value');
   flagsField.name = 'flags';
-  flagsField.value = currentRoom.flags;
+  flagsField.value = current_room.flags;
   editNamePrompt.addField(flagsField);
   console.log('start name prompt');
   editNamePrompt.start();
 }
 
 room.prototype.editRoomDesc = function(session) {
-  var roomId = session.character.currentRoom;
-  var currentRoom = Rooms.room[roomId];
+  var roomId = session.character.current_room;
+  var current_room = Rooms.room[roomId];
 
   var editDescPrompt = Prompt.new(session, this.saveRoomChanges);
 
@@ -152,15 +142,15 @@ room.prototype.editRoomDesc = function(session) {
 
   var zoneIdField = editDescPrompt.newField('value');
   zoneIdField.name = 'zid';
-  zoneIdField.value = currentRoom.zid;
+  zoneIdField.value = current_room.zid;
   editDescPrompt.addField(zoneIdField);
 
   var nameField = editDescPrompt.newField('value');
   nameField.name = 'name';
-  nameField.value = currentRoom.name;
+  nameField.value = current_room.name;
   editDescPrompt.addField(nameField);
 
-  var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + currentRoom.full_description + '%cyan');
+  var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + current_room.full_description + '%cyan');
   var fullDescField = editDescPrompt.newField('multitext');
   fullDescField.name = 'full_description';
   fullDescField.formatPrompt(currently + 'Enter full room description. (This is displayed whenever a player enters the room)');
@@ -168,15 +158,15 @@ room.prototype.editRoomDesc = function(session) {
 
   var flagsField = editDescPrompt.newField('value');
   flagsField.name = 'flags';
-  flagsField.value = currentRoom.flags;
+  flagsField.value = current_room.flags;
   editDescPrompt.addField(flagsField);
 
   editDescPrompt.start();
 }
 
 room.prototype.editRoomFlags = function(session) {
-  var roomId = session.character.currentRoom;
-  var currentRoom = Rooms.room[roomId];
+  var roomId = session.character.current_room;
+  var current_room = Rooms.room[roomId];
 
   var editFlagsPrompt = Prompt.new(session, this.saveRoomChanges);
 
@@ -187,20 +177,20 @@ room.prototype.editRoomFlags = function(session) {
 
   var zoneIdField = editFlagsPrompt.newField('value');
   zoneIdField.name = 'zid';
-  zoneIdField.value = currentRoom.zid;
+  zoneIdField.value = current_room.zid;
   editFlagsPrompt.addField(zoneIdField);
 
   var nameField = editFlagsPrompt.newField('value');
   nameField.name = 'name';
-  nameField.value = currentRoom.name;
+  nameField.value = current_room.name;
   editFlagsPrompt.addField(nameField);
 
   var descField = editFlagsPrompt.newField('value');
   descField.name = 'full_description';
-  descField.value = currentRoom.full_description;
+  descField.value = current_room.full_description;
   editFlagsPrompt.addField(descField);
 
-  var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + currentRoom.flags.join(', ') + '%cyan%');
+  var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + current_room.flags.join(', ') + '%cyan%');
   var flagsField = editFlagsPrompt.newField('multiselect');
   var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
   message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
@@ -214,7 +204,7 @@ room.prototype.editRoomFlags = function(session) {
 }
 
 room.prototype.deleteRoomPrompt = function(session) {
-  var roomId = session.character.currentRoom;
+  var roomId = session.character.current_room;
 
   var deleteRoomPrompt = Prompt.new(session, this.deleteRoom);
 

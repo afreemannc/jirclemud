@@ -18,9 +18,9 @@ function zones() {
   }
 
   this.getCurrentZoneId = function(session) {
-    var roomId = session.character.currentRoom;
-    var currentRoom = Rooms.room[roomId];
-    return currentRoom.zid;
+    var roomId = session.character.current_room;
+    var current_room = Rooms.room[roomId];
+    return current_room.zid;
   }
 
   this.createZone = function(session) {

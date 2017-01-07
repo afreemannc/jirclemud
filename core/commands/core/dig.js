@@ -19,7 +19,7 @@ var Command = function() {
       session.error('Dig where??\n');
     }
     else {
-      var roomId = session.character.currentRoom;
+      var roomId = session.character.current_room;
       // It would be nonsensical to permit digging in a direction with a pre-existing exit.
       if (typeof Rooms.room[roomId].exits[input] !== 'undefined') {
         session.error('An exit already exists in that direction');
@@ -34,7 +34,7 @@ var Command = function() {
       var newRoom = response;
       // create exit from current room to new room.
       var exitValues = {
-        rid: session.character.currentRoom,
+        rid: session.character.current_room,
         zid: Zones.getCurrentZoneId(socket),
         target_rid: newRoom.rid,
         label: input,
@@ -44,7 +44,7 @@ var Command = function() {
       Rooms.saveExit(session, exitValues).then((response) => {
         //create reciprocal exit in new room. Flip values and save.
         exitValues.rid = newRoom.rid;
-        exitValues.target_rid = session.character.currentRoom;
+        exitValues.target_rid = session.character.current_room;
         exitValues.label = Rooms.invertExitLabel(input);
         Rooms.saveExit(socket, exitValues).then((response) => {
           // once exits are saved move the character to the new room.

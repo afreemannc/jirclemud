@@ -35,7 +35,7 @@ function Prompt(session, completionCallback) {
     if (this.quittable === true) {
       message += Tokens.replace(this.session, '%yellow% (@q to quit)%yellow%\n');
     }
-    this.session.socket.write(message);
+    this.session.socket.write(Tokens.replace(this.session, message));
     return true;
   }
 
@@ -72,7 +72,7 @@ function Prompt(session, completionCallback) {
             // Conditional fields may not prompt if conditions are not met.
             // In this case promptUser returns false and the current field
             // is skipped.
-            prompted = this.promptUser(field);
+            prompted = this.promptUser();
             if (prompted === true) {
               return;
             }

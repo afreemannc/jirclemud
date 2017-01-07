@@ -2,6 +2,7 @@ module.exports.name = 'Room';
 module.exports.fields = {
   rid: {
     type: Sequelize.INTEGER.UNSIGNED,
+    autoIncrement: true,
     primaryKey: true
   },
 

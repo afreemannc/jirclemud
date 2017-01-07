@@ -2,6 +2,7 @@ module.exports.name = 'RoomExit';
 module.exports.fields = {
   eid: {
     type: Sequelize.INTEGER.UNSIGNED,
+    autoIncrement: true,
     primaryKey: true
   },
 

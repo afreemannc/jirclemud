@@ -2,6 +2,7 @@ module.exports.name = 'Container';
 module.exports.fields = {
     cid: {
       type: Sequelize.INTEGER.UNSIGNED,
+      autoIncrement: true,
       primaryKey: true
     },
 

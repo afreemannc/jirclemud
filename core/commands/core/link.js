@@ -27,15 +27,15 @@ var Command = function() {
       return false;
     }
     else {
-      var roomId = session.character.currentRoom;
-      var currentRoom = Rooms.room[roomId];
+      var roomId = session.character.current_room;
+      var current_room = Rooms.room[roomId];
       var exitLabel = inputParts[0];
       var targetRid = inputParts[1];
     }
     // link direction already occupied with an exit
     var currentExit = false;
-    for (var i = 0; i < currentRoom.exits.length; ++i) {
-      currentExit = currentRoom.exits[i];
+    for (var i = 0; i < current_room.exits.length; ++i) {
+      currentExit = current_room.exits[i];
       if (currentExit.label === exitLabel) {
         session.error('There is already an exit in that direction.');
         return false;
@@ -54,7 +54,7 @@ var Command = function() {
     }
 
     var values = {
-      rid: session.character.currentRoom,
+      rid: session.character.current_room,
       target_rid: targetRid,
       label: exitLabel,
       description: '',

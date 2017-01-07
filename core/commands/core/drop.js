@@ -21,7 +21,7 @@ var Command = function() {
         index: index
       }
       Containers.transferItemInstance(session, transferDetails);
-      var roomId = session.character.currentRoom;
+      var roomId = session.character.current_room;
       var name = session.character.name;
       // player message
       //TODO: write a thing to determine if a or an is appropriate.
