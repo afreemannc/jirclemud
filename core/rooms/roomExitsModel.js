@@ -1,4 +1,4 @@
-module.exports.name = 'room_exits';
+module.exports.name = 'RoomExit';
 module.exports.fields = {
   eid: {
     type: Sequelize.INTEGER.UNSIGNED,

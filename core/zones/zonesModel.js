@@ -1,7 +1,7 @@
-module.exports.name = 'zones';
+module.exports.name = 'Zone';
 module.exports.fields = {
   zid: {
-    type: Sequelize.INTEGER.UNSIGNED
+    type: Sequelize.INTEGER.UNSIGNED,
     primaryKey: true
   },
 

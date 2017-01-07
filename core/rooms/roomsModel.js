@@ -1,4 +1,4 @@
-module.exports.name = 'rooms';
+module.exports.name = 'Room';
 module.exports.fields = {
   rid: {
     type: Sequelize.INTEGER.UNSIGNED,

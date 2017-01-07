@@ -1,4 +1,4 @@
-module.exports.name = 'items';
+module.exports.name = 'Item';
 module.exports.fields = {
   iid: {
     type: Sequelize.INTEGER.UNSIGNED,

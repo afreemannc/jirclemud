@@ -4,7 +4,6 @@ var crypto = require('crypto');
 // Session mode handler for login
 
 var characters = function(){
-
   /**
    * Login screen prompt.
    */
@@ -30,33 +29,42 @@ var characters = function(){
    * Login prompt completion handler.
    */
   this.loginAuthenticate = function(session, fieldValues) {
+    var Character = Models.Character;
     var userName = fieldValues.username;
     var password = fieldValues.password;
-    var sql = "SELECT salt FROM ?? WHERE ?? = ?";
-    var inserts = ['characters', 'name', fieldValues.username];
-    sql = global.mysql.format(sql, inserts);
-    global.dbPool.query(sql, function(err, results, fields) {
-      if (results.length !== 0) {
-        var salt = results[0].salt;
-        var passwordHash = Characters.passHash(salt, password);
-        var sql = "SELECT * FROM ?? WHERE ?? = ? AND ?? = ?";
-        var inserts = ['characters', 'name', userName, 'pass', passwordHash];
-        sql = global.mysql.format(sql, inserts);
-        global.dbPool.query(sql, function(err, results, fields) {
-          if (results.length !== 0) {
-            var character = results[0];
-            session.character = character;
-            session.character.currentRoom = character.current_room;
-            Characters.loadCharacterDetails(session);
-          }
-          else {
-            // authentication failed, throw error and reset prompt. (add reset method to prompt class)
-            session.prompt.displayCompletionError(session, 'Login incorrect.\n');
-          }
-        });
+    // Salt is required to generate the user's password hash.
+    Character.findOne({
+      attributes:['salt'],
+      where: {
+        name:userName
+      }
+    }).then(function(results) {
+      if (results) {
+        var salt = results.dataValues.salt;
       }
       else {
-        // TODO: throw error and reset prompt. (add reset method to prompt class)
+        // Salt not found, this suggests the character name doesn't exist.
+        session.prompt.displayCompletionError(session, 'Login incorrect.\n');
+      }
+    });
+
+    var passwordHash = this.passHash(salt, password);
+    // Attempt authentication
+    Character.findOne({
+      where: {
+        name:userName,
+        pass:passwordHash
+      }
+    }).then(function(results) {
+      if (results) {
+        // Authentication successful, load character details.
+        var character = results.dataValues;
+        session.character = character;
+        session.character.currentRoom = character.current_room;
+        this.loadCharacterDetails(session);
+      }
+      else {
+        // Authentication failed.
         session.prompt.displayCompletionError(session, 'Login incorrect.\n');
       }
     });
@@ -70,12 +78,11 @@ var characters = function(){
     // Unpack stored properties
     session.character.stats = JSON.parse(character.stats);
     session.character.effects = JSON.parse(character.effects);
-    // Initialize empty equipment slots and then load
-    session.character.equipment = Characters.initialzeEqSlots();
-    // TODO: load saved equipment
+    session.character.equipment = JSON.parse(character.equipment);
 
     // Initialize empty inventory and then load
     session.character.inventory = {};
+
     var values = {
       containerType: 'player_inventory',
       parentId: character.id

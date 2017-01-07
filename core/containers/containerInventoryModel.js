@@ -1,4 +1,4 @@
-module.exports.name = 'ContainerInstance';
+module.exports.name = 'ContainerInventory';
 module.exports.fields = {
   ciid: {
     type: Sequelize.INTEGER.UNSIGNED,

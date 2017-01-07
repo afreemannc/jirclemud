@@ -1,4 +1,4 @@
-module.exports.name = 'character';
+module.exports.name = 'Character';
 module.exports.fields = {
     id: {
       type: Sequelize.INTEGER.UNSIGNED,
