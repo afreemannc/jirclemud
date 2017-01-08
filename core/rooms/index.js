@@ -5,7 +5,16 @@ var room = function(){
 
 // TODO: this method should be attached to the actual room object.
 room.prototype.message = function(session, roomId, message, skipCharacter) {
+  console.log('message room id:' + roomId);
   for (var i = 0; i < Sessions.length; ++i) {
+    // If roomID is false global message
+    if (roomId === false) {
+      if (skipCharacter === false || Sessions[i] != session) {
+        session.write(message);
+      }
+      continue;
+    }
+    // Otherwise only message players in the specified room.
     checkSession = Sessions[i];
     // They ain't here.
     if (checkSession.character.current_room !== roomId) {
