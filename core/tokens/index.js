@@ -2,8 +2,6 @@
 var colors = require('colors/safe');
 // TODO: make session optional, add support for additional token types (room, zone, etc)
 module.exports.replace = function(session, string) {
-  console.log(session);
-  console.log('string:' + string);
   var character = session.character;
   if (typeof character.stats !== 'undefined') {
     var statKeys = Object.keys(character.stats);
