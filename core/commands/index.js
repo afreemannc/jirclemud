@@ -1,14 +1,19 @@
+var fs = require("fs");
+var path = require("path");
+
 function Commands() {
   this.commands = {};
   this.triggers = {};
   // Load core commands
   var normalizedPath = require("path").join(__dirname, "core");
 
-  var coreCommands = require("fs").readdirSync(normalizedPath)
+  var coreCommands = require("fs").readdirSync(normalizedPath);
   for (var i = 0; i < coreCommands.length; ++i) {
-    command = require("./core/" + coreCommands[i]);
-    this.commands[command.trigger] = command;
-    this.triggers[command.trigger] = command.callback;
+    if (coreCommands[i].endsWith('.js') {
+      var command = require("./core/" + coreCommands[i]);
+      this.commands[command.trigger] = command;
+      this.triggers[command.trigger] = command.callback;
+    }
   }
 
   // Load optional plugins
@@ -16,16 +21,19 @@ function Commands() {
 
   var pluginCommands = require("fs").readdirSync(normalizedPath);
   for (var i = 0; i < pluginCommands.length; ++i) {
+    if (pluginCommands[i].endsWith('.js')) {
     command = require("./plugin/" + pluginCommands[i]);
-    // Intentionally skipping checks for pre-existing commands.
-    // This permits individual implementations to override core command
-    // behavior by declaring a custom version of the command in the
-    // plugins directory.
-    this.commands[command.trigger] = command;
-    this.triggers[command.trigger] = command.callback;
+      // Intentionally skipping checks for pre-existing commands.
+      // This permits modules and custom implementations to override core command
+      // behavior by declaring a custom version of the command in the
+      // plugins directory.
+      this.commands[command.trigger] = command;
+      this.triggers[command.trigger] = command.callback;
+    }
   }
 
   this.commandHandler  = function(session, inputRaw) {
+    console.log('inputRaw:' + inputRaw);
     var input = inputRaw.toString().toLowerCase().replace(/(\r\n|\n|\r)/gm,"");
     // Prevent user session from dropping into limbo if a blank newline is sent.
     if (input === '') {
