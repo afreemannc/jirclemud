@@ -95,7 +95,7 @@ var characters = function(){
   /**
    * Create an empty data structure to hold character equipment.
    */
-  this.initialzeEqSlots = function() {
+  this.initializeEqSlots = function() {
     var slotKeys = Object.keys(Config.equipmentSlots);
     var equipment = {};
     var slot = '';
@@ -169,11 +169,17 @@ var characters = function(){
       status: 1,
       current_room: Config.startRoomId,
       stats: Characters.startProperties(fieldValues.characterclass),
-      effects: Characters.starteffects,
-      equipment: JSON.stringify(Characters.initializeEqSlots),
+      effects: Characters.startEffects(),
+      equipment: JSON.stringify(Characters.initializeEqSlots()),
     };
 
     Character.create(values).then(function(instance) {
+      console.log('instance:');
+      console.log(instance);
+      session.character = instance.dataValues;
+      session.socket.write('Welcome ' + values.name + '\n');
+      session.inputContext = 'command';
+      Commands.triggers.look(session, '');
       var Container = Models.Container;
       var values = {
         cid: '',
@@ -185,12 +191,6 @@ var characters = function(){
       Container.create(values).then(function(instance) {
 
       });
-      session.character = instance.dataValues;
-      session.socket.write('Welcome ' + values.name + '\n');
-      session.inputContext = 'command';
-      console.log('session.character:');
-      console.log(session.character);
-      Commands.triggers.look(session, '');
     });
   }
 
@@ -237,7 +237,7 @@ var characters = function(){
    * If a character should begin the game with starting spell effects
    * this is how they are applied.
    */
-  this.startAffects = function() {
+  this.startEffects = function() {
     // Currently no starting affects, will add
     // sustain and others as needed later.
     return JSON.stringify({sustain:500});

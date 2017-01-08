@@ -22,13 +22,14 @@ var Command = function() {
       // display room title
       session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold%')+ "\n");
       // display room description
-      session.socket.write(Tokens.replace(session, room.full_description) + "\n\n");
+      session.socket.write(Tokens.replace(session, room.description) + "\n\n");
       // display room inventory
       if (room.inventory.length > 0) {
         var display = Items.inventoryDisplay(Rooms.room[roomId].inventory);
         session.socket.write(Tokens.replace(session, display) + "\n\n");
       }
       // display exits
+      console.log(Rooms.room[roomId]);
       var exits = Rooms.room[roomId].exits;
       exitKeys = Object.keys(exits);
       if (exitKeys.length > 0) {

@@ -35,11 +35,11 @@ room.prototype.inputIsExit = function(session, input) {
 // Load all rooms into memory
 room.prototype.loadRooms = function() {
   var Room = Models.Room;
-  Room.findAll().then(function(instances)) {
+  Room.findAll().then(function(instances) {
     instances.forEach(function(instance) {
       Rooms.room[instance.get('rid')] = instance.dataValues;
     });
-  }
+  });
 }
 
 // TODO: this should be deprecated by room.message
@@ -49,14 +49,19 @@ room.prototype.exitMessage = function(session, input) {
   Rooms.message(session, roomId, name + " leaves heading " + input, true);
 }
 
-room.prototype.loadExits = function(roomId) {
-  var sql = 'SELECT * FROM ?? WHERE ?? = ?';
-  var inserts = ['room_exits', 'rid', roomId];
-  global.dbPool.query(sql, inserts, function(err, results, fields) {
-    Rooms.room[roomId].exits = {};
-    for (var i = 0; i < results.length; ++i) {
-      Rooms.room[roomId].exits[results[i].label] = results[i];
-    }
+/**
+ * Add exit data to room loaded in memory.
+ *
+ * @param rid
+ *   Numeric room id.
+ *
+ */
+room.prototype.loadExits = function() {
+  var RoomExit = Models.RoomExit;
+  RoomExit.findAll().then(function(instances) {
+    instances.forEach(function(instance) {
+      Rooms.room[instance.get('rid')].exits[instance.get('label')] = instance.dataValues;
+    });
   });
 }
 

@@ -20,7 +20,7 @@ function Session() {
   }
 
   this.error = function(message) {
-    this.socket.write(Token.replace(this, '%red%' + message + '%red%'));
+    this.socket.write(Tokens.replace(this, '%red%' + message + '%red%'));
     this.socket.write(this.characterPrompt());
   }
 

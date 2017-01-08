@@ -9,7 +9,7 @@ function Commands() {
 
   var coreCommands = require("fs").readdirSync(normalizedPath);
   for (var i = 0; i < coreCommands.length; ++i) {
-    if (coreCommands[i].endsWith('.js') {
+    if (coreCommands[i].endsWith('.js')) {
       var command = require("./core/" + coreCommands[i]);
       this.commands[command.trigger] = command;
       this.triggers[command.trigger] = command.callback;
@@ -34,14 +34,15 @@ function Commands() {
 
   this.commandHandler  = function(session, inputRaw) {
     console.log('inputRaw:' + inputRaw);
-    var input = inputRaw.toString().toLowerCase().replace(/(\r\n|\n|\r)/gm,"");
+    console.log(typeof inputRaw);
+    var input = inputRaw.replace(/(\r\n|\n|\r)/gm,"");
     // Prevent user session from dropping into limbo if a blank newline is sent.
     if (input === '') {
       return;
     }
     var commandFound = false;
-    var commandSegments = inputRaw.split(' ');
-    var command = commandSegments[0];
+    var commandSegments = input.split(' ');
+    var command = commandSegments[0].toLowerCase();
     commandSegments.splice(0, 1);
     var arg = commandSegments.join(' ');
 

@@ -3,53 +3,8 @@ var Containers = function() {
   /**
    * Load inventory contents
    */
-  this.loadInventory = function(fieldValues, session) {
-    var inserts = [fieldValues.containerType, fieldValues.parentId];
-    var sql = `
-      SELECT
-        ii.instance_id,
-        i.name,
-        i.room_description,
-        i.full_description,
-        i.properties
-      FROM item_instance ii
-      INNER JOIN items i
-        ON i.iid = ii.iid
-      INNER JOIN container_inventory ci
-        ON ci.instance_id = ii.instance_id
-      INNER JOIN containers c
-        ON c.cid = ci.cid
-      WHERE
-        container_type = ?
-        AND parent_id = ?`;
-
-    sql = global.mysql.format(sql, inserts);
-
-    global.dbPool.query(sql, function(error, results) {
-      if (error) {
-        console.log('unable to load inventory:' + inserts);
-      }
-      else {
-        for (var i = 0; i < results.length; ++i) {
-          results[i].properties = JSON.parse(results[i].properties);
-        }
-        switch (fieldValues.containerType) {
-          case 'player_inventory':
-            session.character.inventory = results;
-            for (var i = 0; i < results.length; ++i) {
-              Items.applyEffects(session, results[i]);
-            }
-            session.character.inventory = results;
-            break;
-          case 'room':
-            Rooms.room[fieldValues.parentId].inventory = results;
-            break;
-          default:
-            console.log('Unknown inventory type specified during load:' + inserts);
-            break;
-        }
-      }
-    });
+  this.loadInventory = function(values, session) {
+    return [];
   }
 
   /**

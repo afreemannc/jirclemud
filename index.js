@@ -53,20 +53,36 @@ loadModels('core');
 var server = net.createServer(newSocket);
 server.listen(Config.port);
 
-//Rooms.loadRooms();
-//Zones.loadZones();
+
+// Load rooms into memory
+var Room = Models.Room;
+Room.findAll().then(function(instances) {
+  instances.forEach(function(instance) {
+    var room = instance.dataValues;
+    room.inventory = Containers.loadInventory({inventoryType:'room', parentId: room.id});
+    room.exits = {};
+    Rooms.room[room.rid] = room;
+  });
+  Rooms.loadExits();
+});
+
+// Load zones into memory
+var Zone = Models.Zone;
+Zone.findAll().then(function(instances) {
+  instances.forEach(function(instance) {
+    Zones.zone[instance.get('zid')] = instance.dataValues;
+  });
+});
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(session, data) {
-  console.log('data:' + data);
 
   switch (session.inputContext) {
     case 'prompt':
       // certain prompts require collection of multi-line inputs so raw data is provided here.
-      session.prompt.promptHandler(data);
+      session.prompt.promptHandler(data.toString());
       break;
     case 'command':
-      // commands should only every be single line so data is sanitized to remove newline characters.
-      Commands.commandHandler(session, data);
+      Commands.commandHandler(session, data.toString());
       break;
     default:
      // This shouldn't ever happen so what to put here?

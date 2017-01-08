@@ -24,37 +24,42 @@ var Command = function() {
       if (typeof Rooms.room[roomId].exits[input] !== 'undefined') {
         session.error('An exit already exists in that direction');
       }
-      fieldValues = {
+      var Room = Models.Room;
+      var values = {
         zid: Zones.getCurrentZoneId,
         name: 'Empty space',
         full_description: 'Empty space just waiting to be filled. Remind you of Prom night?',
         flags: []
       }
-      Rooms.saveRoom(session, fieldValues).then((response) => {
-      var newRoom = response;
-      // create exit from current room to new room.
-      var exitValues = {
-        rid: session.character.current_room,
-        zid: Zones.getCurrentZoneId(socket),
-        target_rid: newRoom.rid,
-        label: input,
-        description: 'Nothing to see here.',
-        properties: [],
-      }
-      Rooms.saveExit(session, exitValues).then((response) => {
-        //create reciprocal exit in new room. Flip values and save.
-        exitValues.rid = newRoom.rid;
-        exitValues.target_rid = session.character.current_room;
-        exitValues.label = Rooms.invertExitLabel(input);
-        Rooms.saveExit(socket, exitValues).then((response) => {
-          // once exits are saved move the character to the new room.
-          Commands.triggers.move(session, input);
-       });
-      }).catch(function(e) {
-        console.log('reciprocal fail:' + e);
-      });
-      }).catch(function(e) {
-        console.log('well that didnt work:' + e);
+
+      Room.create(values).then(function (roomInstance) {
+        var newRoom = roomInstance.dataValues;
+        // create exit from current room to new room.
+        var exitValues = {
+          rid: session.character.current_room,
+          zid: Zones.getCurrentZoneId(socket),
+          target_rid: newRoom.rid,
+          label: input,
+          description: 'Nothing to see here.',
+          properties: [],
+        }
+        var RoomExit = Models.RoomExit;
+        RoomsExit.create(exitValues).then((exitInstance) => {
+          //create reciprocal exit in new room. Flip values and save.
+          exitValues.rid = newRoom.rid;
+          exitValues.target_rid = session.character.current_room;
+          exitValues.label = Rooms.invertExitLabel(input);
+          RoomExit.create(exitValues).then(exitInstance) => {
+            // once exits are saved move the character to the new room.
+            Commands.triggers.move(session, input);
+          }).catch(function (error) {
+            console.log('Dig Error: failed to create reciprocal exit:' + error);
+          });
+        }).catch(function(error) {
+          console.log('Dig Error: failed to create leading exit:' + error);
+        });
+      }).catch(function(error) {
+        console.log('Dig Error: failed to create new room:' + error);
       });
     }
   }
