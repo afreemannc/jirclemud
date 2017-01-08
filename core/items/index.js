@@ -22,23 +22,6 @@ item.prototype.applyEffects = function(session, item) {
   // TODO: apply effect
 }
 
-item.prototype.loadItem = function(itemId) {
-  return new Promise((resolve, reject) => {
-    var sql = "SELECT * FROM ?? WHERE ?? = ?";
-    var inserts = ['items',  'iid', itemId];
-    sql = global.mysql.format(sql, inserts);
-    global.dbPool.query(sql, function(error, results, fields) {
-      if (error) {
-        return reject(error);
-      }
-      else {
-        var item = results[0];
-        // TODO: if container load inventory
-        return resolve(item);
-      }
-    });
-  });
-}
 
 item.prototype.createItem = function(session) {
 
@@ -178,23 +161,26 @@ item.prototype.saveNewItem = function(session, fieldValues) {
     name:fieldValues.name,
     room_description:fieldValues.room_description,
     full_description:fieldValues.full_description,
-    properties: JSON.stringify(global.items.setItemProperties(fieldValues))
+    properties: JSON.stringify(Items.setItemProperties(fieldValues))
   }
+  var Item = Models.Item;
 
-  Items.saveItem(values).then((response) => {
+  Items.create(values).then(function(newItem) {
     session.write('New item type saved.');
     if (fieldValues.create === 'Yes') {
-      values = {
-        iid:response.iid,
-        properties: response.properties
+      var values = {
+        iid:newItemInstance.get('iid'),
+        properties: newItemInstance.get('.properties')
       }
-      Items.saveItemInstance(values).then((response) => {
+      var ItemInstance = Models.ItemInstance;
+      ItemInstance.create(values).then((newItemInstance) => {
         session.write('New instance of item saved.');
         var values = {
           cid: session.character.inventory.id,
-          instance_id: response.instance_id
+          instance_id: newItemInstance.get('instance_id')
         }
-        Items.saveItemToInventory(values).then((response) => {
+        var ContainerInventory = Models.ContainerInventory;
+        ContainerInventory.create(values).then((newContainerInventory) => {
           session.write('New item created. Check your inventory.');
         }).catch(function(error) {
           console.log('something has gone wrong adding a new item to inventory:' + error);
@@ -205,54 +191,6 @@ item.prototype.saveNewItem = function(session, fieldValues) {
     }
   }).catch(function(error) {
     console.log('something has gone wrong saving an item:' + error);
-  });
-}
-
-item.prototype.saveItem = function(values) {
-  return new Promise((resolve, reject) => {
-    global.dbPool.query('INSERT INTO items SET ?', values, function (error, results) {
-      if (error) {
-        return reject(error);
-      }
-      else {
-        session.inputContext = 'command';
-        values.iid = results.insertId;
-        return resolve(values);
-      }
-    });
-  });
-}
-
-item.prototype.saveItemInstance = function(item) {
-  return new Promise((resolve, reject) => {
-    // TODO: this is where the TWEAK happens.
-      // unpack properties
-      // tweak
-      // restringify properties
-
-    global.dbPool.query('INSERT INTO item_instance SET ?', values, function (error, results) {
-      if (error) {
-        return reject(error);
-      }
-      else {
-        values.instance_id = results.insertId;
-        return resolve(values);
-      }
-    });
-  });
-}
-
-item.prototype.saveItemToInventory = function(values) {
-  return new Promise((resolve, reject) => {
-    global.dbPool.query('INSERT INTO container_inventory SET ?', values, function (error, results) {
-      if (error) {
-        return reject(error);
-      }
-      else {
-        values.id = response.insertId;
-        return resolve(values);
-      }
-    });
   });
 }
 
@@ -299,21 +237,6 @@ item.prototype.inventoryDisplay = function(inventory) {
     }
   }
   return output;
-}
-
-
-/**
- * Provide a list of worn equipment.
- *
- *  - Used by eq command to display character equipment
- *  - Used by look command to display mob/character equipment
- */
-item.prototype.equipmentDisplay = function(session, equipment) {
-  // Empty slot display:
-  // (head): - empty
-  //
-  // Equipped slot display:
-  // (head): - The enamel chin of Rolph
 }
 
 module.exports = new item();

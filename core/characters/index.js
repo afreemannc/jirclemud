@@ -174,8 +174,6 @@ var characters = function(){
     };
 
     Character.create(values).then(function(instance) {
-      console.log('instance:');
-      console.log(instance);
       session.character = instance.dataValues;
       session.socket.write('Welcome ' + values.name + '\n');
       session.inputContext = 'command';
@@ -257,7 +255,6 @@ var characters = function(){
    */
   this.validateCharacterName = function(session, name) {
     var Character = Models.Character;
-    console.log('name validation triggered');
     if (name.length === 0) {
       session.prompt('Character Name:\n', 'name');
       return false;

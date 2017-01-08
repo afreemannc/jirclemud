@@ -179,6 +179,7 @@ function zones() {
   }
 
   this.saveZone = function(session, fieldValues) {
+    var Zone = Models.Zone;
     var values = {
       name:fieldValues.name,
       description:fieldValues.description,
@@ -188,7 +189,7 @@ function zones() {
     // are being saved.
     if (typeof fieldValues.zid !== 'undefined') {
       values.zid = fieldValues.zid;
-      global.dbPool.query('UPDATE zones SET ? WHERE ZID = ' + values.zid, values, function (error, results) {
+      Zone.update(values, {zid: fieldValues.zid}).then(function(zoneInstance) {
         // Update copy loaded in memory
         Zones.zone[values.zid].name = values.name;
         Zones.zone[values.zid].description = values.description;
@@ -198,24 +199,27 @@ function zones() {
     }
     else {
       // If rid is not provided this should be saved as a new zone.
-      global.dbPool.query('INSERT INTO zones SET ?', values, function (error, results) {
+      Zone.create(values).then(function(zoneInstace) {
         session.write('New zone saved.');
         session.inputContext = 'command';
         // Once a new zone is created we will need to also create a starter room so
         // construction can start. Otherwise I'm stuck adding a zone selection field to the
         // room creation and edit forms to no good purpose. Much simpler to make a room and then
         // bamf over to start construction.
-        roomValues = {
+        var Room = Models.Room;
+        var values = {
           zid: results.insertId,
           name: 'In the beginning...',
           full_description: '... there was naught but darkness and chaos.',
           flags: [],
         }
-        Rooms.saveRoom(session, roomValues).then((response) => {
-          Commands.triggers.bamf(session, response.rid);
+        Room.create(values).then(function(newRoomInstance) {
+          Commands.triggers.bamf(session, newRoomInstance.get('rid'));
         }).catch(function(error) {
-          console.log('something has gone terribly wrong with zone save:' + error);
+          console.log('Zone Create Error: unable to create first room in zone:' + error);
         });
+      }).catch(function(error) {
+        console.log('Zone Create Error: unable to create new zone:' + error);
       });
     }
   }

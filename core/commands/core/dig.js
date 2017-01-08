@@ -32,7 +32,8 @@ var Command = function() {
         flags: []
       }
 
-      Room.create(values).then(function (roomInstance) {
+      Room.create(values).then(function(roomInstance) {
+        console.log('Dig: Room instance created!');
         var newRoom = roomInstance.dataValues;
         // create exit from current room to new room.
         var exitValues = {
@@ -44,12 +45,12 @@ var Command = function() {
           properties: [],
         }
         var RoomExit = Models.RoomExit;
-        RoomsExit.create(exitValues).then((exitInstance) => {
+        RoomsExit.create(exitValues).then(function(exitInstance) {
           //create reciprocal exit in new room. Flip values and save.
           exitValues.rid = newRoom.rid;
           exitValues.target_rid = session.character.current_room;
           exitValues.label = Rooms.invertExitLabel(input);
-          RoomExit.create(exitValues).then(exitInstance) => {
+          RoomExit.create(exitValues).then(function (exitInstance) {
             // once exits are saved move the character to the new room.
             Commands.triggers.move(session, input);
           }).catch(function (error) {
