@@ -48,8 +48,7 @@ function newSocket(socket) {
 
 // Load data models
 loadModels('core');
-console.log('models:');
-console.log(Models);
+
 // Initialize service and set listening port
 var server = net.createServer(newSocket);
 server.listen(Config.port);
@@ -58,7 +57,8 @@ server.listen(Config.port);
 //Zones.loadZones();
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(session, data) {
-  inputContext = session.getInputContext();
+  console.log('data:' + data);
+
   switch (session.inputContext) {
     case 'prompt':
       // certain prompts require collection of multi-line inputs so raw data is provided here.
@@ -66,8 +66,11 @@ function parseData(session, data) {
       break;
     case 'command':
       // commands should only every be single line so data is sanitized to remove newline characters.
-      Commands.commandHandler(session, input);
+      Commands.commandHandler(session, data);
       break;
+    default:
+     // This shouldn't ever happen so what to put here?
+     break;
   }
 }
 
@@ -95,10 +98,6 @@ function loadModels(dir) {
     })
     .forEach(function(file) {
       var model = require('./' + path.join(dir, file));
-      console.log('model:');
-      console.log(model);
       Models[model.name] = sequelize.define(model.name, model.fields);
     });
 }
-
-sequelize.sync({force:true});

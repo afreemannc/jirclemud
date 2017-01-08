@@ -4,18 +4,6 @@ function Session() {
   this.inputContext = 'start';
   this.socket = false;
 
-  this.getInputContext = function() {
-    var context = this.inputContext.split(':');
-    if (context.length === 1) {
-      return {context: context[0], params: false};
-    }
-    else {
-      var primary = context[0];
-      context.splice(0, 1);
-      return {context: primary, params: context};
-    }
-  }
-
   /**
    *  Display character command prompt.
    */
