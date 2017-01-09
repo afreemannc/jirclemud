@@ -28,22 +28,13 @@ var Command = function() {
     }
     else {
       var roomId = session.character.current_room;
-      var current_room = Rooms.room[roomId];
+      var currentRoom = Rooms.room[roomId];
       var exitLabel = inputParts[0];
       var targetRid = inputParts[1];
     }
     // link direction already occupied with an exit
-    var currentExit = false;
-    for (var i = 0; i < current_room.exits.length; ++i) {
-      currentExit = current_room.exits[i];
-      if (currentExit.label === exitLabel) {
-        session.error('There is already an exit in that direction.');
-        return false;
-      }
-    }
-    // target rid is not a number;
-    if (Number.isInteger(targetRid) === false) {
-      session.error('Target room id specified is incorrect. The room id must be a number.');
+    if (typeof currentRoom.exits[exitLabel] !== 'undefined') {
+      session.error('There is already an exit in that direction.');
       return false;
     }
 
@@ -57,8 +48,14 @@ var Command = function() {
       rid: session.character.current_room,
       target_rid: targetRid,
       label: exitLabel,
-      description: '',
+      description: 'Nothing to see here.',
+      properties: JSON.stringify({})
     }
+    var RoomExit = Models.RoomExit;
+    RoomExit.create(values).then(function(exitInstance) {
+      session.write("New exit created.");
+      Rooms.room[roomId].exits[exitLabel] = exitInstance.dataValues;
+    });
   }
 }
 

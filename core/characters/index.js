@@ -224,7 +224,8 @@ var characters = function(){
       maxmana: startingMana,
       currentmana: startingMana,
       xp: 1,
-      current_room: Config.startRoom
+      current_room: Config.startRoom,
+      flags: []
     }
     // TODO: add stats based on stat system
     // TODO: add currency placeholders based on currency system

@@ -20,7 +20,12 @@ var Command = function() {
       var roomId = session.character.current_room;
       var room = Rooms.room[roomId];
       // display room title
-      session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold%')+ "\n");
+      if (session.character.stats.flags.includes('BUILDER')) {
+        session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold% %green%[' + room.rid + ']%green%')+ "\n");
+      }
+      else {
+        session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold%')+ "\n");
+      }
       // display room description
       session.socket.write(Tokens.replace(session, room.description) + "\n\n");
       // display room inventory
@@ -31,9 +36,16 @@ var Command = function() {
       // display exits
       console.log(Rooms.room[roomId]);
       var exits = Rooms.room[roomId].exits;
-      exitKeys = Object.keys(exits);
+      var exitKeys = Object.keys(exits);
+      var standardExits = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'u', 'd'];
       if (exitKeys.length > 0) {
-        session.write('Exits: [ ' + Tokens.replace(session, '%yellow%' + exitKeys.join(' ') + '%yellow%') + ' ]\n');
+        var exitDisplay = []
+        for (i = 0; i < standardExits.length; ++i) {
+          if (exitKeys.indexOf(standardExits[i]) !== -1) {
+            exitDisplay.push(standardExits[i]);
+          }
+        }
+        session.write('Exits: [ ' + Tokens.replace(session, '%yellow%' + exitDisplay.join(' ') + '%yellow%') + ' ]\n');
       }
       else {
         session.write('Exits: [none]\n');
