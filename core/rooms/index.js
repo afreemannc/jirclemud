@@ -79,7 +79,7 @@ room.prototype.createRoom = function(session) {
   var roomId = session.character.current_room;
   var current_room = Rooms.room[roomId];
 
-  var createRoomPrompt = Prompt.new(session, this.saveRoomChanges);
+  var createRoomPrompt = Prompt.new(session, this.saveRoom);
 
   var zoneIdField = createRoomPrompt.newField('value');
   zoneIdField.name = 'zid';
@@ -92,7 +92,7 @@ room.prototype.createRoom = function(session) {
   createRoomPrompt.addField(nameField);
 
   var fullDescField = createRoomPrompt.newField('multitext');
-  fullDescField.name = 'full_description';
+  fullDescField.name = 'description';
   fullDescField.formatPrompt('Enter full room description. (This is displayed whenever a player enters the room)');
   createRoomPrompt.addField(fullDescField);
 
@@ -111,7 +111,7 @@ room.prototype.editRoomName = function(session) {
   var roomId = session.character.current_room;
   var current_room = Rooms.room[roomId];
 
-  var editNamePrompt = Prompt.new(session, this.saveRoomChanges);
+  var editNamePrompt = Prompt.new(session, this.saveRoom);
 
   var ridField = editNamePrompt.newField('value');
   ridField.name = 'rid';
@@ -131,8 +131,8 @@ room.prototype.editRoomName = function(session) {
 
 
   var descField = editNamePrompt.newField('value');
-  descField.name = 'full_description';
-  descField.value = current_room.full_description;
+  descField.name = 'description';
+  descField.value = current_room.description;
   editNamePrompt.addField(descField);
 
   var flagsField = editNamePrompt.newField('value');
@@ -147,7 +147,7 @@ room.prototype.editRoomDesc = function(session) {
   var roomId = session.character.current_room;
   var current_room = Rooms.room[roomId];
 
-  var editDescPrompt = Prompt.new(session, this.saveRoomChanges);
+  var editDescPrompt = Prompt.new(session, this.saveRoom);
 
   var ridField = editDescPrompt.newField('value');
   ridField.name = 'rid';
@@ -164,9 +164,9 @@ room.prototype.editRoomDesc = function(session) {
   nameField.value = current_room.name;
   editDescPrompt.addField(nameField);
 
-  var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + current_room.full_description + '%cyan');
+  var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + current_room.description + '%cyan');
   var fullDescField = editDescPrompt.newField('multitext');
-  fullDescField.name = 'full_description';
+  fullDescField.name = 'description';
   fullDescField.formatPrompt(currently + 'Enter full room description. (This is displayed whenever a player enters the room)');
   editDescPrompt.addField(fullDescField);
 
@@ -182,7 +182,7 @@ room.prototype.editRoomFlags = function(session) {
   var roomId = session.character.current_room;
   var current_room = Rooms.room[roomId];
 
-  var editFlagsPrompt = Prompt.new(session, this.saveRoomChanges);
+  var editFlagsPrompt = Prompt.new(session, this.saveRoom);
 
   var ridField = editFlagsPrompt.newField('value');
   ridField.name = 'rid';
@@ -200,8 +200,8 @@ room.prototype.editRoomFlags = function(session) {
   editFlagsPrompt.addField(nameField);
 
   var descField = editFlagsPrompt.newField('value');
-  descField.name = 'full_description';
-  descField.value = current_room.full_description;
+  descField.name = 'description';
+  descField.value = current_room.description;
   editFlagsPrompt.addField(descField);
 
   var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + current_room.flags.join(', ') + '%cyan%');
@@ -209,12 +209,41 @@ room.prototype.editRoomFlags = function(session) {
   var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
   message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';
   flagsField.name = 'flags';
-  flagsField.options = {0:'none', s:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DEATHTRAP', m:'!MAGIC'};
+  flagsField.options = {0:'none', sh:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DARK', sa:'SAVEPOINT', sm:'SMALL', rip:'DEATHTRAP'};
   flagsField.formatPrompt(currently + message, true);
   flagsField.value = Rooms.room[roomId].flags;
   editFlagsPrompt.addField(flagsField);
 
   editFlagsPrompt.start();
+}
+
+room.prototype.saveRoom = function(session, values) {
+  values.flags = JSON.stringify(values.flags);
+  var Room = Models.Room;
+  if (typeof values.rid !== 'undefined' && values.rid) {
+    Room.update(values, {where: {rid:values.rid}}).then(function(response) {
+      values.flags = JSON.parse(values.flags);
+      var keys = Object.keys(values);
+      // Update room in memory.
+      for (i = 0; i < keys.length; ++i) {
+        Rooms.room[values.rid][keys[i]] = values[keys[i]];
+      }
+      session.inputContext = 'command';
+      session.write('Room changes saved.');
+      Commands.triggers.look(session, '');
+    });
+  }
+  else {
+    Room.create(values).then(function(instance) {
+      var newRoom = instance.dataValues;
+      newRoom.exits = {};
+      newRoom.inventory = [];
+      newRoom.flags = JSON.parse(newRoom.flags);
+      Rooms.room[newRoom.rid] = newRoom;
+      session.inputContext = 'command';
+      session.write('New room created (rid:' + instance.get('rid') + ')');
+    });
+  }
 }
 
 room.prototype.deleteRoomPrompt = function(session) {
@@ -294,91 +323,6 @@ room.prototype.invertExitLabel = function(label) {
       break;
   }
   return output;
-}
-
-room.prototype.saveExit = function(session, fieldValues) {
-  return new Promise((resolve, reject) => {
-    var properties = fieldValues.properties;
-    var values = {
-      rid: fieldValues.rid,
-      target_rid:fieldValues.target_rid,
-      label:fieldValues.label,
-      description: fieldValues.description,
-      properties: JSON.stringify(properties) // TODO: implement exit properties?
-    }
-    global.dbPool.query('INSERT INTO room_exits SET ?', values, function (error, results) {
-      if (error) {
-        return reject(error);
-      }
-      session.write('Exit saved.');
-      session.inputContext = 'command';
-      values.eid = results.insertId;
-      values.properties = JSON.parse(values.properties);
-      // update exit in memory;
-      Rooms.room[values.rid].exits[values.label] = values;
-      return resolve(values);
-    });
-  });
-}
-
-room.prototype.saveRoomChanges = function(session, fieldValues) {
-  this.saveRoom(session, fieldValues).then((response) => {
-    if (typeof fieldValues.rid !== 'undefined') {
-      session.write('Room changes saved');
-      return response;
-    }
-    else {
-      session.write('New room created');
-      return response;
-    }
-  }).catch(function (error) {
-    console.log('something has gone terribly wrong:' + error);
-  });
-}
-
-room.prototype.saveRoom = function(session, values) {
-  return new Promise((resolve, reject) => {
-    values.flags = JSON.stringify(values.flags);
-    // If rid is passed in with field values this indicates changes to an existing room
-    // are being saved.
-    if (typeof values.rid !== 'undefined') {
-      global.dbPool.query('UPDATE rooms SET ? WHERE RID = ' + values.rid, values, function (error, results) {
-        // Update copy loaded in memory
-        if (error) {
-          return reject(error);
-        }
-        else {
-          Rooms.room[values.rid].name = values.name;
-          Rooms.room[values.rid].full_description = values.full_description;
-          return resolve(values);
-        }
-      });
-    }
-    else {
-      // If rid is not provided this should be saved as a new room.
-      global.dbPool.query('INSERT INTO rooms SET ?', values, function (error, results) {
-        if (error) {
-          return reject(error);
-        }
-        else {
-          values.rid = results.insertId;
-          Rooms.room[results.insertId] = values;
-          Rooms.room[results.insertId].inventory = [];
-          Rooms.room[results.insertId].exits = [];
-          // A container entry for the new room needs to be created so the room can
-          // hold items.
-          var containerValues = {
-            container_type: 'room',
-            parent_id: results.insertId,
-            max_size: -1,
-            max_weight: -1
-          }
-          Containers.createContainer(values);
-          return resolve(values);
-        }
-      });
-    }
-  });
 }
 
 module.exports = new room();
