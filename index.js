@@ -55,16 +55,7 @@ server.listen(Config.port);
 
 
 // Load rooms into memory
-var Room = Models.Room;
-Room.findAll().then(function(instances) {
-  instances.forEach(function(instance) {
-    var room = instance.dataValues;
-    room.inventory = Containers.loadInventory({inventoryType:'room', parentId: room.id});
-    room.exits = {};
-    Rooms.room[room.rid] = room;
-  });
-  Rooms.loadExits();
-});
+Rooms.loadRooms();
 
 // Load zones into memory
 var Zone = Models.Zone;

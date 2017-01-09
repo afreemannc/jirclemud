@@ -46,8 +46,14 @@ room.prototype.loadRooms = function() {
   var Room = Models.Room;
   Room.findAll().then(function(instances) {
     instances.forEach(function(instance) {
-      Rooms.room[instance.get('rid')] = instance.dataValues;
+      var room = instance.dataValues;
+      room.inventory = Containers.loadInventory({inventoryType:'room', parentId: room.id});
+      room.exits = {};
+      room.mobiles = [];
+      Rooms.room[room.rid] = room;
     });
+    Rooms.loadExits();
+    Mobiles.loadMobiles();
   });
 }
 
@@ -240,6 +246,16 @@ room.prototype.saveRoom = function(session, values) {
       newRoom.inventory = [];
       newRoom.flags = JSON.parse(newRoom.flags);
       Rooms.room[newRoom.rid] = newRoom;
+
+      var Container = Models.Container;
+      var containerValues = {
+        container_type: 'room',
+        parent_id: newRoom.rid,
+        max_size: -1,
+        max_weight: -1,
+      }
+      // This can happen asyncronously so no need for .then().
+      Container.create(containerValues);
       session.inputContext = 'command';
       session.write('New room created (rid:' + instance.get('rid') + ')');
     });
