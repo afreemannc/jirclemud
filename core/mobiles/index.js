@@ -34,13 +34,8 @@ function Mobiles() {
     mobileDescField.formatPrompt('Describe this mobile. (Description displayed by "look")'),
     createMobilePrompt.addField(mobileDescField);
 
-    var zoneOptions = {};
-    Zones.zone.forEach(function(zone) {
-      zoneOptions[zone.zid] = zone.name;
-    });
-
     // Zone ID
-    var mobileZidField = createMobilePrompt.newField('value');
+    var mobileZidField = createMobilePrompt.newField('select');
     mobileZidField.name = 'zid';
     mobileZidField.value = Zones.getCurrentZoneId(session);
     createMobilePrompt.addField(mobileZidField);
@@ -135,6 +130,15 @@ function Mobiles() {
     }
     var Mobile = Models.Mobile;
     Mobile.create(values).then(function(mobileInstance) {
+      var Container = Models.Container;
+      var containerValues = {
+        container_type: 'mobile',
+        parent_id: mobileInstance.get('mid'),
+        max_size: -1, // TODO: correct these based on str
+        max_weight: -1, // TODO: correct these based on str
+      }
+      // This can happen asyncronously so no need for .then().
+      Container.create(containerValues);
       Rooms.room[mobileInstance.get('start_rid')].mobiles.push(mobileInstance.dataValues);
       session.write('New mob created.');
     });

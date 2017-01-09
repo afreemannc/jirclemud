@@ -28,11 +28,6 @@ var Command = function() {
       }
       // display room description
       session.socket.write(Tokens.replace(session, room.description) + "\n\n");
-      // display room inventory
-      if (room.inventory.length > 0) {
-        var display = Items.inventoryDisplay(Rooms.room[roomId].inventory);
-        session.socket.write(Tokens.replace(session, display) + "\n\n");
-      }
       // display exits
       console.log(Rooms.room[roomId]);
       var exits = Rooms.room[roomId].exits;
@@ -49,6 +44,17 @@ var Command = function() {
       }
       else {
         session.write('Exits: [none]\n');
+      }
+      // display room inventory
+      if (room.inventory.length > 0) {
+        var display = Items.inventoryDisplay(Rooms.room[roomId].inventory);
+        session.socket.write(Tokens.replace(session, display) + "\n");
+      }
+      // display mobiles
+      if (room.mobiles.length > 0) {
+        room.mobiles.forEach(function(mobile) {
+          session.socket.write(mobile.name + '\n');
+        }
       }
     }
     else {
