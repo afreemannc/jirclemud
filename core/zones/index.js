@@ -2,27 +2,26 @@
 
 function zones() {
   this.zone = {};
-  // Zone details need to be in memory for "where", help <zone>, and zone <zone id> commands
-  //  to work without a bunch of grovelling.
-  this.loadZones = function() {
 
-    global.dbPool.query('SELECT * FROM zones', function(err, results, fields) {
-      for(var i = 0; i < results.length; ++i) {
-        console.log('loading zone ' + results[i].zid);
-        var zoneId = results[i].zid;
-        if (zoneId > 0) {
-          Zones.zone[zoneId] = results[i];
-        }
-      }
-    });
-  }
-
+  /**
+   * Look up the zone id for the zone a player is in.
+   *
+   * @param session
+   *   Player session object
+   *
+   * @return
+   *   Returns the zone id for the room the player is in currently.
+   *
+   */
   this.getCurrentZoneId = function(session) {
     var roomId = session.character.current_room;
     var current_room = Rooms.room[roomId];
     return current_room.zid;
   }
 
+  /**
+   * Zone creation prompt.
+   */
   this.createZone = function(session) {
     var createZonePrompt = Prompt.new(session, this.saveZone);
 
@@ -70,6 +69,9 @@ function zones() {
     createZonePrompt.start();
   }
 
+  /**
+   * Zone name edit prompt.
+   */
   this.editZoneName = function(session, zoneId) {
     var zone = Zones.zone[zoneId];
     var editZonePrompt = Prompt.new(session, this.saveZone);
@@ -97,6 +99,9 @@ function zones() {
     editZonePrompt.start();
   }
 
+  /**
+   * Zone description edit prompt.
+   */
   this.editZoneDescription = function(session) {
     var zone = Zones.zone[zoneId];
     var editZonePrompt = Prompt.new(session, this.saveZone);
@@ -120,6 +125,9 @@ function zones() {
     editZonePrompt.start();
   }
 
+  /**
+   * Zone rating edit prompt.
+   */
   this.editZoneRating = function(session) {
     var zone = Zones.zone[zoneId];
     var editZonePrompt = Prompt.new(session, this.saveZone);
@@ -148,7 +156,7 @@ function zones() {
       9:'Cannot be solod at all, frequently kills full groups. Mob HP set to ludicrous levels, spell effects ubiquitous, mazy navigation, puzzles, and deadly room effects guaranteed',
      10:'Routinely kills full groups of high level characters with top end equipment. No trick is too dirty.',
     };
-    // rating
+
     var ratingField = editZonePrompt.newField('select');
     descriptionField.name = 'rating';
     descriptionField.options = options;
@@ -168,6 +176,20 @@ function zones() {
 
   }
 
+  /**
+   * Check if a zone already exists with the given name.
+   *
+   * @param session
+   *   Player session object. Unused, but must be accounted for as
+   *   the prompt system always passes this as the first parameter to
+   *   any validation callback.
+   *
+   * @param zoneName
+   *  Name to look for.
+   *
+   * @return
+   *   return true if the zone name isn't already in use, otherwise false.
+   */
   this.validateZoneName = function(session, zoneName) {
     for (var i = 0; i < Zones.zone.length; ++i) {
       var zone = Zones.zone[i];
@@ -178,6 +200,9 @@ function zones() {
     return true;
   }
 
+  /**
+   * Prompt completion callback for zone creation and editing prompts.
+   */
   this.saveZone = function(session, fieldValues) {
     var Zone = Models.Zone;
     var values = {
@@ -193,13 +218,15 @@ function zones() {
         // Update copy loaded in memory
         Zones.zone[values.zid].name = values.name;
         Zones.zone[values.zid].description = values.description;
+        Zones.zone[values.zid].rating = values.rating;
         session.write('Zone changes saved.');
         session.inputContext = 'command';
       });
     }
     else {
       // If rid is not provided this should be saved as a new zone.
-      Zone.create(values).then(function(zoneInstace) {
+      Zone.create(values).then(function(zoneInstance) {
+        Zones.zone[zoneInstance.get('rid')] = zoneInstance.dataValues;
         session.write('New zone saved.');
         session.inputContext = 'command';
         // Once a new zone is created we will need to also create a starter room so
@@ -208,12 +235,18 @@ function zones() {
         // bamf over to start construction.
         var Room = Models.Room;
         var values = {
-          zid: results.insertId,
+          zid: zoneInstance.get('zid'),
           name: 'In the beginning...',
-          full_description: '... there was naught but darkness and chaos.',
-          flags: [],
+          description: '... there was naught but darkness and chaos.',
+          flags: JSON.stringify([])
         }
         Room.create(values).then(function(newRoomInstance) {
+          var newRoom = newRoomInstance.dataValues;
+          newRoom.exits = {};
+          newRoom.inventory = [];
+          Rooms.room[newRoomInstance.get('rid')] = newRoom;
+          session.write('First room in zone created.');
+          console.log(newRoomInstance);
           Commands.triggers.bamf(session, newRoomInstance.get('rid'));
         }).catch(function(error) {
           console.log('Zone Create Error: unable to create first room in zone:' + error);
