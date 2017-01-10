@@ -1,9 +1,17 @@
-module.exports.name = 'Mobile';
+module.exports.name = 'MobilesInstance';
 module.exports.fields = {
-    mid: {
+    miid: {
       type: Sequelize.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true
+    },
+
+    mid: {
+      type: Sequelize.INTEGER.UNSIGNED,
+    },
+
+    start_rid: {
+      type: Sequelize.INTEGER.UNSIGNED
     },
 
     name: {

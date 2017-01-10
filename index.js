@@ -25,6 +25,7 @@ Prompt = require('./core/prompt');
 Zones = require('./core/zones');
 Tokens = require('./core/tokens');
 Containers = require('./core/containers');
+Mobiles = require('./core/mobiles');
 
 Models = {};
 Sessions = [];
@@ -48,6 +49,7 @@ function newSocket(socket) {
 
 // Load data models
 loadModels('core');
+console.log(Models);
 
 // Initialize service and set listening port
 var server = net.createServer(newSocket);

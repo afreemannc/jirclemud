@@ -49,10 +49,10 @@ var Command = function() {
             exitDisplay.push(standardExits[i]);
           }
         }
-        session.write('Exits: [ ' + Tokens.replace(session, '%yellow%' + exitDisplay.join(' ') + '%yellow%') + ' ]\n');
+        session.socket.write('Exits: [ ' + Tokens.replace(session, '%yellow%' + exitDisplay.join(' ') + '%yellow%') + ' ]\n');
       }
       else {
-        session.write('Exits: [none]\n');
+        session.socket.write('Exits: [none]\n');
       }
       // display room inventory
       if (room.inventory.length > 0) {
@@ -60,12 +60,13 @@ var Command = function() {
         session.socket.write(Tokens.replace(session, display) + "\n");
       }
       // display mobiles
-      /*
+
       if (room.mobiles.length > 0) {
         room.mobiles.forEach(function(mobile) {
           session.socket.write(mobile.name + '\n');
         });
-      }*/
+      }
+      session.write('');
     }
     else {
       var roomId = session.character.current_room;

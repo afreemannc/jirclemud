@@ -17,6 +17,9 @@ var Command = function() {
         case 'item':
           Items.createItem(session);
           break;
+        case 'mob':
+          Mobiles.createMobile(session);
+          break;
         default:
           session.error('Create what??\n');
       }

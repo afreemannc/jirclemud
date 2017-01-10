@@ -2,24 +2,24 @@
 function Mobiles() {
   // load
   this.loadMobiles = function() {
-    var Mobile = Models.Mobile;
-    Mobile.findAll().then(function(instances) {
+    var MobilesInstance = Models.MobilesInstance;
+    MobilesInstance.findAll().then(function(instances) {
       instances.forEach(function(instance) {
         var mobile = instance.dataValues;
-        mobile.inventory = Containers.loadInventory({inventoryType:'mobile', parentId: mobile.mid});
+        mobile.inventory = JSON.parse(mobile.inventory);
         mobile.stats = JSON.parse(mobile.stats);
         mobile.equipment = JSON.parse(mobile.equipment);
         mobile.effects = JSON.parse(mobile.effects);
         mobile.extra = JSON.parse(mobile.extra);
 
-        Rooms.room[mobile.start_rid].push(mobile);
+        Rooms.room[mobile.start_rid].mobiles.push(mobile);
       });
       console.log('Mobiles loaded');
     });
   }
 
   // create
-  this.create = function(session) {
+  this.createMobile = function(session) {
     var createMobilePrompt = Prompt.new(session, this.saveNewMobile);
 
     // Name
@@ -35,16 +35,10 @@ function Mobiles() {
     createMobilePrompt.addField(mobileDescField);
 
     // Zone ID
-    var mobileZidField = createMobilePrompt.newField('select');
+    var mobileZidField = createMobilePrompt.newField('value');
     mobileZidField.name = 'zid';
     mobileZidField.value = Zones.getCurrentZoneId(session);
     createMobilePrompt.addField(mobileZidField);
-
-    // Room ID
-    var mobileRidField = createMobilePrompt.newField('value');
-    mobileRidField.name = 'start_rid';
-    mobileRidField.value = session.character.current_room;
-    createMobilePrompt.addField(mobileRidField);
 
     // HP
     var mobileHPField = createMobilePrompt.newField('int');
@@ -78,6 +72,7 @@ function Mobiles() {
     var mobileFlagsField = createMobilePrompt.newField('multiselect');
     mobileFlagsField.name = 'flags';
     mobileFlagsField.options = {n:'NONE', c:'CASTER', p:'PATROL', s:'SKILLED', a:'AGGRO', z:'ZONEHUNTER', w:'WORLDHUNTER'},
+    mobileFlagsField.formatPrompt('What additional flags should this mob have?');
     createMobilePrompt.addField(mobileFlagsField);
 
     // TODO: effects field once spells are a thing
@@ -113,7 +108,6 @@ function Mobiles() {
   this.saveNewMobile = function(session, fieldValues) {
     var values = {
       zid: fieldValues.zid,
-      start_rid: fieldValues.start_rid,
       name: fieldValues.name,
       description: fieldValues.description,
       stats: JSON.stringify({
@@ -126,21 +120,25 @@ function Mobiles() {
         level: fieldValues.level
       }),
       effects:fieldValues.effects,
+      equipment:JSON.stringify(Characters.initializeEqSlots),
+      inventory: JSON.stringify([]),
       extra:fieldValues.extra
     }
     var Mobile = Models.Mobile;
     Mobile.create(values).then(function(mobileInstance) {
-      var Container = Models.Container;
-      var containerValues = {
-        container_type: 'mobile',
-        parent_id: mobileInstance.get('mid'),
-        max_size: -1, // TODO: correct these based on str
-        max_weight: -1, // TODO: correct these based on str
-      }
+      session.inputContext = 'command';
+      session.write('New mob type saved.');
+      //var Container = Models.Container;
+      //var containerValues = {
+      //  container_type: 'mobile',
+      //  parent_id: mobileInstance.get('mid'),
+      //  max_size: -1, // TODO: correct these based on str
+      //  max_weight: -1, // TODO: correct these based on str
+      //}
       // This can happen asyncronously so no need for .then().
-      Container.create(containerValues);
-      Rooms.room[mobileInstance.get('start_rid')].mobiles.push(mobileInstance.dataValues);
-      session.write('New mob created.');
+      //Container.create(containerValues);
+      //Rooms.room[mobileInstance.get('start_rid')].mobiles.push(mobileInstance.dataValues);
+      //session.write('New mob created.');
     });
   }
 }

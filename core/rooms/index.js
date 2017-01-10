@@ -53,6 +53,7 @@ room.prototype.loadRooms = function() {
       Rooms.room[room.rid] = room;
     });
     Rooms.loadExits();
+    Mobiles.loadMobiles();
   });
 }
 
