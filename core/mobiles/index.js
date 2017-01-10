@@ -124,7 +124,7 @@ function Mobiles() {
         max_mana: fieldValues.mana,
         current_mana: fieldValues.mana,
         level: fieldValues.level
-      });
+      }),
       effects:fieldValues.effects,
       extra:fieldValues.extra
     }

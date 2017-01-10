@@ -51,11 +51,12 @@ var Command = function() {
         session.socket.write(Tokens.replace(session, display) + "\n");
       }
       // display mobiles
+      /*
       if (room.mobiles.length > 0) {
         room.mobiles.forEach(function(mobile) {
           session.socket.write(mobile.name + '\n');
-        }
-      }
+        });
+      }*/
     }
     else {
       var roomId = session.character.current_room;
