@@ -74,7 +74,9 @@ room.prototype.loadExits = function() {
   var RoomExit = Models.RoomExit;
   RoomExit.findAll().then(function(instances) {
     instances.forEach(function(instance) {
-      Rooms.room[instance.get('rid')].exits[instance.get('label')] = instance.dataValues;
+      var exit = instance.dataValues;
+      exit.properties = JSON.parse(exit.properties);
+      Rooms.room[instance.get('rid')].exits[instance.get('label')] = exit;
     });
   });
 }

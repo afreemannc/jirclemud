@@ -17,17 +17,22 @@ var Command = function() {
          > %bold%You close the chest..%bold%
   `;
   this.callback = function (session, input) {
-    if (Rooms.inputIsExit(session, input) {
+    if (Rooms.inputIsExit(session, input)) {
+      var inputInverted = Rooms.invertExitLabel(input);
       var roomId = session.character.current_room;
-      var exits = Rooms[roomId].exits;
+      var exit = Rooms.room[roomId].exits[input];
+      if (exit.properties.flags.includes('DOOR') === false) {
+        session.write('There is no door there.');
+        return false;
+      }
 
-
-      if (exits[input].properties.flags.includes('CLOSED') {
+      if (exit.properties.flags.includes('CLOSED')) {
         session.write('It is already closed!');
         return false;
       }
       else {
         Rooms.room[roomId].exits[input].properties.flags.push('CLOSED');
+        Rooms.room[exit.target_rid].exits[inputInverted].properties.flags.push('CLOSED');
         session.write("You close the door.");
         return true;
       }

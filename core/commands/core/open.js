@@ -17,18 +17,27 @@ var Command = function() {
          > %bold%The chest will not open. It appears to be locked.%bold%
   `;
   this.callback = function (session, input) {
-    if (Rooms.inputIsExit(session, input) {
+    if (Rooms.inputIsExit(session, input)) {
+      var inputInverted = Rooms.invertExitLabel(input);
       var roomId = session.character.current_room;
-      var exits = Rooms[roomId].exits;
+      var exit = Rooms.room[roomId].exits[input];
+      var recipExit = Rooms.room[exit.target_rid].exits[inputInverted];
 
-      if (exits[input].properties.flags.includes('LOCKED')) {
+      if (exit.properties.flags.includes('DOOR') === false) {
+        session.write('There is no door there.');
+        return false;
+      }
+
+      if (exit.properties.flags.includes('LOCKED')) {
         session.write('The door will not open. It appears to be locked.');
         return false;
       }
 
-      if (exits[input].properties.flags.includes('CLOSED')) {
-        var index = exits[input].properties.flags.indexOf('CLOSED');
+      if (exit.properties.flags.includes('CLOSED')) {
+        var index = exit.properties.flags.indexOf('CLOSED');
         Rooms.room[roomId].exits[input].properties.flags.splice(index, 1);
+        index = recipExit.properties.flags.indexOf('CLOSED');
+        Rooms.room[exit.target_rid].exits[inputInverted].properties.flags.splice(index, 1);
         session.write('You open the door.');
         return true;
       }
