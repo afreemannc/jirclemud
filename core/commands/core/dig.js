@@ -54,7 +54,7 @@ var Command = function() {
           target_rid: newRoom.rid,
           label: input,
           description: 'Nothing to see here.',
-          properties: JSON.stringify([]),
+          properties: JSON.stringify({flags:[]}),
         }
         var RoomExit = Models.RoomExit;
         RoomExit.create(exitValues).then(function(exitInstance) {
@@ -65,7 +65,7 @@ var Command = function() {
             rid: newRoom.rid,
             target_rid: session.character.current_room,
             label: Rooms.invertExitLabel(input),
-            properties: JSON.stringify([]),
+            properties: JSON.stringify({flags:[]}),
           }
           RoomExit.create(exitValues).then(function (exitInstance) {
             // Update memory with new exit

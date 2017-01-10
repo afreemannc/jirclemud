@@ -1,7 +1,8 @@
 var Command = function() {
   this.trigger = 'unlink';
+  this.permsRequired = 'BUILDER';
   this.helpText = `
-  Destroy an exit leading from the current room to another room.
+  Builder ONLY: Destroy an exit leading from the current room to another room.
   Note: this command only destroys a single exit pointing to the target room.
 
   %yellow%Usage:%yellow%

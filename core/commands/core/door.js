@@ -63,6 +63,7 @@ var Command = function() {
     }
     var doorFlags = ['DOOR', 'CLOSED'];
     if (locked === true) {
+      doorFlags.push('LOCKABLE');
       doorFlags.push('LOCKED');
     }
 

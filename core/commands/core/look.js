@@ -37,6 +37,15 @@ var Command = function() {
         var exitDisplay = []
         for (i = 0; i < standardExits.length; ++i) {
           if (exitKeys.indexOf(standardExits[i]) !== -1) {
+            // Skip closed doors.
+            console.log('checking exit:');
+            console.log(exits[standardExits[i]]);
+            if (typeof exits[standardExits[i]].properties.flags !== 'undefined') {
+              if (exits[standardExits[i]].properties.flags.includes('CLOSED')) {
+                console.log('closed door found ' + standardExits[i]);
+                continue;
+              }
+            }
             exitDisplay.push(standardExits[i]);
           }
         }

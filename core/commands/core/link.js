@@ -49,7 +49,7 @@ var Command = function() {
       target_rid: targetRid,
       label: exitLabel,
       description: 'Nothing to see here.',
-      properties: JSON.stringify({})
+      properties: JSON.stringify({flags:[]})
     }
     var RoomExit = Models.RoomExit;
     RoomExit.create(values).then(function(exitInstance) {
