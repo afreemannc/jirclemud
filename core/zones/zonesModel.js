@@ -16,6 +16,9 @@ module.exports.fields = {
 
   rating: {
     type: Sequelize.INTEGER.UNSIGNED
-  }
+  },
 
+  tic_interval: {
+    type: Sequelize.INTEGER.UNSIGNED
+  }
 };

@@ -122,24 +122,45 @@ function Mobiles() {
       effects:fieldValues.effects,
       equipment:JSON.stringify(Characters.initializeEqSlots),
       inventory: JSON.stringify([]),
-      extra:fieldValues.extra
+      extra:JSON.stringify({flags:fieldValues.flags})
     }
     var Mobile = Models.Mobile;
     Mobile.create(values).then(function(mobileInstance) {
       session.inputContext = 'command';
       session.write('New mob type saved.');
-      //var Container = Models.Container;
-      //var containerValues = {
-      //  container_type: 'mobile',
-      //  parent_id: mobileInstance.get('mid'),
-      //  max_size: -1, // TODO: correct these based on str
-      //  max_weight: -1, // TODO: correct these based on str
-      //}
-      // This can happen asyncronously so no need for .then().
-      //Container.create(containerValues);
-      //Rooms.room[mobileInstance.get('start_rid')].mobiles.push(mobileInstance.dataValues);
-      //session.write('New mob created.');
     });
+  }
+
+  this.moveMobs = function(zoneId) {
+    var Room = Models.Room;
+    var zoneRoomIds = Zones.zone[zoneId].rooms;
+      for(i = 0; i < zoneRoomIds.length; ++i) {
+        var rid = zoneRoomIds[i];;
+        if (Rooms.room[rid].mobiles.length > 0) {
+          for (i = 0; i < Rooms.room[rid].mobiles.length; ++i) {
+            var mobile = Rooms.room[rid].mobiles[i];
+            if (mobile.extra.flags.includes('PATROL') && Rooms.hasExits(Rooms.room[rid])) {
+              var exitKeys = Object.keys(Rooms.room[rid].exits);
+              var exitCount = exitKeys.length;
+              // mobs don't always move even when they can.
+              var roll = Math.floor(Math.random() * (exitCount + 2));
+              console.log('roll:' + roll);
+              console.log('exit count:' + exitCount);
+
+              if (roll < exitCount) {
+                 var label = exitKeys[roll];
+                 console.log('roll:' + roll);
+                 console.log('label:' + label);
+                 var targetRid = Rooms.room[rid].exits[label].target_rid;
+                 var index = Rooms.room[rid].mobiles.indexOf(mobile);
+                 Rooms.room[rid].mobiles.splice(index, 1);
+                 Rooms.room[targetRid].mobiles.push(mobile);
+                 console.log('Moved mob to ' + targetRid);
+              }
+            }
+          }
+        }
+      };
   }
 }
 

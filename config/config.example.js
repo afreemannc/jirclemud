@@ -66,4 +66,7 @@ module.exports = {
     l:  'LEGS',
     fe: 'FEET'
   }
+
+  // Number of seconds between world tics
+  worldTic = 195;
 }

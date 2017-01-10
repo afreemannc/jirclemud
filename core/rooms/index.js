@@ -50,7 +50,9 @@ room.prototype.loadRooms = function() {
       room.inventory = Containers.loadInventory({inventoryType:'room', parentId: room.id});
       room.exits = {};
       room.mobiles = [];
+      // TODO: make Rooms.room go away.
       Rooms.room[room.rid] = room;
+      Zones.zone[room.zid].rooms.push(room.rid);
     });
     Rooms.loadExits();
     Mobiles.loadMobiles();
@@ -342,5 +344,21 @@ room.prototype.invertExitLabel = function(label) {
   }
   return output;
 }
+
+room.prototype.hasExits = function(room) {
+    exitKeys = Object.keys(room.exits);
+    if (exitKeys.length === 0) {
+      return false;
+    }
+    else {
+      for (i = 0; i < exitKeys.length; ++i) {
+        var exit = room.exits[exitKeys[i]];
+        if (exit.properties.flags.includes('CLOSED') === false) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
 
 module.exports = new room();

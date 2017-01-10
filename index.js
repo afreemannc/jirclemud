@@ -14,7 +14,7 @@ sequelize = new Sequelize(
   }
 );
 
-
+Tics = require('./core/tics');
 Session = require('./core/session');
 Commands = require('./core/commands');
 Characters = require('./core/characters');
@@ -49,23 +49,15 @@ function newSocket(socket) {
 
 // Load data models
 loadModels('core');
-console.log(Models);
 
 // Initialize service and set listening port
 var server = net.createServer(newSocket);
 server.listen(Config.port);
 
-
-// Load rooms into memory
+// Load zones into memory
+Zones.loadZones();
 Rooms.loadRooms();
 
-// Load zones into memory
-var Zone = Models.Zone;
-Zone.findAll().then(function(instances) {
-  instances.forEach(function(instance) {
-    Zones.zone[instance.get('zid')] = instance.dataValues;
-  });
-});
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(session, data) {
 

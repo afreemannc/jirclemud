@@ -1,7 +1,39 @@
 // Zone CRUD
 
 function zones() {
+
+  this.registerTimers = function() {
+    var Zone = Models.Zone;
+    Zone.findAll().then(function(instances) {
+      instances.forEach(function(instance) {
+        var zoneId = instance.get('zid');
+        var ticInterval = instance.get('tic_interval');
+        console.log('registering zone timer:' + zoneId);
+        var tic = Tics.addQueue('zone' + zoneId, ticInterval);
+        tic.event.on('zone' + zoneId, function() {
+          console.log('zone ' + zoneId + ' tic event');
+          Mobiles.moveMobs(zoneId);
+        });
+      });
+      Tics.startQueues();
+    });
+  };
+
+
   this.zone = {};
+
+  this.loadZones = function() {
+    var Zone = Models.Zone;
+    Zone.findAll().then(function(instances) {
+      instances.forEach(function(instance) {
+        var zone = instance.dataValues;
+        zone.rooms = [];
+        Zones.zone[instance.get('zid')] = zone;
+      });
+    });
+    console.log('Zones loaded');
+    Zones.registerTimers();
+  }
 
   /**
    * Look up the zone id for the zone a player is in.
