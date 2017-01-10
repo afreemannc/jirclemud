@@ -17,6 +17,11 @@ var Command = function() {
          > %bold%You close the chest..%bold%
   `;
   this.callback = function (session, input) {
+    if (input.includes('door')) {
+      var inputParts = input.split(' ');
+      input = inputParts[1];
+    }
+
     if (Rooms.inputIsExit(session, input)) {
       var inputInverted = Rooms.invertExitLabel(input);
       var roomId = session.character.current_room;
@@ -39,6 +44,8 @@ var Command = function() {
     }
     else {
       // TODO: implement item close once CLOSEABLE and CLOSED flags are implemented for items.
+      session.write('Close what??');
+      return false;
     }
   }
 }

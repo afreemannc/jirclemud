@@ -5,6 +5,7 @@ var Command = function() {
 
   %yellow%Usage:%yellow%
          Open a door: open <direction>
+         Open a door: open door <direction>
          Open a closed object: open <item name>
 
   %yellow%Usage:%yellow%
@@ -17,6 +18,12 @@ var Command = function() {
          > %bold%The chest will not open. It appears to be locked.%bold%
   `;
   this.callback = function (session, input) {
+    if (input.includes('door')) {
+      var inputParts = input.split(' ');
+      input = inputParts[1];
+    }
+
+
     if (Rooms.inputIsExit(session, input)) {
       var inputInverted = Rooms.invertExitLabel(input);
       var roomId = session.character.current_room;
@@ -48,6 +55,8 @@ var Command = function() {
     }
     else {
       // TODO: implement item open once CLOSEABLE and CLOSED flags are implemented for items.
+      session.write('Open what?');
+      return false;
     }
   }
 }
