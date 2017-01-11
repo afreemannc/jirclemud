@@ -11,7 +11,12 @@ Project goals:
 
 ## Installation
 
-TBD
+- Clone this repo to a working directory
+- Create a database for the MUD to use (see [sequelize docs](http://docs.sequelizejs.com/en/v3/) for more details on supported databases)
+- Clone this repo to a working directory
+- Copy config/config.example.js to config.js
+- Edit config.js, change database settings as needed.
+- Run 'npm install'. This will download required npm packages and initialize the database tables.
 
 ## Features
 

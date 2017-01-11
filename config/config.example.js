@@ -10,6 +10,7 @@ module.exports = {
   dbName: '<db name>',
   dbUser: '<db username>',
   dbPass: '<db password>',
+  dbDialect: '<database dialect>', // @see: http://docs.sequelizejs.com/en/1.7.0/docs/usage/#dialects
   // Uncomment this line if you are running mudjs on a mac with MAMP
   // dbUnixSocket: '/Applications/MAMP/tmp/mysql/mysql.sock',
 
@@ -66,7 +67,7 @@ module.exports = {
     wa: 'WAIST',
     l:  'LEGS',
     fe: 'FEET'
-  }
+  },
 
   // ### Timers ###
 
@@ -76,5 +77,5 @@ module.exports = {
   // closing and relocking any unlocked or opened doors, restoring missing items, etc.
   //
   // Number of seconds between world tics
-  worldTic = 195;
+  worldTic: 195
 }

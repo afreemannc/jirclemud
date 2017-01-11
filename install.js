@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
-var Sequelize = require('sequelize');
-var Config = reqire('./config/config.js');
+Sequelize = require('sequelize');
+var Config = require('./config/config.js');
 
 var dbSettings = {
   dialect: Config.dbDialect,
@@ -20,16 +20,16 @@ sequelize = new Sequelize(
   dbSettings
 );
 
-Models = {}
-loadModels(core);
+Models = {};
+loadModels('core');
 
 sequelize.sync().then(function() {
 
-}).catch(function(error)) {
+}).catch(function(error) {
   console.log('Unable to complete the installation due to database errors:');
   console.log(error);
   console.log('Please check the database credentials in config.js and try again.');
-}
+});
 
 /**
  * Recursively scan for and load Sequilize data models.
@@ -47,6 +47,7 @@ function loadModels(dir) {
       return (file.endsWith("Model.js"));
     })
     .forEach(function(file) {
+
       var model = require('./' + path.join(dir, file));
       Models[model.name] = sequelize.define(model.name, model.fields);
     });
