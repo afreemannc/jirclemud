@@ -1,20 +1,21 @@
 
 // global configuration
 module.exports = {
-  mudName: 'MUD MUD',
+  mudName: '<your mud name here>',
   //port number MUD server should listen on
   port: 8765,
 
-  //DB stuffs
-  dbHost: 'localhost',
+  // ### DB settings ###
+  dbHost: '<db host>',
   dbName: '<db name>',
   dbUser: '<db username>',
   dbPass: '<db password>',
   // Uncomment this line if you are running mudjs on a mac with MAMP
-  // dbPort: '/Applications/MAMP/tmp/mysql/mysql.sock',
+  // dbUnixSocket: '/Applications/MAMP/tmp/mysql/mysql.sock',
 
-  // mud stuffs
-  startRoomId: 1, // room new characters get dropped in
+  // ### MUD settings ###
+  // Room id to start new characters in.
+  startRoomId: 1,
 
   quitMessage: 'Goodbye!',
 
@@ -67,6 +68,13 @@ module.exports = {
     fe: 'FEET'
   }
 
+  // ### Timers ###
+
+  // World tic triggers mob movement
+  //
+  // Zone tic refreshes the contents of a zone, respawning any missing mobs,
+  // closing and relocking any unlocked or opened doors, restoring missing items, etc.
+  //
   // Number of seconds between world tics
   worldTic = 195;
 }

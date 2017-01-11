@@ -3,15 +3,23 @@ var path = require("path");
 var net = require('net');
 Config = require('./config/config.js');
 Sequelize = require('sequelize');
+
+
+var dbSettings = {
+  dialect: Config.dbDialect,
+}
+if (typeof Config.dbUnixSocket !== 'undefined') {
+  dbSettings['dialectOptions'] = {
+    socketPath: Config.dbUnixSocket
+  }
+}
+console.log(dbSettings);
+
 sequelize = new Sequelize(
   Config.dbName,
   Config.dbUser,
   Config.dbPass,
-  {
-    dialectOptions: {
-      socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
-    }
-  }
+  dbSettings
 );
 
 Tics = require('./core/tics');
