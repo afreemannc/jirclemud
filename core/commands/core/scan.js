@@ -23,7 +23,7 @@ var Command = function() {
     var mobiles = Rooms.room[roomId].mobiles;
     if (mobiles.length > 0) {
       for (var i = 0; i < mobiles.length; ++i) {
-        message += 'Immediate area: ' + mobiles[i].short_name;
+        message += 'Immediate area: ' + mobiles[i].short_name + '\n';
       }
     }
     // get room exits
@@ -35,8 +35,14 @@ var Command = function() {
       if (exit.properties.flags.includes('CLOSED') === false) {
         var mobiles = Rooms.room[exit.target_rid].mobiles;
         if (mobiles.length > 0) {
+          var exitLabelLong = Rooms.exitLabelToLong(exitLabel);
           for (var j = 0; j < mobiles.length; ++j) {
-            message += exitLabel + ': ' + mobiles[j].short_name;
+            if (exitLabelLong !== false) {
+              message += exitLabelLong + ': ' + mobiles[j].short_name + '\n';
+            }
+            else {
+              message += exitLabel + ': ' + mobiles[j].short_name + '\n';
+            }
           }
         }
       }

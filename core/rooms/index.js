@@ -344,6 +344,23 @@ room.prototype.invertExitLabel = function(label) {
   return output;
 }
 
+room.prototype.exitLabelToLong = function(label) {
+  var labels = {
+    n: 'North',
+    ne: 'Northeast',
+    e: 'East',
+    se: 'Southeast',
+    s: 'South',
+    sw: 'Southwest',
+    w: 'West',
+    nw: 'Northwest',
+  }
+  if (typeof labels[label] !== 'undefined') {
+    return labels[label].toString();
+  }
+  return false;
+}
+
 room.prototype.hasExits = function(room) {
     exitKeys = Object.keys(room.exits);
     if (exitKeys.length === 0) {
