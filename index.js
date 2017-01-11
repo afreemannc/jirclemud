@@ -13,7 +13,6 @@ if (typeof Config.dbUnixSocket !== 'undefined') {
     socketPath: Config.dbUnixSocket
   }
 }
-console.log(dbSettings);
 
 sequelize = new Sequelize(
   Config.dbName,

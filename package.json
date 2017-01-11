@@ -9,7 +9,8 @@
     "sequelize":"^3.28.0"
   }
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "install": "node instal.js",
   },
   "repository": {
     "type": "git",
