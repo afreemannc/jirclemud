@@ -10,6 +10,10 @@ module.exports.fields = {
       type: Sequelize.STRING
     },
 
+    short_name: {
+      type: Sequelize.STRING
+    },
+
     description: {
       type: Sequelize.TEXT
     },

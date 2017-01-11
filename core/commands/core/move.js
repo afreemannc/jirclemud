@@ -26,8 +26,16 @@ var Command = function() {
     }
     else {
       var currentExit = currentExits[input];
-      session.character.current_room = currentExit.target_rid;
-      Commands.triggers.look(session, '');
+      if (currentExits.properties.flags.includes('CLOSED')) {
+        session.write('The door seems to be closed.');
+        return false;
+      }
+      else {
+        session.character.current_room = currentExit.target_rid;
+        Rooms.message(session, roomId, session.character.name + ' leaves.', true);
+        Rooms.message(session, target_rid, session.character.name + ' arrives.', true);
+        Commands.triggers.look(session, '');
+      }
     }
   }
 }

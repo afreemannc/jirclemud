@@ -21,13 +21,13 @@ var Command = function() {
       var room = Rooms.room[roomId];
       // display room title
       if (session.character.stats.flags.includes('BUILDER')) {
-        session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold% %green%[' + room.rid + ']%green%')+ "\n");
+        session.socket.write("\n" + Tokens.replace(session, '%bold%' + room.name + '%bold% %green%[' + room.rid + ']%green%')+ "\n");
       }
       else {
         session.socket.write(Tokens.replace(session, '%bold%' + room.name + '%bold%')+ "\n");
       }
       // display room description
-      session.socket.write(Tokens.replace(session, room.description) + "\n\n");
+      session.socket.write(Tokens.replace(session, room.description) + "\n");
       // display exits
       console.log(Rooms.room[roomId]);
       var exits = Rooms.room[roomId].exits;
@@ -49,10 +49,10 @@ var Command = function() {
             exitDisplay.push(standardExits[i]);
           }
         }
-        session.socket.write('Exits: [ ' + Tokens.replace(session, '%yellow%' + exitDisplay.join(' ') + '%yellow%') + ' ]\n');
+        session.socket.write('Exits: [ ' + Tokens.replace(session, '%yellow%' + exitDisplay.join(' ') + '%yellow%') + ' ]\n\n');
       }
       else {
-        session.socket.write('Exits: [none]\n');
+        session.socket.write('Exits: [none]\n\n');
       }
       // display room inventory
       if (room.inventory.length > 0) {

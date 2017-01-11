@@ -47,8 +47,7 @@ function zones() {
    */
   this.getCurrentZoneId = function(session) {
     var roomId = session.character.current_room;
-    var current_room = Rooms.room[roomId];
-    return current_room.zid;
+    return Rooms.room[roomId].zid;
   }
 
   /**
@@ -97,6 +96,12 @@ function zones() {
       return true;
     };
     createZonePrompt.addField(ratingField);
+
+
+    var ticIntervalField = createZonePrompt.addField('int');
+    ticIntervalField.name = 'tic_interval';
+    ticInterval.formatPrompt('How frequently (in seconds) should this zone refresh? (ex. 3600 = 1 hour)');
+    createZonePrompt.addField(ticIntervalField);
 
     createZonePrompt.start();
   }
@@ -240,7 +245,8 @@ function zones() {
     var values = {
       name:fieldValues.name,
       description:fieldValues.description,
-      rating:fieldValues.rating
+      rating:fieldValues.rating,
+      tic_interval:fieldValues.tic_interval
     }
     // If zid is passed in with field values this indicates changes to an existing zone
     // are being saved.
@@ -258,7 +264,9 @@ function zones() {
     else {
       // If rid is not provided this should be saved as a new zone.
       Zone.create(values).then(function(zoneInstance) {
-        Zones.zone[zoneInstance.get('rid')] = zoneInstance.dataValues;
+        var newZone = zoneInstance.dataValues;
+        newZone.rooms = [];
+        Zones.zone[zoneInstance.get('rid')] = newZone;
         session.write('New zone saved.');
         session.inputContext = 'command';
         // Once a new zone is created we will need to also create a starter room so
@@ -276,7 +284,9 @@ function zones() {
           var newRoom = newRoomInstance.dataValues;
           newRoom.exits = {};
           newRoom.inventory = [];
+          newRoom.flags = JSON.parse(newRoom.flags);
           Rooms.room[newRoomInstance.get('rid')] = newRoom;
+          Zones.zone[newRoom.zid].rooms.push(newRoom.rid);
           session.write('First room in zone created.');
           console.log(newRoomInstance);
           Commands.triggers.bamf(session, newRoomInstance.get('rid'));

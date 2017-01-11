@@ -28,6 +28,12 @@ function Mobiles() {
     mobileNameField.formatPrompt('What should this mobile be named? (Name displays in room.)'),
     createMobilePrompt.addField(mobileNameField);
 
+    var mobileShortNameField = createMobilePrompt.newField('text');
+    mobileShortNameField.name = 'short_name',
+    mobileShortNameField.formatPrompt('Provide a short name: (Displays during move, by "scan", etc.)'),
+    createMobilePrompt.addField(mobileShortNameField);
+
+
     // Description
     var mobileDescField = createMobilePrompt.newField('multitext');
     mobileDescField.name = 'description',
@@ -109,6 +115,7 @@ function Mobiles() {
     var values = {
       zid: fieldValues.zid,
       name: fieldValues.name,
+      short_name: fieldValues.short_name,
       description: fieldValues.description,
       stats: JSON.stringify({
         hit: fieldValues.hit,
@@ -134,33 +141,36 @@ function Mobiles() {
   this.moveMobs = function(zoneId) {
     var Room = Models.Room;
     var zoneRoomIds = Zones.zone[zoneId].rooms;
-      for(i = 0; i < zoneRoomIds.length; ++i) {
-        var rid = zoneRoomIds[i];;
-        if (Rooms.room[rid].mobiles.length > 0) {
-          for (i = 0; i < Rooms.room[rid].mobiles.length; ++i) {
-            var mobile = Rooms.room[rid].mobiles[i];
-            if (mobile.extra.flags.includes('PATROL') && Rooms.hasExits(Rooms.room[rid])) {
-              var exitKeys = Object.keys(Rooms.room[rid].exits);
-              var exitCount = exitKeys.length;
-              // mobs don't always move even when they can.
-              var roll = Math.floor(Math.random() * (exitCount + 2));
-              console.log('roll:' + roll);
-              console.log('exit count:' + exitCount);
+    for(var i = 0; i < zoneRoomIds.length; ++i) {
+      var rid = zoneRoomIds[i];;
+      if (Rooms.room[rid].mobiles.length > 0) {
+        for (var j = 0; j < Rooms.room[rid].mobiles.length; ++j) {
+          var mobile = Rooms.room[rid].mobiles[j];
+          if (mobile.extra.flags.includes('PATROL') && Rooms.hasExits(Rooms.room[rid])) {
+            var exitKeys = Object.keys(Rooms.room[rid].exits);
+            var exitCount = exitKeys.length;
+            // mobs don't always move even when they can.
+            var roll = Math.floor(Math.random() * (exitCount + 2));
 
-              if (roll < exitCount) {
-                 var label = exitKeys[roll];
-                 console.log('roll:' + roll);
-                 console.log('label:' + label);
-                 var targetRid = Rooms.room[rid].exits[label].target_rid;
-                 var index = Rooms.room[rid].mobiles.indexOf(mobile);
-                 Rooms.room[rid].mobiles.splice(index, 1);
-                 Rooms.room[targetRid].mobiles.push(mobile);
-                 console.log('Moved mob to ' + targetRid);
+            if (roll < exitCount) {
+              var exit = Rooms.room[rid].exits[exitKeys[roll]];
+              if (exit.properties.flags.includes('CLOSED')) {
+                // No walking through doors y'all.
+                Rooms.message(false, rid, mobile.short_name + ' nudges the door.', false);
+                continue;
               }
+              var label = exitKeys[roll];
+              var targetRid = Rooms.room[rid].exits[label].target_rid;
+              var index = Rooms.room[rid].mobiles.indexOf(mobile);
+              Rooms.room[rid].mobiles.splice(index, 1);
+              Rooms.room[targetRid].mobiles.push(mobile);
+              Rooms.message(false, rid, mobile.short_name + ' leaves.', false);
+              Rooms.message(false, targetRid, mobile.short_name + ' has arrived.', false);
             }
           }
         }
-      };
+      }
+    };
   }
 }
 

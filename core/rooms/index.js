@@ -3,13 +3,12 @@ var room = function(){
   this.room = {};
 };
 
-// TODO: this method should be attached to the actual room object.
 room.prototype.message = function(session, roomId, message, skipCharacter) {
   console.log('message room id:' + roomId);
   for (var i = 0; i < Sessions.length; ++i) {
     // If roomID is false global message
     if (roomId === false) {
-      if (skipCharacter === false || Sessions[i] != session) {
+      if (skipCharacter === false || session === false || Sessions[i] != session) {
         session.write(message);
       }
       continue;
@@ -20,11 +19,11 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
     if (checkSession.character.current_room !== roomId) {
       return;
     }
-    else if (checkSession.character.id === session.character.id && skipCharacter === true) {
+    else if (session != false && checkSession.character.id === session.character.id && skipCharacter === true) {
       return;
     }
     else {
-      session.write(message);
+      checkSession.write(message);
     }
   }
 }
