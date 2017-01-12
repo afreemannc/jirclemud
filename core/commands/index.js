@@ -1,7 +1,7 @@
 var fs = require("fs");
 var path = require("path");
 
-function Commands() {
+function commands() {
   this.commands = {};
   this.triggers = {};
   // Load core commands
@@ -15,24 +15,29 @@ function Commands() {
       this.triggers[command.trigger] = command.callback;
     }
   }
+}
 
   // Load optional plugins
-  normalizedPath = require("path").join(__dirname, "plugins");
+commands.prototype.loadCommands = function(dir) {
 
-  var pluginCommands = require("fs").readdirSync(normalizedPath);
-  for (var i = 0; i < pluginCommands.length; ++i) {
-    if (pluginCommands[i].endsWith('.js')) {
-    command = require("./plugin/" + pluginCommands[i]);
-      // Intentionally skipping checks for pre-existing commands.
-      // This permits modules and custom implementations to override core command
-      // behavior by declaring a custom version of the command in the
-      // plugins directory.
-      this.commands[command.trigger] = command;
-      this.triggers[command.trigger] = command.callback;
+    var pluginCommands = require("fs").readdirSync(dir);
+    for (var i = 0; i < pluginCommands.length; ++i) {
+      if (pluginCommands[i].endsWith('.js')) {
+        var file = pluginCommands[i];
+        console.log('loading plugin command file:' + dir + '/' + file);
+        var command = require(dir + "/" + file);
+        console.log(command);
+        // Intentionally skipping checks for pre-existing commands.
+        // This permits modules and custom implementations to override core command
+        // behavior by declaring a custom version of the command in the
+        // plugins directory.
+        Commands.commands[command.trigger] = command;
+        Commands.triggers[command.trigger] = command.callback;
+      }
     }
   }
 
-  this.commandHandler  = function(session, inputRaw) {
+commands.prototype.commandHandler  = function(session, inputRaw) {
     console.log('inputRaw:' + inputRaw);
     console.log(typeof inputRaw);
     var input = inputRaw.replace(/(\r\n|\n|\r)/gm,"");
@@ -67,6 +72,6 @@ function Commands() {
     }
 
   }
-}
 
-module.exports = new Commands();
+
+module.exports = new commands();

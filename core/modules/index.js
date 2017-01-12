@@ -5,35 +5,38 @@
 var fs = require('fs');
 var path = require('path');
 
-function Modules() {
+var modules = function() {
   this.modules = {};
-
-  this.moduleDir = .join(__dirname + '/../../', "modules");
-
-  this.findModules = function(dir) {
-    fs.readdirSync(dir)
-      .filter(function(file) {
-        var filepath = path.join(dir, file);
-        if(fs.statSync(filepath).isDirectory()) {
-          Modules.findModules(filepath);
-        }
-        return (file === "index.js");
-      })
-      .forEach(function(file) {
-        console.log('require path:' + path.join(dir, file));
-        var module = require('' + path.join(dir, file));
-        Modules.module[module.name] = module.description;
-      });
-  }
-
-  this.listModules() {
-
-  }
-
-  this.loadModule(moduleName) {
-    // load commands if available
-    // alter flag lists if available
-  }
+  this.aThing = {};
 }
 
-module.exports = new Modules();
+modules.prototype.moduleDir = path.join(__dirname + '/../../', "modules");
+
+
+modules.prototype.loadEnabledModules = function() {
+    var Module = Models.Module;
+
+    Module.findAll({where:{status: 1}}).then(function(instances) {
+      if (instances) {
+        instances.forEach(function(instance) {
+          var currentModule = instance.dataValues;
+          console.log(currentModule);
+          currentModule.features = JSON.parse(currentModule.features);
+          console.log(currentModule);
+          Modules.modules[currentModule.name] = require(currentModule.filepath + '/index.js');
+
+          if (currentModule.features.includes('commands')) {
+            // load commands into memory
+            console.log('module implements commands, loading:');
+            var commandFolderPath = currentModule.filepath + '/commands';
+            Commands.loadCommands(commandFolderPath);
+          }
+        });
+      }
+    });
+    // alter flag lists if available
+  }
+  console.log(this);
+
+
+module.exports = new modules();

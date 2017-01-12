@@ -33,6 +33,7 @@ Zones = require('./core/zones');
 Tokens = require('./core/tokens');
 Containers = require('./core/containers');
 Mobiles = require('./core/mobiles');
+Modules = require('./core/modules');
 
 Models = {};
 Sessions = [];
@@ -64,6 +65,10 @@ server.listen(Config.port);
 // Load zones into memory
 Zones.loadZones();
 Rooms.loadRooms();
+
+// Load optional modules
+Modules.loadEnabledModules();
+
 Tics.addQueue('world', Config.worldTicInterval);
 
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.

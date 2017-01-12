@@ -18,6 +18,14 @@ module.exports.fields = {
     type: Sequelize.INTEGER.UNSIGNED
   },
 
+  features: {
+    type: Sequelize.TEXT
+  },
+
+  filepath: {
+    type: Sequelize.STRING
+  },
+
   version: {
     type: Sequelize.STRING
   }
