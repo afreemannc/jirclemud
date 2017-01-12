@@ -12,7 +12,6 @@ MudJS is an extensible text based multi-user dungeon engine based loosely on the
 
 ## Installation
 
-- Clone this repo to a working directory
 - Create a database for the MUD to use (see [sequelize docs](http://docs.sequelizejs.com/en/v3/) for more details on supported databases)
 - Clone this repo to a working directory
 - Copy config/config.example.js to config.js
