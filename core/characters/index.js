@@ -299,11 +299,12 @@ var characters = function(){
     for (var i = 0; i < Sessions.length; ++i) {
       var session = Sessions[i];
       if (session.character.name.startsWith(name)) {
-        return session.character.id;
+        return session;
       }
     }
     return false;
   }
+
 }
 
 module.exports = new characters();

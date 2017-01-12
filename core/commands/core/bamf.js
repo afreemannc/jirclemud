@@ -1,5 +1,6 @@
 var Command = function() {
   this.trigger = 'bamf';
+  this.permsRequired = 'BUILDER';
   this.helpText = `
   One of the priviledges of being an admin is the ability to instantly move from any room to any other room.
 

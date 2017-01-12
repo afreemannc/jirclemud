@@ -1,5 +1,6 @@
 var Command = function() {
   this.trigger = 'link';
+  this.permsRequired = 'BUILDER';
   this.helpText = `
   Create an exit leading from the current room to another room.
   Note: this command only creates a single exit pointing to the target room.

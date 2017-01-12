@@ -1,5 +1,6 @@
 var Command = function() {
   this.trigger = 'arch';
+  this.permsRequired = 'BUILDER';
   this.helpText = 'Access the administrator console';
   this.callback = function (session, input) {
     // set NOGOSSIP flag on character session

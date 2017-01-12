@@ -172,6 +172,20 @@ function Mobiles() {
       }
     };
   }
+
+  this.respawnMob(miid) {
+    // Load copy of mob instance from db
+    // iterate equipment
+       // generate item instance
+       // place item instance in mob equipment slot
+    // iterate inventory
+       // generate item instance
+       // place item instance in mob inventory
+    // iterate effects
+       // apply effects as needed
+    // write mob instance to Rooms.room[roomId].mobiles;
+    // rooms.write(A mob.name has arrived.);
+  }
 }
 
 module.exports = new Mobiles();

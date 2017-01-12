@@ -1,6 +1,7 @@
 var Command = function() {
   this.trigger = 'destroy';
-  this.helpText = 'Immortals only: destroy a thing (room, item, etc).';
+  this.permsRequired = 'BUILDER';
+  this.helpText = 'Destroy a thing (room, item, etc).';
   this.callback = function(session, context) {
     // TODO: implement character perms checking
     if (context.length === 0) {

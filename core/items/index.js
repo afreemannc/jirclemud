@@ -239,4 +239,10 @@ item.prototype.inventoryDisplay = function(inventory) {
   return output;
 }
 
+item.prototype.generate = function(iid) {
+  // load item from database
+  // apply tweaks if needed
+  // copy instance to relevant memory location.
+}
+
 module.exports = new item();

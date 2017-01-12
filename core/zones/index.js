@@ -1,7 +1,14 @@
-// Zone CRUD
+// @file Zone-related CRUD and helper functions.
 
 function zones() {
+  // Storage for zones once they are loaded into memory.
+  this.zone = {};
 
+  /**
+   * Create zone refresh timers.
+   *
+   * Each timer controls when a given zone is refreshed.
+   */
   this.registerTimers = function() {
     var Zone = Models.Zone;
     Zone.findAll().then(function(instances) {
@@ -19,9 +26,24 @@ function zones() {
     });
   };
 
+  /**
+   * Handle routine tasks required during a zone refresh.
+   *
+   * This includes:
+   * - respawning any mobs that have been killed
+   * - closing and locking any doors that have been unlocked or opened
+   *
+   */
+  this.refreshZone(zoneId) {
+    // Identify mobs that have been killed
+    // Regenerate
+    // Identify unlocked or opened doors that should be closed/locked
+    // close open doors, lock if lockable.
+  }
 
-  this.zone = {};
-
+  /**
+   * Load zones into memory.
+   */
   this.loadZones = function() {
     var Zone = Models.Zone;
     Zone.findAll().then(function(instances) {
@@ -297,6 +319,20 @@ function zones() {
         console.log('Zone Create Error: unable to create new zone:' + error);
       });
     }
+  }
+
+  this.listPlayersInZone = function(zoneId) {
+    var characters = [];
+    for (var i = 0; i < Sessions.length; ++i) {
+      if (typeof Sessions[i].character !== 'undefined') {
+        var character = Sessions[i].character;
+        var zid = Rooms.room[character.current_room].zid;
+        if (zid === zoneId) {
+          characters.push(character.name + '          - ' + Rooms.room[character.current_room].name);
+        }
+      }
+    };
+    return characters.join('\n');
   }
 }
 

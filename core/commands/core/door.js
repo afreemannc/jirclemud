@@ -1,5 +1,6 @@
 var Command = function() {
   this.trigger = 'door';
+  this.permsRequired = 'BUILDER';
   this.helpText = `
   Create a door leading from current room to another room.
   Note: this command will attempt to create reciprocal exits in both rooms if possible.

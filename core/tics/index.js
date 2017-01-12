@@ -2,23 +2,22 @@
 var Events = require('events');
 
 function TicQueues() {
-  this.queues = {};
+  this.queues = [];
 
   this.addQueue = function(name, interval) {
-    Tics.queues[name] = {
+    var newQueue = {
       name: name,
       interval: interval,
       event: new Events.EventEmitter(),
       started: false
-    };
-    return this.queues[name];
+    }
+    Tics.queues.push(newQueue);
+    return newQueue;;
   }
 
   this.startQueues = function() {
-    var queueKeys = Object.keys(Tics.queues);
-    console.log(queueKeys);
-    for (i = 0; i < queueKeys.length; ++i) {
-      var queue = this.queues[queueKeys[i]];
+    for (i = 0; i < Tics.queues.length; ++i) {
+      var queue = Tics.queues[i];
       if (queue.started === true) {
         continue;
       }
@@ -26,7 +25,7 @@ function TicQueues() {
       var interval = setInterval(function(queue) {
         console.log('tic:' + queue.name);
         queue.event.emit(queue.name);
-      }, queue.interval * 100, queue);
+      }, queue.interval * 1000, queue);
       Tics.queues[queue.name].started = true;
     }
   }

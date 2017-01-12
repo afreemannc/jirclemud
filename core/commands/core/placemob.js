@@ -1,5 +1,6 @@
 var Command = function() {
   this.trigger = 'placemob';
+  this.permsRequired = 'BUILDER';
   this.helpText = `
   Builder only: Place a mob in the current room. Note this change is permanent and this mob will load in this location going forward.
   If you want to create a temporary copy of a mob try summon.

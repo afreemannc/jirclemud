@@ -1,5 +1,6 @@
 var Command = function() {
   this.trigger = 'edit';
+  this.permsRequired = 'BUILDER';
   this.helpText = `
   Builder only: universal in-game editing command for world building. Great for editing rooms and items.
 

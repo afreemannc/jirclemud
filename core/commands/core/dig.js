@@ -1,6 +1,7 @@
 
 var Command = function() {
   this.trigger = 'dig';
+  this.permsRequired = 'BUILDER';
   this.helpText = `
     The dig command is used to add rooms to a zone..
     When used several things happen in order:
