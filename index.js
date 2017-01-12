@@ -64,6 +64,7 @@ server.listen(Config.port);
 // Load zones into memory
 Zones.loadZones();
 Rooms.loadRooms();
+Tics.addQueue('world', Config.worldTicInterval);
 
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(session, data) {
