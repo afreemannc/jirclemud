@@ -1,6 +1,13 @@
 
 function Mobiles() {
   // load
+  var worldQueue = Tics.findQueue('world');
+  if (worldQueue) {
+    worldQueue.event.on('world', function() {
+      Mobiles.moveMobs(zoneId);
+    });
+  }
+
   this.loadMobiles = function() {
     var MobilesInstance = Models.MobilesInstance;
     MobilesInstance.findAll().then(function(instances) {
@@ -173,7 +180,7 @@ function Mobiles() {
     };
   }
 
-  this.respawnMob(miid) {
+  this.respawnMob = function(miid) {
     // Load copy of mob instance from db
     // iterate equipment
        // generate item instance

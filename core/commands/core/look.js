@@ -56,7 +56,7 @@ var Command = function() {
       }
       // display room inventory
       if (room.inventory.length > 0) {
-        var display = Items.inventoryDisplay(Rooms.room[roomId].inventory);
+        var display = Items.inventoryDisplay(Rooms.room[roomId].inventory, true);
         session.socket.write(Tokens.replace(session, display) + "\n");
       }
       // display mobiles

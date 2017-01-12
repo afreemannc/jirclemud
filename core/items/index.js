@@ -165,7 +165,7 @@ item.prototype.saveNewItem = function(session, fieldValues) {
   }
   var Item = Models.Item;
 
-  Items.create(values).then(function(newItem) {
+  Item.create(values).then(function(newItem) {
     session.write('New item type saved.');
     if (fieldValues.create === 'Yes') {
       var values = {
@@ -208,7 +208,7 @@ item.prototype.saveNewItem = function(session, fieldValues) {
  * -  Used by glance skill to display contents of mob/character inventory
  */
 
-item.prototype.inventoryDisplay = function(inventory) {
+item.prototype.inventoryDisplay = function(inventory, room) {
   var output = '';
   if (Array.isArray(inventory) === true) {
     var numericKeys = true;
@@ -230,7 +230,12 @@ item.prototype.inventoryDisplay = function(inventory) {
       if (numericKeys === false) {
         output += '%cyan%<worn on ' + keys[i] + '>%cyan% '
       }
-      output += item.name + "\n";
+      if (room) {
+        output += item.room_description;
+      }
+      else {
+        output += item.name + "\n";
+      }
     }
     else if (item === false && numericKeys === false) {
       output += '%cyan%<worn on ' + keys[i] + '>%cyan%  nothing\n';

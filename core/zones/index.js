@@ -19,7 +19,7 @@ function zones() {
         var tic = Tics.addQueue('zone' + zoneId, ticInterval);
         tic.event.on('zone' + zoneId, function() {
           console.log('zone ' + zoneId + ' tic event');
-          Mobiles.moveMobs(zoneId);
+          Zones.refreshZone(zoneId);
         });
       });
       Tics.startQueues();
@@ -34,7 +34,7 @@ function zones() {
    * - closing and locking any doors that have been unlocked or opened
    *
    */
-  this.refreshZone(zoneId) {
+  this.refreshZone = function(zoneId) {
     // Identify mobs that have been killed
     // Regenerate
     // Identify unlocked or opened doors that should be closed/locked

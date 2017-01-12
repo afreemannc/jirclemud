@@ -23,12 +23,10 @@ var Command = function() {
       session.error('There is nobody around with that name.');
     }
     else {
-        // tell them
-        targetCharacterSession.write(Tokens.replace(session, '%red%' + senderName + " tells you:" + message + '%red%'));
-        // echo to sender
-        session.write(Tokens.replace(session, "%red%You tell " + recipientName + ": " + message + '%red%'));
-        break;
-      }
+      // tell them
+      targetCharacterSession.write(Tokens.replace(session, '%red%' + senderName + " tells you:" + message + '%red%'));
+      // echo to sender
+      session.write(Tokens.replace(session, "%red%You tell " + recipientName + ": " + message + '%red%'));
     }
   }
 }

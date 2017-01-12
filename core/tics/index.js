@@ -12,7 +12,7 @@ function TicQueues() {
       started: false
     }
     Tics.queues.push(newQueue);
-    return newQueue;;
+    return newQueue;
   }
 
   this.startQueues = function() {
@@ -26,10 +26,18 @@ function TicQueues() {
         console.log('tic:' + queue.name);
         queue.event.emit(queue.name);
       }, queue.interval * 1000, queue);
-      Tics.queues[queue.name].started = true;
+      Tics.queues[i].started = true;
     }
   }
 
+  this.findQueue = function(queueName) {
+    for (var i = 0; i < Tics.queues.length; ++i) {
+      if (Tics.queues[i].name === queueName) {
+        return Tics.queues[i];i
+      }
+    }
+    return false;
+  }
 }
 
 module.exports = new TicQueues();

@@ -79,7 +79,7 @@ var characters = function(){
     session.character.equipment = JSON.parse(character.equipment);
 
     // Initialize empty inventory and then load
-    session.character.inventory = {};
+    session.character.inventory = [];
 
     var values = {
       containerType: 'player_inventory',

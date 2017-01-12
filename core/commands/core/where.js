@@ -28,22 +28,22 @@ var Command = function() {
       output += Zones.listPlayersInZone(zoneId) + '\n';
       session.write(output);
     }
-  }
-  else {
-    var targetCharacterSession = searchActiveCharactersByName(input);
-    if (targetCharacterSession === 'false') {
-      session.write('Nobody around by that name.');
-      return false;
-    }
-    var targetRoomId = targetCharacterSession.character.current_room;
-    var targetZid = Rooms.room[roomId].zid;
-    if (targetZid !== zoneId) {
-      session.write('Nobody around by that name.');
-      return false;
-    }
-    session.write(character.name + '          - ' + Rooms.room[character.current_room].name + "\n");
-  }
 
+    else {
+      var targetCharacterSession = searchActiveCharactersByName(input);
+      if (targetCharacterSession === 'false') {
+        session.write('Nobody around by that name.');
+        return false;
+      }
+      var targetRoomId = targetCharacterSession.character.current_room;
+      var targetZid = Rooms.room[roomId].zid;
+      if (targetZid !== zoneId) {
+        session.write('Nobody around by that name.');
+        return false;
+      }
+      session.write(character.name + '          - ' + Rooms.room[character.current_room].name + "\n");
+    }
+  }
 }
 
 module.exports = new Command();
