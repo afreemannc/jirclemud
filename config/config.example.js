@@ -71,11 +71,8 @@ module.exports = {
 
   // ### Timers ###
 
-  // World tic triggers mob movement
-  //
-  // Zone tic refreshes the contents of a zone, respawning any missing mobs,
-  // closing and relocking any unlocked or opened doors, restoring missing items, etc.
+  // World tic triggers mob movement and other events.
   //
   // Number of seconds between world tics
-  worldTic: 195
+  worldTicInterval: 120
 }
