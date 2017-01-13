@@ -21,41 +21,59 @@ var Command = function() {
          > %green%[thieves] Derp says 'hi'%green%
   `;
   this.callback = function (session, input) {
-    if (input.includes('say ') {
+    if (input.includes('say ')) {
       message = input.replace('say ', '');
-      var itemIndex = global.containers.findItemInContainer('TALKER', 'properties.flags', global.rooms.room[roomId].inventory, true);
-      if (itemIndex === false) {
-        session.error('You do not have a talker.');
+
+      if (session.character.perms.includes('TALKERON') === false) {
+        session.error('Nothing happens. You might want to turn it on first.');
         return false;
       }
-      var channel = session.character.talkerChannel;
-      Modules.Talker.write(message, channel);
+
+      if (typeof session.talkerChannel === 'undefined') {
+        session.error('Nothing happens. You need to set it to a channel.');
+        return false;
+      }
+      var channel = session.talkerChannel;
+      Modules.modules.Talker.write(session, message, channel);
       return true;
     }
-  }
-  else if (input === 'on') {
-    // turn talker on
-    session.character.perms.push('TALKERON');
-  }
-  else if (input === 'off') {
-    // turn talker off
-    var index = session.character.perms.indexOf('TALKERON');
-    if (index === false) {
-      session.write('Your talker is already off.');
-      return false;
+
+    else if (input === 'on') {
+      // turn talker on
+      if (session.character.perms.includes('TALKERON')) {
+        session.write('It is already on.');
+        return false;
+
+      }
+      else {
+        session.character.perms.push('TALKERON');
+        session.write('You turn it on.');
+        return true;
+      }
     }
-    else {
-      session.character.perms.splice(index, 1);
-      session.write('You turn your talker off.');
+    else if (input === 'off') {
+      // turn talker off
+      var index = session.character.perms.indexOf('TALKERON');
+      if (index === false) {
+        session.write('Your talker is already off.');
+        return false;
+      }
+      else {
+        session.character.perms.splice(index, 1);
+        session.write('You turn your talker off.');
+        return true;
+      }
     }
-  }
-  else if (input.includes('channel ')) {
-    // confirm channel exists and player can access it
-    // change channel
-    // display change message
-  }
-  else if (input === 'channels') {
-    // List channels available to character.
+    else if (input.includes('channel ')) {
+      var channel = input.replace('channel ', '');
+      // confirm channel exists and player can access it
+      // change channel
+      session.talkerChannel = channel;
+      // display change message
+    }
+    else if (input === 'channels') {
+      // List channels available to character.
+    }
   }
 }
 

@@ -60,17 +60,22 @@ var Command = function() {
         var RoomExit = Models.RoomExit;
         RoomExit.create(exitValues).then(function(exitInstance) {
           // Update memory with new exit
-          Rooms.room[exitInstance.get('rid')].exits[exitInstance.get('label')] = exitInstance.dataValues;
+          var newExit = exitInstance.dataValues;
+          newExit.properties = JSON.parse(newExit.properties);
+          Rooms.room[exitInstance.get('rid')].exits[exitInstance.get('label')] = newExit;
           //create reciprocal exit in new room. Flip values and save.
           var exitValues = {
             rid: newRoom.rid,
             target_rid: session.character.current_room,
             label: Rooms.invertExitLabel(input),
+            description: 'Nothing to see here.',
             properties: JSON.stringify({flags:[]}),
           }
           RoomExit.create(exitValues).then(function (exitInstance) {
             // Update memory with new exit
-            Rooms.room[exitInstance.get('rid')].exits[exitInstance.get('label')] = exitInstance.dataValues;
+            var reciprocalExit = exitInstance.dataValues;
+            reciprocalExit.properties = JSON.parse(reciprocalExit.properties);
+            Rooms.room[exitInstance.get('rid')].exits[exitInstance.get('label')] = reciprocalExit;
             // once exits are saved move the character to the new room.
             Commands.triggers.move(session, input);
           });
