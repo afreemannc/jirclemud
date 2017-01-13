@@ -2,6 +2,7 @@ var fs = require("fs");
 var path = require("path");
 var net = require('net');
 Config = require('./config/config.js');
+Variables = require('./core/variables');
 Sequelize = require('sequelize');
 
 
@@ -34,6 +35,7 @@ Tokens = require('./core/tokens');
 Containers = require('./core/containers');
 Mobiles = require('./core/mobiles');
 Modules = require('./core/modules');
+Admin = require('./core/admin');
 
 Models = {};
 Sessions = [];
@@ -77,10 +79,13 @@ function parseData(session, data) {
   switch (session.inputContext) {
     case 'prompt':
       // certain prompts require collection of multi-line inputs so raw data is provided here.
-      session.prompt.promptHandler(data.toString());
+      session.prompt.inputHandler(data.toString());
       break;
     case 'command':
-      Commands.commandHandler(session, data.toString());
+      Commands.inputHandler(session, data.toString());
+      break;
+    case 'admin':
+      Admin.inputHandler(session, data.toString());
       break;
     default:
      // This shouldn't ever happen so what to put here?

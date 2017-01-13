@@ -35,7 +35,7 @@ commands.prototype.loadCommands = function(dir) {
   }
 }
 
-commands.prototype.commandHandler  = function(session, inputRaw) {
+commands.prototype.inputHandler  = function(session, inputRaw) {
     console.log('inputRaw:' + inputRaw);
     console.log(typeof inputRaw);
     var input = inputRaw.replace(/(\r\n|\n|\r)/gm,"");
