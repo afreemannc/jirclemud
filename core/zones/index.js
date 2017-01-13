@@ -334,6 +334,47 @@ function zones() {
     };
     return characters.join('\n');
   }
+
+  this.exportZone = function(zoneId) {
+    var Zone = Models.Zone;
+    Zone.findOne({where:{zid:zoneId}}).then(function(instance) {
+      var zoneFile = JSON.stringify(instance.dataValues);
+      // write zone file
+    });
+
+    var Room = Models.Room;
+    Room.findAll({where:{zid:zoneId}}).then(function(instances) {
+      var rooms =[];
+      instances.forEach(function(instance) {
+        rooms.push(instance.dataValues);
+      })
+      var roomsFile = JSON.stringify(rooms);
+      // write rooms file
+    });
+
+    var Mobile = Models.Mobile;
+    Mobile.findAll({where:{zid:zoneId}}).then(function(instances) {
+      var mobs = [];
+      var mids = [];
+      instances.forEach(function(instance) {
+        mids.push(instance.get('mid'));
+        mobs.push(instance.dataValues);
+      });
+      var mobfile = JSON.stringify(mobs);
+      // write mob file
+      var MobilesInstance = Models.MobilesInstance;
+      MobilesInstance.findAll({where:{mid:mids}}).then(function(instances) {
+        var mobInstances = [];
+        instances.forEach(function(instance) {
+          mobInstances.push(instance.fieldValues);
+        });
+        var mobInstancesFile = JSON.stringify(mobInstances);
+        // write mob instances
+      });
+    });
+
+    // TODO: write item definitions for stuff in zone once mob eq is figured out.
+  }
 }
 
 module.exports = new zones();
