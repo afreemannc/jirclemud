@@ -1,20 +1,19 @@
 var item = function(){};
 
-// TODO: replace with flag objects that include effect callbacks?
 item.prototype.flags = {
-  0:  'NONE',
-  c:  'CONTAINER',
-  i:  'INVISIBLE',
-  pi: 'PLAYERINVISIBLE',
-  we: 'WEARABLE',
-  u:  'CURSE',
-  b:  'BLESS',
-  h:  'HUM',
-  t:  'TAKE',
-  wi: 'WIELD',
-  h:  'HOLD',
-  th: 'TWO-HANDED',
-  po: 'PORTAL',
+    0:  'NONE',
+    c:  'CONTAINER',
+    i:  'INVISIBLE',
+    pi: 'PLAYERINVISIBLE',
+    we: 'WEARABLE',
+    u:  'CURSE',
+    b:  'BLESS',
+    h:  'HUM',
+    t:  'TAKE',
+    wi: 'WIELD',
+    h:  'HOLD',
+    th: 'TWO-HANDED',
+    po: 'PORTAL',
 }
 
 item.prototype.applyEffects = function(session, item) {
@@ -146,8 +145,11 @@ item.prototype.createItem = function(session) {
 }
 
 item.prototype.setItemProperties = function(fieldValues) {
-  var properties = fieldValues;
-  properties.flags = fieldValues.flags.join(',');
+  var properties = {};
+  properties['flags'] = fieldValues.flags;
+  properties['effects'] = fieldValues.effects;
+  // TODO: deal with container stuff
+  // TODO: deal with weapon dice
   return properties;
 }
 

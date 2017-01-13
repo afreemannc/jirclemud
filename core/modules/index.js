@@ -20,16 +20,20 @@ modules.prototype.loadEnabledModules = function() {
       if (instances) {
         instances.forEach(function(instance) {
           var currentModule = instance.dataValues;
-          console.log(currentModule);
           currentModule.features = JSON.parse(currentModule.features);
-          console.log(currentModule);
           Modules.modules[currentModule.name] = require(currentModule.filepath + '/index.js');
-
+          console.log('Modules:');
+          console.log(Modules);
           if (currentModule.features.includes('commands')) {
             // load commands into memory
             console.log('module implements commands, loading:');
             var commandFolderPath = currentModule.filepath + '/commands';
             Commands.loadCommands(commandFolderPath);
+          }
+          console.log('current module:');
+          console.log(currentModule);
+          if (typeof  Modules.modules[currentModule.name].load !== 'undefined') {
+            Modules.modules[currentModule.name].load();
           }
         });
       }

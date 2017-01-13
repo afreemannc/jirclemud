@@ -1,5 +1,7 @@
-var Containers = function() {
+var Events = require('events');
 
+var Containers = function() {
+  this.event = new Events.EventEmitter(),
   /**
    * Load inventory contents
    */
@@ -85,6 +87,8 @@ var Containers = function() {
   this.transferItemInstance = function(session, transferDetails) {
     // Note: inventory alterations to containers, rooms, and players must be syncronous to prevent
     // race conditions and item duping.
+    var item = transferDetails.item;
+    Containers.event.emit('itemMove', session, item);
     switch (transferDetails.transferType) {
       // "drop" command
       case 'character-to-room':

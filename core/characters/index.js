@@ -77,7 +77,7 @@ var characters = function(){
     session.character.stats = JSON.parse(character.stats);
     session.character.effects = JSON.parse(character.effects);
     session.character.equipment = JSON.parse(character.equipment);
-
+    session.character.perms = JSON.parse(character.perms);
     // Initialize empty inventory and then load
     session.character.inventory = [];
 

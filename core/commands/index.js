@@ -20,22 +20,20 @@ function commands() {
   // Load optional plugins
 commands.prototype.loadCommands = function(dir) {
 
-    var pluginCommands = require("fs").readdirSync(dir);
-    for (var i = 0; i < pluginCommands.length; ++i) {
-      if (pluginCommands[i].endsWith('.js')) {
-        var file = pluginCommands[i];
-        console.log('loading plugin command file:' + dir + '/' + file);
-        var command = require(dir + "/" + file);
-        console.log(command);
-        // Intentionally skipping checks for pre-existing commands.
-        // This permits modules and custom implementations to override core command
-        // behavior by declaring a custom version of the command in the
-        // plugins directory.
-        Commands.commands[command.trigger] = command;
-        Commands.triggers[command.trigger] = command.callback;
-      }
+  var pluginCommands = require("fs").readdirSync(dir);
+  for (var i = 0; i < pluginCommands.length; ++i) {
+    if (pluginCommands[i].endsWith('.js')) {
+      var file = pluginCommands[i];
+      var command = require(dir + "/" + file);
+      // Intentionally skipping checks for pre-existing commands.
+      // This permits modules and custom implementations to override core command
+      // behavior by declaring a custom version of the command in the
+      // plugins directory.
+      Commands.commands[command.trigger] = command;
+      Commands.triggers[command.trigger] = command.callback;
     }
   }
+}
 
 commands.prototype.commandHandler  = function(session, inputRaw) {
     console.log('inputRaw:' + inputRaw);

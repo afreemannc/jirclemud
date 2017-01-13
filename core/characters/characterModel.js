@@ -30,6 +30,10 @@ module.exports.fields = {
       type: Sequelize.INTEGER.UNSIGNED,
     },
 
+    perms: {
+      type: Sequelize.TEXT
+    },
+
     current_room: {
       type: Sequelize.INTEGER.UNSIGNED,
     },
