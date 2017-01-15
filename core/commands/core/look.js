@@ -18,59 +18,7 @@ var Command = function() {
     // Room look, aka look with no additional arguments passed.
     if (input === '') {
       var roomId = session.character.current_room;
-      var current_room = Rooms.room[roomId];
-      // display room title
-      if (session.character.stats.flags.includes('BUILDER')) {
-        session.socket.write("\n" + Tokens.replace('%bold%%room.name%%bold% %green%[%room.rid%]%green%', {room:current_room})+ "\n");
-      }
-      else {
-        session.socket.write(Tokens.replace('%bold%%room.name%%bold%', {room:current_room})+ "\n");
-      }
-      // display room description
-      session.socket.write(Tokens.replace('%room.description%', {room:current_room}) + "\n");
-      // display exits
-      var exits = Rooms.room[roomId].exits;
-      var exitKeys = Object.keys(exits);
-      var standardExits = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'u', 'd'];
-      if (exitKeys.length > 0) {
-        var exitDisplay = []
-        for (i = 0; i < standardExits.length; ++i) {
-          if (exitKeys.indexOf(standardExits[i]) !== -1) {
-            // Skip closed doors.
-            console.log('checking exit:');
-            console.log(exits[standardExits[i]]);
-            if (typeof exits[standardExits[i]].properties.flags !== 'undefined') {
-              if (exits[standardExits[i]].properties.flags.includes('CLOSED')) {
-                console.log('closed door found ' + standardExits[i]);
-                continue;
-              }
-            }
-            exitDisplay.push(standardExits[i]);
-          }
-        }
-        session.socket.write('Exits: [ ' + Tokens.replace('%yellow%' + exitDisplay.join(' ') + '%yellow%') + ' ]\n\n');
-      }
-      else {
-        session.socket.write('Exits: [none]\n\n');
-      }
-      // display room inventory
-      if (current_room.inventory.length > 0) {
-        var display = Items.inventoryDisplay(curent_room.inventory, true);
-        session.socket.write(Tokens.replace(display) + "\n");
-      }
-      // display mobiles
-
-      if (current_room.mobiles.length > 0) {
-        current_room.mobiles.forEach(function(mobile) {
-          if (session.character.stats.flags.includes('BUILDER')) {
-            session.socket.write(Tokens.replace('%mobile.name%%yellow%[%mobile.miid%]%yellow%\n', {mobile:mobile}));
-          }
-          else {
-            session.socket.write(Tokens.replace(mobile.name) + '\n');
-          }
-        });
-      }
-      session.write('');
+      Rooms.displayRoom(session, roomId);
     }
     else {
       var roomId = session.character.current_room;

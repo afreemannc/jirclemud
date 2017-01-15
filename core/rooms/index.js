@@ -377,4 +377,57 @@ room.prototype.hasExits = function(room) {
     }
   }
 
+room.prototype.displayRoom = function(session, roomId) {
+  var current_room = Rooms.room[roomId];
+  var output = '';
+  // display room title
+  if (session.character.stats.flags.includes('BUILDER')) {
+    output += "\n%bold%%room.name%%bold% %green%[%room.rid%]%green%\n";
+  }
+  else {
+    output += "%bold%%room.name%%bold%\n";
+  }
+  // display room description
+  output += "%room.description%\n";
+  // display exits
+  var exits = Rooms.room[roomId].exits;
+  var exitKeys = Object.keys(exits);
+  var standardExits = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'u', 'd'];
+  if (exitKeys.length > 0) {
+    var exitDisplay = []
+    for (i = 0; i < standardExits.length; ++i) {
+      if (exitKeys.indexOf(standardExits[i]) !== -1) {
+        // Skip closed doors.
+        if (typeof exits[standardExits[i]].properties.flags !== 'undefined') {
+          if (exits[standardExits[i]].properties.flags.includes('CLOSED')) {
+            continue;
+          }
+        }
+        exitDisplay.push(standardExits[i]);
+      }
+    }
+    output += "Exits: [ %yellow%" + exitDisplay.join(' ') + "%yellow% ]\n\n";
+  }
+  else {
+    output += "Exits: [none]\n\n";
+  }
+  // display room inventory
+  if (current_room.inventory.length > 0) {
+    var display = Items.inventoryDisplay(curent_room.inventory, true);
+    output += display + "\n";
+  }
+  // display mobiles
+  if (current_room.mobiles.length > 0) {
+    current_room.mobiles.forEach(function(mobile) {
+      if (session.character.stats.flags.includes('BUILDER')) {
+        output += Tokens.replace('%mobile.name%%yellow%[%mobile.miid%]%yellow%\n', {mobile:mobile});
+      }
+      else {
+        output += Tokens.replace(mobile.name + "\n", {mobile: mobile});
+      }
+    });
+  }
+  session.write(Tokens.replace(output, {room:current_room}));
+}
+
 module.exports = new room();
