@@ -16,6 +16,7 @@ var Command = function() {
     var targetCharacterName = commandParts.splice(0, 1);
     var message = commandParts.join(' ');
     var targetCharacterSession = Characters.searchActiveCharactersByName(targetCharacterName);
+    var recipientName = targetCharacterSession.character.name;
 
     // Bail if we can't find them.
     // TODO: include mobs in list of findables? Support 2.<thing> notation?
@@ -24,9 +25,9 @@ var Command = function() {
     }
     else {
       // tell them
-      targetCharacterSession.write(Tokens.replace(session, '%red%' + senderName + " tells you:" + message + '%red%'));
+      targetCharacterSession.write(Tokens.replace('%red%%character.name%  tells you:' + message + '%red%', {character:session.character}));
       // echo to sender
-      session.write(Tokens.replace(session, "%red%You tell " + recipientName + ": " + message + '%red%'));
+      session.write(Tokens.replace("%red%You tell " + recipientName + ": " + message + '%red%'));
     }
   }
 }

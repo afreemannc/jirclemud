@@ -1,17 +1,17 @@
 // Token Replacement
 var colors = require('colors/safe');
 // TODO: make session optional, add support for additional token types (room, zone, etc)
-module.exports.replace = function(session, string) {
-  var character = session.character;
-  if (typeof character.stats !== 'undefined') {
-    var statKeys = Object.keys(character.stats);
-
-    // Replace character stat tokens
-    for (var i = 0; i < statKeys.length; ++i) {
-      stat = statKeys[i];
-
-      if (string.includes('%character.stats.' + stat + '%')) {
-        string = string.replace('%character.stats.' + stat + '%', character.stats[stat]);
+module.exports.replace = function(string, values) {
+  if (values) {
+    var valueKeys = Object.keys(values);
+    for (i = 0; i < valueKeys.length; ++i) {
+      var value = valueKeys[i];
+      // No sense in processing a thing that was passed in if there are no tokens that require it.
+      if (!string.includes('%' + value)) {
+        continue;
+      }
+      else {
+        string = Tokens.replaceRecursive(string, values[value], value);
       }
     }
   }
@@ -35,3 +35,23 @@ module.exports.replace = function(session, string) {
 
   return string;
 }
+
+module.exports.replaceRecursive = function (string, target, token) {
+  for (var key in target) {
+    var tokenString = token + '.' + key;
+    if (!target.hasOwnProperty(key)) {
+      continue;
+    }
+    if (typeof target[key] == "object" && target[key] !== null) {
+      string = Tokens.replaceRecursive(string, target[key], tokenString);
+    }
+    else {
+      console.log('check on:' + tokenString);
+      if (string.includes('%' + tokenString + '%')) {
+        string = string.replace('%' + tokenString + '%', target[key]);
+      }
+    }
+  }
+  return string;
+}
+

@@ -14,7 +14,7 @@ var Command = function() {
          > %magenta%Dent gossips: LOL RIP%magenta%
   `;
   this.callback = function (session, input) {
-    var message = Tokens.replace(session, "%magenta%[gossip] " + session.character.name + ": " + input + "%magenta%\n");
+    var message = Tokens.replace("%magenta%[gossip] %character.name%: " + input + "%magenta%\n", {character:session.character});
     Rooms.message(session, false, message, false);
   }
 

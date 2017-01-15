@@ -16,7 +16,7 @@ var Command = function() {
     }
     var difficultyKeys = Object.keys(difficulty);
     for (var i = 0; i < difficultyKeys.length; ++i) {
-      output += Tokens.replace(session, '\n\n%yellow%Difficulty ' + difficultyKeys[i] + '%yellow%\n');
+      output += Tokens.replace('\n\n%yellow%Difficulty ' + difficultyKeys[i] + '%yellow%\n');
       zoneKeys = Object.keys(difficulty[difficultyKeys[i]]);
       for (var j =0; j < zoneKeys.length; ++j) {
         output += '  ' + zoneKeys[j] + ': ' + difficulty[difficultyKeys[i]][zoneKeys[j]] + '\n';

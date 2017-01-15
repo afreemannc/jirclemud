@@ -10,7 +10,7 @@ function Session() {
   this.characterPrompt = function() {
     // Prompt is configurable in config.js.
     // @see comments in config.js.example for details.
-    var prompt = Tokens.replace(this, Config.playerPrompt);
+    var prompt = Tokens.replace(Config.playerPrompt, {character: this.character});
     return "\n" + prompt;
   }
 
@@ -20,7 +20,7 @@ function Session() {
   }
 
   this.error = function(message) {
-    this.socket.write(Tokens.replace(this, '%red%' + message + '%red%'));
+    this.socket.write(Tokens.replace('%red%' + message + '%red%'));
     this.socket.write(this.characterPrompt());
   }
 

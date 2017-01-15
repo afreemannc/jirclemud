@@ -49,7 +49,7 @@ AC: %character.stats.ac%    APR: %character.stats.apr%
 
 `;
     // TODO: make Tokens.replace truly generic.
-    session.write(Tokens.replace(session, template));
+    session.write(Tokens.replace(template, {character: session.character}));
   }
 
 }

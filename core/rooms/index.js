@@ -132,7 +132,7 @@ room.prototype.editRoomName = function(session) {
   zoneIdField.value = current_room.zid;
   editNamePrompt.addField(zoneIdField);
 
-  var currently =  'Currently:\n' + Tokens.replace(session, '%cyan%' + current_room.name + '%cyan%') + '\n\n';
+  var currently =  'Currently:\n' + Tokens.replace('%cyan%%room.name%%cyan%', {room:current_room}) + '\n\n';
   var nameField = editNamePrompt.newField('text');
   nameField.name = 'name';
   nameField.formatPrompt(currently + 'Enter room name. (This is displayed at the top of the room description)');
@@ -173,7 +173,7 @@ room.prototype.editRoomDesc = function(session) {
   nameField.value = current_room.name;
   editDescPrompt.addField(nameField);
 
-  var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + current_room.description + '%cyan');
+  var currently = 'Currently:\n' + Tokens.replace('%cyan%%room.description%%cyan%', {room:current_room});
   var fullDescField = editDescPrompt.newField('multitext');
   fullDescField.name = 'description';
   fullDescField.formatPrompt(currently + 'Enter full room description. (This is displayed whenever a player enters the room)');
@@ -213,7 +213,7 @@ room.prototype.editRoomFlags = function(session) {
   descField.value = current_room.description;
   editFlagsPrompt.addField(descField);
 
-  var currently = 'Currently:\n' + Tokens.replace(session, '%cyan' + current_room.flags.join(', ') + '%cyan%');
+  var currently = 'Currently:\n' + Tokens.replace('%cyan' + current_room.flags.join(', ') + '%cyan%');
   var flagsField = editFlagsPrompt.newField('multiselect');
   var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
   message += '[::0::] None [::h::]OT [::c::]OLD [::a::]IR UNDER[::w::]ATER [::d::]EATHTRAP';

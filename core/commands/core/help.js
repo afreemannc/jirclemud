@@ -21,7 +21,7 @@ var Command = function() {
       if (command.helpText !== '') {
         var helpText = '%cyan%Help topic [' + input + ']%cyan%\n';
         helpText += command.helpText;
-        session.write(Tokens.replace(session, helpText));
+        session.write(Tokens.replace(helpText, {character:session.character}));
       }
       else {
         session.write('There is no help for that term.');

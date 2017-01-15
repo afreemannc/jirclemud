@@ -33,9 +33,9 @@ function Prompt(session, completionCallback) {
     }
     var message = this.currentField.promptMessage;
     if (this.quittable === true) {
-      message += Tokens.replace(this.session, '%yellow% (@q to quit)%yellow%\n');
+      message += Tokens.replace('%yellow% (@q to quit)%yellow%\n');
     }
-    this.session.socket.write(Tokens.replace(this.session, message));
+    this.session.socket.write(Tokens.replace(message));
     return true;
   }
 

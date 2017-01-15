@@ -19,7 +19,7 @@ var Command = function() {
   `;
   this.callback = function(session, input) {
     if (input === 'ye flask') {
-      session.write(Tokens.replace(session, '%bold%Ye cannot get ye flask.%bold%'));
+      session.write(Tokens.replace('%bold%Ye cannot get ye flask.%bold%'));
       return true;
     }
     var roomId = session.character.current_room;
