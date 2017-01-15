@@ -63,7 +63,12 @@ var Command = function() {
 
       if (room.mobiles.length > 0) {
         room.mobiles.forEach(function(mobile) {
-          session.socket.write(mobile.name + '\n');
+          if (session.character.stats.flags.includes('BUILDER')) {
+            session.socket.write(Tokens.replace(session, mobile.name + '%yellow%[' + mobile.miid + ']%yellow%\n'));
+          }
+          else {
+            session.socket.write(Tokens.replace(session, mobile.name) + '\n');
+          }
         });
       }
       session.write('');
@@ -77,13 +82,20 @@ var Command = function() {
         session.write(session.character.inventory[itemIndex].full_description);
       }
       else {
-        // Check the room
+        // Check the room for items
         itemIndex = Containers.findItemInContainer(input, 'name', room.inventory, true);
         if (itemIndex !== false) {
           session.write(room.inventory[itemIndex].full_description);
         }
         else {
-          session.error('You do not see one of those here.');
+          // check the room for mobs
+          itemIndex = Containers.findItemInContainer(input, 'name', room.mobiles, true);
+          if (itemIndex !== false) {
+            session.write(JSON.stringify(room.mobiles[itemIndex]));
+          }
+          else {
+            session.error('You do not see one of those here.');
+          }
         }
       }
     }

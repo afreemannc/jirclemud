@@ -1,10 +1,11 @@
 
-function Mobiles() {
+function Mobile() {
   // load
   var worldQueue = Tics.findQueue('world');
   if (worldQueue) {
     worldQueue.event.on('world', function() {
-      Mobiles.moveMobs(zoneId);
+      console.log('move mobs invoked');
+      Mobiles.moveMobs();
     });
   }
 
@@ -15,10 +16,27 @@ function Mobiles() {
         var mobile = instance.dataValues;
         mobile.inventory = JSON.parse(mobile.inventory);
         mobile.stats = JSON.parse(mobile.stats);
+        // Unpack equipment and generate item instances
         mobile.equipment = JSON.parse(mobile.equipment);
+        console.log(mobile.equipment);
+        var eqKeys = Object.keys(mobile.equipment);
+        for (var i = 0; i < eqKeys.length; ++i) {
+          var key = eqKeys[i];
+          // skip empty slots.
+          if (mobile.equipment[key] === false) {
+            continue;
+          }
+          var iid = mobile.equipment[key];
+          console.log('key:' + key);
+          console.log('iid:' + iid);
+          if (iid) {
+            Items.generateItemInstance(iid, mobile.equipment, key);
+          }
+        }
         mobile.effects = JSON.parse(mobile.effects);
         mobile.extra = JSON.parse(mobile.extra);
-
+        console.log('loaded mob:');
+        console.log(mobile);
         Rooms.room[mobile.start_rid].mobiles.push(mobile);
       });
       console.log('Mobiles loaded');
@@ -133,8 +151,8 @@ function Mobiles() {
         current_mana: fieldValues.mana,
         level: fieldValues.level
       }),
-      effects:fieldValues.effects,
-      equipment:JSON.stringify(Characters.initializeEqSlots),
+      effects:JSON.stringify(fieldValues.effects),
+      equipment:JSON.stringify(Characters.initializeEqSlots()),
       inventory: JSON.stringify([]),
       extra:JSON.stringify({flags:fieldValues.flags})
     }
@@ -145,33 +163,32 @@ function Mobiles() {
     });
   }
 
-  this.moveMobs = function(zoneId) {
-    var Room = Models.Room;
-    var zoneRoomIds = Zones.zone[zoneId].rooms;
-    for(var i = 0; i < zoneRoomIds.length; ++i) {
-      var rid = zoneRoomIds[i];;
-      if (Rooms.room[rid].mobiles.length > 0) {
-        for (var j = 0; j < Rooms.room[rid].mobiles.length; ++j) {
-          var mobile = Rooms.room[rid].mobiles[j];
-          if (mobile.extra.flags.includes('PATROL') && Rooms.hasExits(Rooms.room[rid])) {
-            var exitKeys = Object.keys(Rooms.room[rid].exits);
+  this.moveMobs = function() {
+    var roomKeys = Object.keys(Rooms.room);
+    for(var i = 0; i < roomKeys.length; ++i) {
+      var room = Rooms.room[roomKeys[i]];
+      if (room.mobiles.length > 0) {
+        for (var j = 0; j < room.mobiles.length; ++j) {
+          var mobile = room.mobiles[j];
+          if (mobile.extra.flags.includes('PATROL') && Rooms.hasExits(room)) {
+            var exitKeys = Object.keys(room.exits);
             var exitCount = exitKeys.length;
             // mobs don't always move even when they can.
             var roll = Math.floor(Math.random() * (exitCount + 2));
 
             if (roll < exitCount) {
-              var exit = Rooms.room[rid].exits[exitKeys[roll]];
+              var exit = room.exits[exitKeys[roll]];
               if (exit.properties.flags.includes('CLOSED')) {
                 // No walking through doors y'all.
-                Rooms.message(false, rid, mobile.short_name + ' nudges the door.', false);
+                Rooms.message(false, room.rid, mobile.short_name + ' nudges the door.', false);
                 continue;
               }
               var label = exitKeys[roll];
-              var targetRid = Rooms.room[rid].exits[label].target_rid;
-              var index = Rooms.room[rid].mobiles.indexOf(mobile);
-              Rooms.room[rid].mobiles.splice(index, 1);
+              var targetRid = room.exits[label].target_rid;
+              var index = room.mobiles.indexOf(mobile);
+              Rooms.room[room.rid].mobiles.splice(index, 1);
               Rooms.room[targetRid].mobiles.push(mobile);
-              Rooms.message(false, rid, mobile.short_name + ' leaves.', false);
+              Rooms.message(false, room.rid, mobile.short_name + ' leaves.', false);
               Rooms.message(false, targetRid, mobile.short_name + ' has arrived.', false);
             }
           }
@@ -195,4 +212,4 @@ function Mobiles() {
   }
 }
 
-module.exports = new Mobiles();
+module.exports = new Mobile();

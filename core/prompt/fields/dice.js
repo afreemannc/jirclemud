@@ -27,12 +27,12 @@ function Dice() {
       return false;
     }
     // XdY X is not a number
-    if (Number.isInteger(parts[0]) === false) {
+    if (parseInt(parts[0]) === 'NaN') {
       this.validationError(session, input);
       return false;
     }
     // XdY Y is not a number
-    if (Number.isInteger(parts[1]) === false) {
+    if (parseInt(parts[1]) === 'NaN') {
       this.validationError(session, input);
       return false;
     }

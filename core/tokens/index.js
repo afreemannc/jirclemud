@@ -10,8 +10,8 @@ module.exports.replace = function(session, string) {
     for (var i = 0; i < statKeys.length; ++i) {
       stat = statKeys[i];
 
-      if (string.includes('%' + stat + '%')) {
-        string = string.replace('%' + stat + '%', character.stats[stat]);
+      if (string.includes('%character.stats.' + stat + '%')) {
+        string = string.replace('%character.stats.' + stat + '%', character.stats[stat]);
       }
     }
   }

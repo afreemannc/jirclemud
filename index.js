@@ -23,6 +23,8 @@ sequelize = new Sequelize(
 );
 
 Tics = require('./core/tics');
+Tics.addQueue('world', Config.worldTicInterval);
+
 Session = require('./core/session');
 Commands = require('./core/commands');
 Characters = require('./core/characters');
@@ -70,8 +72,6 @@ Rooms.loadRooms();
 
 // Load optional modules
 Modules.loadEnabledModules();
-
-Tics.addQueue('world', Config.worldTicInterval);
 
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(session, data) {

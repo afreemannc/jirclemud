@@ -1,4 +1,8 @@
-var item = function(){};
+var Events = require('events');
+
+var item = function(){
+  this.event = new Events.EventEmitter();
+};
 
 item.prototype.flags = {
     0:  'NONE',
@@ -16,15 +20,48 @@ item.prototype.flags = {
     po: 'PORTAL',
 }
 
-item.prototype.applyEffects = function(session, item) {
-  effects = item.properties.effects;
-  // TODO: apply effect
+item.prototype.applyEffects = function(recipient, item) {
+  var effects = item.properties.effects;
+  for (i = 0; i < effects.length; ++i) {
+    var effect = effects[i];
+    if (effect.effectType === 'stat') {
+      recipient.stats[effect.affectedStat] += parseInt(effect.bonus);
+    }
+    else {
+      recipient.stats.hit += parseInt(effect.bonus);
+    }
+  }
+}
+
+item.prototype.removeEffects = function(recipient, item) {
+  var effects = item.properties.effects;
+  for (i = 0; i < effects.length; ++i) {
+    var effect = effects[i];
+    if (effect.effectType === 'stat') {
+      recipient.stats[effect.affectedStat] -= parseInt(effect.bonus);
+    }
+    else {
+      recipient.stats[effect.effectType] -= parseInt(effect.bonus);
+    }
+  }
 }
 
 
 item.prototype.createItem = function(session) {
+  var roomId = session.character.current_room;
+  var zid = Rooms.room[roomId].zid;
 
   var itemPrompt = Prompt.new(session, this.saveNewItem);
+
+  // Item definitions are tied to a specific zone to make life easier
+  // when equipping mobiles. Having zid in this table makes listing
+  // items associated with the zone trivial.
+
+  var zidField = itemPrompt.newField('value');
+  zidField.name = 'zid';
+  zidField.value = zid;
+  itemPrompt.addField(zidField);
+
   var nameField = itemPrompt.newField('text');
   nameField.name = 'name';
   nameField.inputCacheName = 'name';
@@ -40,6 +77,20 @@ item.prototype.createItem = function(session) {
   fullDescriptionField.name = 'full_description';
   fullDescriptionField.formatPrompt('Provide a thorough description. This is what will be displayed if this item is examined.');
   itemPrompt.addField(fullDescriptionField);
+
+  // Required to drive item scarcity if it is enabled.
+  if (typeof Config.itemScarcity !== 'undefined' && Config.itemScarcity === true) {
+    var maxCountField = itemPrompt.newField('int');
+    maxCountField.name = 'max_count';
+    maxCountField.formatPrompt('How many of this item can exist in the world at one time? (-1 for unlimited)');
+    itemPrompt.addField(maxCountField);
+
+    var loadChanceField = itemPrompt.newField('int');
+    loadChanceField.name = 'load_chance';
+    loadChanceField.maxint = 100;
+    loadChanceField.formatPrompt('What are is % chance of this item loading on respawn? (100 for always)');
+    itemPrompt.addField(loadChanceField);
+  }
 
   var flagsField = itemPrompt.newField('multiselect');
   flagsField.name = 'flags';
@@ -71,7 +122,7 @@ item.prototype.createItem = function(session) {
 
   // Wear slot
   var wearSlotField = itemPrompt.newField('select');
-  wearSlotField.name = 'equipmentSlot';
+  wearSlotField.name = 'equipment_slot';
   wearSlotField.options = Config.equipmentSlots;
   wearSlotField.conditional = {
     field: 'flags',
@@ -83,7 +134,7 @@ item.prototype.createItem = function(session) {
   // Wield fields
   // base damage dice
   var damageDiceField = itemPrompt.newField('dice');
-  damageDiceField.name = 'damageDice';
+  damageDiceField.name = 'damage_dice';
   damageDiceField.formatPrompt('Weapon base damage dice');
   damageDiceField.conditional = {
     field: 'flags',
@@ -135,20 +186,19 @@ item.prototype.createItem = function(session) {
   }
   itemPrompt.addField(bonusFieldGroup);
 
-  var createItemField = itemPrompt.newField('select');
-  createItemField.name = 'create',
-  createItemField.options = {y:'Yes', n:'No'},
-  createItemField.formatPrompt('Create an instance of this item?');
-  itemPrompt.addField(createItemField);
-
   itemPrompt.start();
 }
 
 item.prototype.setItemProperties = function(fieldValues) {
-  var properties = {};
-  properties['flags'] = fieldValues.flags;
-  properties['effects'] = fieldValues.effects;
-  // TODO: deal with container stuff
+  var properties = {
+    flags: fieldValues.flags,
+    effects: fieldValues.effects,
+    max_count: fieldValues.max_count,
+    load_chance: fieldValues.load_chance,
+    equipment_slot: fieldValues.equipment_slot,
+    damage_dice: fieldValues.damage_dice,
+  };
+// TODO: deal with container stuff
   // TODO: deal with weapon dice
   return properties;
 }
@@ -246,10 +296,17 @@ item.prototype.inventoryDisplay = function(inventory, room) {
   return output;
 }
 
-item.prototype.generate = function(iid) {
+item.prototype.generateItemInstance = function(iid, destination, key) {
   // load item from database
-  // apply tweaks if needed
-  // copy instance to relevant memory location.
+  console.log('generating item:' + iid);
+  var Item = Models.Item;
+  console.log('iid:' + iid);
+  Item.findOne({where:{iid:iid}}).then(function(instance) {
+    var generatedItem = instance.dataValues;
+    generatedItem.properties = JSON.parse(generatedItem.properties);
+    Items.event.emit('itemCreated', generatedItem);
+    destination[key] = generatedItem;
+  });
 }
 
 module.exports = new item();

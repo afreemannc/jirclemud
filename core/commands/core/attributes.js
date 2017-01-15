@@ -28,7 +28,28 @@ var Command = function() {
   `;
   this.callback = function (session, input) {
     console.log(session.character);
-    session.write('under construction');
+    var template = `
+
+%character.name% the %character.race% %character.class% (%character.gender% %character.race%))
+
+You are %character.height% and weigh %character.weight%.
+You are carrying %character.inventorycount% items, and wearing %character.equipmentcount% items.
+Your total encumbrance is %character.encumbrance% lbs.
+
+<stat row 1>
+<stat row 2>
+
+%cyan%MELEE:%cyan%
+Hit: %character.stats.hit%    Damage: %character.stats.dam%
+AC: %character.stats.ac%    APR: %character.stats.apr%
+
+<age row>
+<sustenance row>
+<alignment row>
+
+`;
+    // TODO: make Tokens.replace truly generic.
+    session.write(Tokens.replace(session, template));
   }
 
 }

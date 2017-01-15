@@ -1,9 +1,11 @@
 // user stuff
 var dice = require('./dice');
 var crypto = require('crypto');
+var Events = require('events');
 // Session mode handler for login
 
 var characters = function(){
+  this.event = new Events.EventEmitter();
   /**
    * Login screen prompt.
    */
@@ -54,6 +56,7 @@ var characters = function(){
             var character = results.dataValues;
             session.character = character;
             Characters.loadCharacterDetails(session);
+            Characters.event.emit('characterLoad', session);
           }
           else {
             // Authentication failed.
@@ -104,6 +107,7 @@ var characters = function(){
       slot = Config.equipmentSlots[slotKeys[i]];
       equipment[slot] = false;
     }
+    console.log(equipment);
     return equipment;
   }
 

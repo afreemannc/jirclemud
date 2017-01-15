@@ -35,7 +35,7 @@ function Variables() {
     });
   }
 
-  this.loadVariables() {
+  this.loadVariables = function() {
     var Variable = Models.Variable;
     Variable.findAll().then(function(instances) {
       instances.forEach(function(instance) {

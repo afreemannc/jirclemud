@@ -95,6 +95,7 @@ var Containers = function() {
         var roomId = session.character.current_room;
         // delete inventory[index] from character inventory
         session.character.inventory.splice(transferDetails.index, 1);
+        Items.removeEffects(session.character, transferDetails.item);
         // add item to room[room id].inventory
         Rooms.room[roomId].inventory.push(transferDetails.item);
         break;
@@ -105,6 +106,7 @@ var Containers = function() {
         Rooms.room[roomId].inventory.splice(transferDetails.index, 1);
         // add item to room[room id].inventory
         session.character.inventory.push(transferDetails.item);
+        Items.applyEffects(session.character, transferDetails.item);
         break;
       // "give" command
       case 'character-to-character':

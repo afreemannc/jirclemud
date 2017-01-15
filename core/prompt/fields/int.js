@@ -2,6 +2,7 @@ function Int() {
 
   this.name = '';
   this.type = '';
+  this.maxint = false;
   this.value = false;
   this.promptMessage = '';
   this.validated = false;
@@ -18,7 +19,12 @@ function Int() {
   }
 
   this.formatPrompt = function(message) {
-    this.promptMessage =  message + '\n';
+    if (this.maxint === false) {
+      this.promptMessage =  message + '\n';
+    }
+    else {
+      this.promptMessage = message + ' (max: ' + this.maxint + ')\n';
+    }
   };
 
   this.sanitizeInput = function(input) {
@@ -28,6 +34,14 @@ function Int() {
 
   this.validate = function(session, input) {
     if (Number.isInteger(input)) {
+      if (this.maxint !== false) {
+        if (input <= this.maxint) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
       return true;
     }
     else {
@@ -37,7 +51,15 @@ function Int() {
   }
 
   this.validationError = function(session, input) {
-    session.socket.write('"' + input + '" is not a number.\n');
+    if (this.maxint === false) {
+      session.socket.write('"' + input + '" is not a number.\n');
+    }
+    else if (this.maxint > input) {
+      session.socket.write('"' + input + '" is larger than the max value allowed.\n');
+    }
+    else {
+      session.socket.write('"' + input + '" is not a number.\n');
+    }
   };
 
 

@@ -42,7 +42,7 @@ module.exports = {
   //      %style%<output to style>%style%
   //   @see https://www.npmjs.com/package/colors Colors package documentation for additional details:
 
-  playerPrompt: '%red%%currenthp%H%red% | %blue%%currentmana%M%blue% | %cyan%%xp%XP%cyan% >',
+  playerPrompt: '%red%%character.stats.currenthp%H%red% | %blue%%character.stats.currentmana%M%blue% | %cyan%%character.stats.xp%XP%cyan% >',
 
   // Characters may access the wimp command unless this is set to false.
   //
@@ -68,6 +68,9 @@ module.exports = {
     l:  'LEGS',
     fe: 'FEET'
   },
+
+  // Determines if items all load all the time. Item scarcity is typically a critical part of establishing an in-game economy
+  itemScarcity: true,
 
   // ### Timers ###
 

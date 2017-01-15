@@ -33,7 +33,7 @@ function TicQueues() {
   this.findQueue = function(queueName) {
     for (var i = 0; i < Tics.queues.length; ++i) {
       if (Tics.queues[i].name === queueName) {
-        return Tics.queues[i];i
+        return Tics.queues[i];
       }
     }
     return false;

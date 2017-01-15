@@ -6,6 +6,7 @@ var Command = function() {
     session.nogossip = true;
     session.inputContext = 'arch';
     session.write('');
+    Admin.listTasks(session);
   }
 }
 
