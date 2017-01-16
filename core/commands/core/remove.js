@@ -11,7 +11,7 @@ var Command = function() {
          >
          > %bold%You take off a colorful codpiece.%bold%
          >
-         > %bold% Dent says 'OMG MY EYES MAKE IT STOP'%bold%
+         > %bold% Derp says 'MY EYES MAKE IT STOP'%bold%
   `;
   this.callback = function(session, input) {
     var index = Containers.findItemInContainer(input, 'name', session.character.equipment, true);

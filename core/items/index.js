@@ -260,7 +260,7 @@ item.prototype.saveNewItem = function(session, fieldValues) {
  * -  Used by glance skill to display contents of mob/character inventory
  */
 
-item.prototype.inventoryDisplay = function(inventory, room) {
+item.prototype.inventoryDisplay = function(inventory, room, showEmptySlots) {
   var output = '';
   if (Array.isArray(inventory) === true) {
     var numericKeys = true;
@@ -280,7 +280,18 @@ item.prototype.inventoryDisplay = function(inventory, room) {
     }
     if (typeof item === 'object') {
       if (numericKeys === false) {
-        output += '%cyan%<worn on ' + keys[i] + '>%cyan% '
+        console.log('key:' + keys[i]);
+        switch (keys[i]) {
+          case 'WIELD':
+            output += '%cyan%<weapon wielded>%cyan% ';
+            break;
+          case 'HOLD':
+            output += '%cyan%<item held>%cyan% ';
+            break;
+          default:
+            output += '%cyan%<worn on ' + keys[i].toLowerCase() + '>%cyan% ';
+            break;
+        }
       }
       if (room) {
         output += item.room_description;
@@ -289,8 +300,20 @@ item.prototype.inventoryDisplay = function(inventory, room) {
         output += item.name + "\n";
       }
     }
-    else if (item === false && numericKeys === false) {
+    else if (item === false && numericKeys === false && showEmptySlots) {
       output += '%cyan%<worn on ' + keys[i] + '>%cyan%  nothing\n';
+      switch (keys[i]) {
+          case 'WIELD':
+            output += '%cyan%<weapon wielded>%cyan% <empty>';
+            break;
+          case 'HOLD':
+            output += '%cyan%<item held>%cyan% <empty>';
+            break;
+          default:
+            output += '%cyan%<worn on ' + keys[i].toLowerCase() + '>%cyan% <empty>';
+            break;
+      }
+
     }
   }
   return output;

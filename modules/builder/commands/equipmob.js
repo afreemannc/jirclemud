@@ -27,14 +27,9 @@ var Command = function() {
     var miid = parseInt(commandParts[0]);
     var iid = parseInt(commandParts[1]);
 
-    console.log('miid:' + miid);
-    console.log('iid:' + iid);
     var mobileIndex = false;
-    console.log(Rooms.room[roomId].mobiles);
     for (var i = 0; i < Rooms.room[roomId].mobiles.length; ++i) {
       var mobile = Rooms.room[roomId].mobiles[i];
-      console.log(typeof mobile.miid);
-      console.log(typeof miid);
       if (mobile.miid === miid) {
         mobileIndex = i;
         break;
@@ -53,18 +48,24 @@ var Command = function() {
       // place item in mob equipment slot.
       if (item.properties.flags.includes('WIELD')) {
         Rooms.room[roomId].mobiles[mobileIndex].equipment['WIELD'] = item;
-        Rooms.message(session, roomId, 'You equip the mob', false);
+        Rooms.message(session, roomId, 'You arm the mob with ' + item.name, false);
+      }
+      else if (item.properties.flags.includes('WEARABLE')) {
+        var slot = item.properties.equipment_slot;
+        Rooms.room[roomId].mobiles[mobileIndex].equipment[slot] = item;
+        Rooms.message(session, roomId, 'You equip the mob with ' + item.name, false);
       }
       // update mob stats from item effects
-      var mobEQ = Rooms.room[roomId].mobiles[mobileIndex].equipment;
-      var eqKeys = Object.keys(mobEQ);
-      for (i = 0; i < eqKeys.length; ++i) {
+      var equipment = Rooms.room[roomId].mobiles[mobileIndex].equipment;
+      var eqKeys = Object.keys(equipment);
+      var mobEQ = {};
+      for (var i = 0; i < eqKeys.length; ++i) {
         var key = eqKeys[i];
-        if (mobEQ[key] === false) {
-          continue;
+        if (equipment[key] === false) {
+          mobEQ[key] = false;
         }
         else {
-          mobEQ[key] = mobEQ[key].iid;
+          mobEQ[key] = equipment[key].iid;
         }
       }
       // Update mob definition in db, add item iid to equipment slot

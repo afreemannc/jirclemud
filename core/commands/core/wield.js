@@ -1,42 +1,40 @@
 var Command = function() {
-  this.trigger = 'wear';
+  this.trigger = 'wield';
   this.helpText = `
-  Equip an item you are carrying.
+  Wield an item you are carrying.
 
   %yellow%Usage:%yellow%
-         equip <item>
+         wield <item>
 
   %yellow%Example:%yellow%
-         > wear codpiece
+         > wield axe
          >
-         > %bold%You wear a colorful codpiece around your waist.%bold%
+         > %bold%You wield a dwarven war axe.%bold%
   `;
   this.callback = function(session, input) {
     var index = Containers.findItemInContainer(input, 'name', session.character.inventory, true);
     if (index !== false) {
       var item = session.character.inventory[index];
-      if (item.properties.flags.includes('WEARABLE') === false) {
-        session.write('You cannot wear that.');
+      if (item.properties.flags.includes('WIELD') === false) {
+        session.write('You cannot wield that.');
         return false;
       }
-
-      // TODO: check for wearable flag first.
       var transferDetails = {
         transferType: 'character-to-equipped',
         item: session.character.inventory[index],
-        index: index
+        index: index,
       }
       Containers.transferItemInstance(session, transferDetails);
       var roomId = session.character.current_room;
       var name = session.character.name;
       // player message
       //TODO: write a thing to determine if a or an is appropriate.
-      session.write('You wear ' + transferDetails.item.name);
+      session.write('You wield ' + transferDetails.item.name);
       // room message
-      Rooms.message(session, roomId, name + ' wears ' + transferDetails.item.name, true);
+      Rooms.message(session, roomId, name + ' wields ' + transferDetails.item.name, true);
     }
     else {
-      session.error('Wear what??\n');
+      session.error('Wield what??\n');
     }
   }
 

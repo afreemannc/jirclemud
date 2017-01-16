@@ -197,6 +197,12 @@ function Mobile() {
     };
   }
 
+  this.displayMobile = function(session, mobile) {
+    var output = mobile.description + ' is using:\n';
+    output += Items.inventoryDisplay(mobile.equipment);
+    session.write(Tokens.replace(output));
+  }
+
   this.respawnMob = function(miid) {
     // Load copy of mob instance from db
     // iterate equipment

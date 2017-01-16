@@ -27,24 +27,28 @@ var Command = function() {
       var itemIndex = Containers.findItemInContainer(input, 'name', session.character.inventory, true);
       if (itemIndex !== false) {
         session.write(session.character.inventory[itemIndex].full_description);
+        return true;
       }
-      else {
-        // Check the room for items
-        itemIndex = Containers.findItemInContainer(input, 'name', room.inventory, true);
-        if (itemIndex !== false) {
-          session.write(room.inventory[itemIndex].full_description);
-        }
-        else {
-          // check the room for mobs
-          itemIndex = Containers.findItemInContainer(input, 'name', room.mobiles, true);
-          if (itemIndex !== false) {
-            session.write(JSON.stringify(room.mobiles[itemIndex]));
-          }
-          else {
-            session.error('You do not see one of those here.');
-          }
-        }
+
+      // Check the room for items
+      var itemIndex = Containers.findItemInContainer(input, 'name', room.inventory, true);
+      if (itemIndex !== false) {
+        session.write(room.inventory[itemIndex].full_description);
+        return true;
       }
+
+      // check the room for mobs
+      var itemIndex = Containers.findItemInContainer(input, 'name', room.mobiles, true);
+      if (itemIndex !== false) {
+        Mobiles.displayMobile(session, room.mobiles[itemIndex]);
+        return true;
+      }
+
+      // TODO: character look.
+
+      session.error('You do not see one of those here.');
+      return false;
+
     }
   }
 }

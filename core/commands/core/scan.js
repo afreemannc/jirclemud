@@ -17,6 +17,7 @@ var Command = function() {
 
   `;
   this.callback = function (session, input) {
+    // TODO: refactor this mess.
     // Immediate area
     var message = '';
     var roomId = session.character.current_room;
@@ -33,18 +34,21 @@ var Command = function() {
       var exitLabel = exitLabels[i];
       var exit = Rooms.room[roomId].exits[exitLabel];
       if (exit.properties.flags.includes('CLOSED') === false) {
+        // check adjoining rooms
         var mobiles = Rooms.room[exit.target_rid].mobiles;
         if (mobiles.length > 0) {
           var exitLabelLong = Rooms.exitLabelToLong(exitLabel);
           for (var j = 0; j < mobiles.length; ++j) {
             if (exitLabelLong !== false) {
-              message += exitLabelLong + ': ' + mobiles[j].short_name + '\n';
+              message += exitLabelLong + ': ' + mobiles[j].name + '\n';
             }
             else {
-              message += exitLabel + ': ' + mobiles[j].short_name + '\n';
+              message += exitLabel + ': ' + mobiles[j].name + '\n';
             }
           }
         }
+        // Check secondary rooms
+
       }
     }
     session.write(message);
