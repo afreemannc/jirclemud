@@ -40,15 +40,7 @@ var Command = function() {
         newRoom['inventory'] = [];
         // Add new room to memory
         Rooms.room[newRoom.rid] = newRoom;
-        var Container = Models.Container;
-        var containerValues = {
-          container_type: 'room',
-          parent_id: newRoom.rid,
-          max_size: -1,
-          max_weight: -1,
-        }
-        // This can happen asyncronously so no need for .then().
-        Container.create(containerValues);
+
         // create exit from current room to new room.
         var exitValues = {
           rid: session.character.current_room,
