@@ -8,6 +8,13 @@ var Command = function() {
 
       for (var i = 0; i < keys.length; ++i) {
         command = Commands.commands[keys[i]];
+        // If character does not have access to a command it should be
+        // omitted from help output.
+        if (typeof command.permsRequired !== 'undefined') {
+          if (session.character.perms.includes(command.permsRequired) === false) {
+            continue;
+          }
+        }
         if (command.helpText !== '') {
           output += command.trigger.toUpperCase() + '\n';
         }
@@ -17,6 +24,14 @@ var Command = function() {
     }
     if (typeof Commands.commands[input] !== 'undefined') {
       var command = Commands.commands[input];
+      // If character does not have access to a command it should be
+      // omitted from help output.
+      if (typeof command.permsRequired !== 'undefined') {
+        if (session.character.perms.includes(command.permsRequired) === false) {
+          session.write('There is no help for that term.');
+          return false;
+        }
+      }
       // Valid commands may have their help text intentionally blanked
       if (command.helpText !== '') {
         var helpText = '%cyan%Help topic [' + input + ']%cyan%\n';
@@ -25,10 +40,12 @@ var Command = function() {
       }
       else {
         session.write('There is no help for that term.');
+        return false;
       }
     }
     else {
       session.write('There is no help for that term.');
+      return false;
     }
   }
 }

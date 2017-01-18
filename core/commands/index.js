@@ -57,15 +57,20 @@ commands.prototype.inputHandler  = function(session, inputRaw) {
 
   for (var i = 0; i < keys.length; ++i) {
     if (keys[i].startsWith(command)) {
+      // Command found, check perms and execute if authorized.
+      if (typeof this.commands[keys[i]].permsRequired !== 'undefined') {
+        var perm = this.commands[keys[i]].permsRequired;
+        if (session.character.perms.includes(perm) === false) {
+          session.write('Do what??');
+          return false;
+        }
+      }
       this.triggers[keys[i]](session, arg);
-      commandFound = true;
-      break;
+      return true;
     }
   }
-
-  if (commandFound === false) {
-    session.write('Do what??\n');
-  }
+  // Command not found.
+  session.write('Do what??');
 }
 
 
