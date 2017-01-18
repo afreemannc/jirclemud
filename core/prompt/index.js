@@ -59,6 +59,7 @@ function Prompt(session, completionCallback) {
       }
       else {
         inputComplete = this.currentField.cacheInput(input);
+        console.log('input complete:' + inputComplete);
       }
       // The current field has completed gathering input.
       if (inputComplete) {

@@ -46,7 +46,6 @@ module.exports.replaceRecursive = function (string, target, token) {
       string = Tokens.replaceRecursive(string, target[key], tokenString);
     }
     else {
-      console.log('check on:' + tokenString);
       if (string.includes('%' + tokenString + '%')) {
         string = string.replace('%' + tokenString + '%', target[key]);
       }

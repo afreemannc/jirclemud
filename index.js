@@ -3,6 +3,7 @@ var path = require("path");
 var net = require('net');
 Config = require('./config/config.js');
 Variables = require('./core/variables');
+Admin = require('./core/admin');
 Sequelize = require('sequelize');
 
 
@@ -34,10 +35,8 @@ Items = require('./core/items');
 Prompt = require('./core/prompt');
 Zones = require('./core/zones');
 Tokens = require('./core/tokens');
-Containers = require('./core/containers');
 Mobiles = require('./core/mobiles');
 Modules = require('./core/modules');
-Admin = require('./core/admin');
 
 Models = {};
 Sessions = [];
@@ -83,9 +82,6 @@ function parseData(session, data) {
       break;
     case 'command':
       Commands.inputHandler(session, data.toString());
-      break;
-    case 'admin':
-      Admin.inputHandler(session, data.toString());
       break;
     default:
      // This shouldn't ever happen so what to put here?
