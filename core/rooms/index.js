@@ -46,12 +46,13 @@ room.prototype.loadRooms = function() {
   Room.findAll().then(function(instances) {
     instances.forEach(function(instance) {
       var room = instance.dataValues;
-      room.inventory = Containers.loadInventory({inventoryType:'room', parentId: room.id});
+      // TODO: load inventory
+      // room.inventory = Containers.loadInventory({inventoryType:'room', parentId: room.id});
       room.exits = {};
       room.mobiles = [];
       // TODO: make Rooms.room go away.
       Rooms.room[room.rid] = room;
-      Zones.zone[room.zid].rooms.push(room.rid);
+      //Zones.zone[room.zid].rooms.push(room.rid);
     });
     Rooms.loadExits();
     Mobiles.loadMobiles();

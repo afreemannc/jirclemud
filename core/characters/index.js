@@ -81,14 +81,13 @@ var characters = function(){
     session.character.effects = JSON.parse(character.effects);
     session.character.equipment = JSON.parse(character.equipment);
     session.character.perms = JSON.parse(character.perms);
-    // Initialize empty inventory and then load
-    session.character.inventory = [];
+    session.character.inventory = JSON.parse(character.inventory);
 
     var values = {
       containerType: 'player_inventory',
       parentId: character.id
     }
-    Containers.loadInventory(values, session);
+
     // Raw socket write is used here since the command prompt will be displayed after "look" runs.
     session.socket.write('Welcome back ' + character.name + '\n');
     session.inputContext = 'command';
@@ -175,6 +174,7 @@ var characters = function(){
       stats: Characters.startProperties(fieldValues.characterclass),
       effects: Characters.startEffects(),
       equipment: JSON.stringify(Characters.initializeEqSlots()),
+      inventory: JSON.stringify([])
     };
 
     Character.create(values).then(function(instance) {

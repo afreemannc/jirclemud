@@ -12,7 +12,7 @@ var Command = function() {
          > %bold%You wield a dwarven war axe.%bold%
   `;
   this.callback = function(session, input) {
-    var index = Containers.findItemInContainer(input, 'name', session.character.inventory, true);
+    var index = Items.findItemInContainer(input, 'name', session.character.inventory, true);
     if (index !== false) {
       var item = session.character.inventory[index];
       if (item.properties.flags.includes('WIELD') === false) {
@@ -24,7 +24,7 @@ var Command = function() {
         item: session.character.inventory[index],
         index: index,
       }
-      Containers.transferItemInstance(session, transferDetails);
+      Items.transferItemInstance(session, transferDetails);
       var roomId = session.character.current_room;
       var name = session.character.name;
       // player message

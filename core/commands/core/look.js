@@ -24,21 +24,21 @@ var Command = function() {
       var roomId = session.character.current_room;
       var room = Rooms.room[roomId];
       // Check personal inventory
-      var itemIndex = Containers.findItemInContainer(input, 'name', session.character.inventory, true);
+      var itemIndex = Items.findItemInContainer(input, 'name', session.character.inventory, true);
       if (itemIndex !== false) {
         session.write(session.character.inventory[itemIndex].full_description);
         return true;
       }
 
       // Check the room for items
-      var itemIndex = Containers.findItemInContainer(input, 'name', room.inventory, true);
+      var itemIndex = Items.findItemInContainer(input, 'name', room.inventory, true);
       if (itemIndex !== false) {
         session.write(room.inventory[itemIndex].full_description);
         return true;
       }
 
       // check the room for mobs
-      var itemIndex = Containers.findItemInContainer(input, 'name', room.mobiles, true);
+      var itemIndex = Items.findItemInContainer(input, 'name', room.mobiles, true);
       if (itemIndex !== false) {
         Mobiles.displayMobile(session, room.mobiles[itemIndex]);
         return true;
