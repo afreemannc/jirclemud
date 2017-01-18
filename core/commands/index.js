@@ -36,40 +36,37 @@ commands.prototype.loadCommands = function(dir) {
 }
 
 commands.prototype.inputHandler  = function(session, inputRaw) {
-    console.log('inputRaw:' + inputRaw);
-    console.log(typeof inputRaw);
-    var input = inputRaw.replace(/(\r\n|\n|\r)/gm,"");
-    // Prevent user session from dropping into limbo if a blank newline is sent.
-    if (input === '') {
-      return;
-    }
-    var commandFound = false;
-    var commandSegments = input.split(' ');
-    var command = commandSegments[0].toLowerCase();
-    commandSegments.splice(0, 1);
-    var arg = commandSegments.join(' ');
-
-    // If input matches an exit label for the current room treat as move.
-    if (Rooms.inputIsExit(session, input) === true) {
-      this.triggers.move(session, input);
-      return;
-    }
-    // Otherwise lets check available commands
-    var keys = Object.keys(this.commands);
-
-    for (var i = 0; i < keys.length; ++i) {
-      if (keys[i].startsWith(command)) {
-        this.triggers[keys[i]](session, arg);
-        commandFound = true;
-        break;
-      }
-    }
-
-    if (commandFound === false) {
-      session.write('Do what??\n');
-    }
-
+  var input = inputRaw.replace(/(\r\n|\n|\r)/gm,"");
+  // Prevent user session from dropping into limbo if a blank newline is sent.
+  if (input === '') {
+    return;
   }
+  var commandFound = false;
+  var commandSegments = input.split(' ');
+  var command = commandSegments[0].toLowerCase();
+  commandSegments.splice(0, 1);
+  var arg = commandSegments.join(' ');
+
+  // If input matches an exit label for the current room treat as move.
+  if (Rooms.inputIsExit(session, input) === true) {
+    this.triggers.move(session, input);
+    return;
+  }
+  // Otherwise lets check available commands
+  var keys = Object.keys(this.commands);
+
+  for (var i = 0; i < keys.length; ++i) {
+    if (keys[i].startsWith(command)) {
+      this.triggers[keys[i]](session, arg);
+      commandFound = true;
+      break;
+    }
+  }
+
+  if (commandFound === false) {
+    session.write('Do what??\n');
+  }
+}
 
 
 module.exports = new commands();
