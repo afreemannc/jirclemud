@@ -4,7 +4,6 @@ function Mobile() {
   var worldQueue = Tics.findQueue('world');
   if (worldQueue) {
     worldQueue.event.on('world', function() {
-      console.log('move mobs invoked');
       Mobiles.moveMobs();
     });
   }
@@ -18,7 +17,6 @@ function Mobile() {
         mobile.stats = JSON.parse(mobile.stats);
         // Unpack equipment and generate item instances
         mobile.equipment = JSON.parse(mobile.equipment);
-        console.log(mobile.equipment);
         var eqKeys = Object.keys(mobile.equipment);
         for (var i = 0; i < eqKeys.length; ++i) {
           var key = eqKeys[i];
@@ -27,16 +25,12 @@ function Mobile() {
             continue;
           }
           var iid = mobile.equipment[key];
-          console.log('key:' + key);
-          console.log('iid:' + iid);
           if (iid) {
             Items.generateItemInstance(iid, mobile.equipment, key);
           }
         }
         mobile.effects = JSON.parse(mobile.effects);
         mobile.extra = JSON.parse(mobile.extra);
-        console.log('loaded mob:');
-        console.log(mobile);
         Rooms.room[mobile.start_rid].mobiles.push(mobile);
       });
       console.log('Mobiles loaded');
