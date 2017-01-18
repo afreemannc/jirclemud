@@ -1,6 +1,6 @@
 var Command = function() {
   this.trigger = 'arch';
-  this.permsRequired = 'BUILDER';
+  this.permsRequired = 'ADMIN';
   this.helpText = 'Access the administrator console';
   this.callback = function (session, input) {
     session.nogossip = true;
