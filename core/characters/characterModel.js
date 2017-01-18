@@ -48,7 +48,7 @@ module.exports.fields = {
 
     equipment: {
       type: Sequelize.TEXT
-    }
+    },
 
     inventory: {
       type: Sequelize.TEXT

@@ -444,5 +444,5 @@ item.prototype.transferItemInstance = function(session, transferDetails) {
         break;
     }
   }
-}
+
 module.exports = new item();

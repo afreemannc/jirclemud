@@ -46,8 +46,8 @@ room.prototype.loadRooms = function() {
   Room.findAll().then(function(instances) {
     instances.forEach(function(instance) {
       var room = instance.dataValues;
-      // TODO: load inventory
-      // room.inventory = Containers.loadInventory({inventoryType:'room', parentId: room.id});
+      room.flags = JSON.parse(room.flags);
+      room.inventory = JSON.parse(room.inventory);
       room.exits = {};
       room.mobiles = [];
       // TODO: make Rooms.room go away.
@@ -114,6 +114,11 @@ room.prototype.createRoom = function(session) {
   flagsField.formatPrompt(message);
   createRoomPrompt.addField(flagsField);
 
+    var inventoryField = createRoomPrompt.newField('value');
+  inventoryField.name = 'inventory';
+  inventoryValue = [];
+  createRoomPrompt.addField(inventoryValue);
+
   createRoomPrompt.start();
 }
 
@@ -149,6 +154,12 @@ room.prototype.editRoomName = function(session) {
   flagsField.name = 'flags';
   flagsField.value = current_room.flags;
   editNamePrompt.addField(flagsField);
+
+  var inventoryField = editNamePrompt.newField('value');
+  inventoryField.name = 'inventory';
+  inventoryValue = current_room.inventory;
+  editNamePrompt.addField(inventoryValue);
+
   console.log('start name prompt');
   editNamePrompt.start();
 }
@@ -184,6 +195,11 @@ room.prototype.editRoomDesc = function(session) {
   flagsField.name = 'flags';
   flagsField.value = current_room.flags;
   editDescPrompt.addField(flagsField);
+
+  var inventoryField = editDescPrompt.newField('value');
+  inventoryField.name = 'inventory';
+  inventoryValue = current_room.inventory;
+  editDescPrompt.addField(inventoryValue);
 
   editDescPrompt.start();
 }
@@ -224,15 +240,22 @@ room.prototype.editRoomFlags = function(session) {
   flagsField.value = Rooms.room[roomId].flags;
   editFlagsPrompt.addField(flagsField);
 
+  var inventoryField = editFlagsPrompt.newField('value');
+  inventoryField.name = 'inventory';
+  inventoryValue = current_room.inventory;
+  editFlagsPrompt.addField(inventoryValue);
+
   editFlagsPrompt.start();
 }
 
 room.prototype.saveRoom = function(session, values) {
   values.flags = JSON.stringify(values.flags);
+  values.inventory = JSON.stringify(values.inventory);
   var Room = Models.Room;
   if (typeof values.rid !== 'undefined' && values.rid) {
     Room.update(values, {where: {rid:values.rid}}).then(function(response) {
       values.flags = JSON.parse(values.flags);
+      values.inventory = JSON.parse(values.inventory);
       var keys = Object.keys(values);
       // Update room in memory.
       for (i = 0; i < keys.length; ++i) {
@@ -251,15 +274,6 @@ room.prototype.saveRoom = function(session, values) {
       newRoom.flags = JSON.parse(newRoom.flags);
       Rooms.room[newRoom.rid] = newRoom;
 
-      var Container = Models.Container;
-      var containerValues = {
-        container_type: 'room',
-        parent_id: newRoom.rid,
-        max_size: -1,
-        max_weight: -1,
-      }
-      // This can happen asyncronously so no need for .then().
-      Container.create(containerValues);
       session.inputContext = 'command';
       session.write('New room created (rid:' + instance.get('rid') + ')');
     });

@@ -20,5 +20,9 @@ module.exports.fields = {
 
   flags: {
     type: Sequelize.TEXT
+  },
+
+  inventory: {
+    type: Sequelize.TEXT
   }
 };
