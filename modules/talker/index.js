@@ -8,7 +8,7 @@ function Module() {
   this.load = function() {
     console.log('talker module load invoked');
     Items.flags['talker'] = "TALKER";
-    Containers.event.on('itemMove', function(session, item, moveType) {
+    Items.event.on('itemMove', function(session, item, moveType) {
       // Character is getting rid of an item or stashing it in a container.
       if (moveType.includes('character-to') && moveType.includes('equipped') === false) {
         // A talker is moving, check to see if we need to do stuff with character perms.
