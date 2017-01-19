@@ -204,12 +204,15 @@ item.prototype.setItemProperties = function(fieldValues) {
 }
 
 item.prototype.saveNewItem = function(session, fieldValues) {
+  var roomId = session.character.current_room;
+  var zid = Rooms.room[roomId].zid;
   // Whatever happens next the prompt that got us here has
   // completed so we need to switch input context to escape the
   // prompt system
   session.inputContext = 'command';
   var properties = {};
   var values = {
+    zid: zid,
     name:fieldValues.name,
     room_description:fieldValues.room_description,
     full_description:fieldValues.full_description,
