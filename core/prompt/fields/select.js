@@ -7,6 +7,7 @@ function Select() {
   this.validated = false;
   this.conditional = false;
   this.fieldGroup = false;
+  this.saveRawInput = false
 
   this.checkConditional = function(input) {
     if (Array.isArray(input)) {
@@ -65,7 +66,12 @@ function Select() {
   };
 
   this.cacheInput = function(input) {
-    this.value = this.options[input];
+    if (this.saveRawInput === true) {
+      this.value = input;
+    }
+    else {
+      this.value = this.options[input];
+    }
     return true;
   };
 }

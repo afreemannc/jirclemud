@@ -8,6 +8,7 @@ function Multiselect() {
   this.validated = false;
   this.conditional = false;
   this.fieldGroup = false;
+  this.saveRawInput = false;
 
   this.checkConditional = function(input) {
     if (Array.isArray(input)) {
@@ -54,8 +55,12 @@ function Multiselect() {
   this.validate = function(session, input) {
     if (input !== '@@') {
       if (typeof this.options[input] !== 'undefined') {
-
-        var index = this.value.indexOf(this.options[input]);
+        if (this.saveRawInput === true) {
+          this.value.indexOf(input);
+        }
+        else {
+          var index = this.value.indexOf(this.options[input]);
+        }
         var value = this.value.slice();
         // unset in display on double entry
         console.log('index:' + index);
@@ -64,7 +69,12 @@ function Multiselect() {
         }
         else {
           // add selection to display
-          value.push(this.options[input]);
+          if (this.saveRawInput === 'input') {
+            value.push(input);
+          }
+          else {
+            value.push(this.options[input]);
+          }
         }
         var selected = value.join(', ');
         session.socket.write('Currently selected:' + selected + '\n');
@@ -88,12 +98,22 @@ function Multiselect() {
   this.cacheInput = function(input) {
     if (input !== '@@') {
       // unset in cached value on double entry
-      var index = this.value.indexOf(this.options[input]);
+      if (this.saveRawInput === true) {
+        var index = this.value.indexOf(input);
+      }
+      else {
+        var index = this.value.indexOf(this.options[input]);
+      }
       if (index >= 0) {
         this.value.splice(index, 1);
       }
       else {
-        this.value.push(this.options[input]);
+        if (this.saveRawInput === true) {
+          this.value.push(input);
+        }
+        else {
+          this.value.push(this.options[input]);
+        }
       }
       return false;
     }
