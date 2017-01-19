@@ -6,6 +6,7 @@ var fs = require('fs');
 var path = require('path');
 
 var modules = function() {
+  this.modules = {};
   this.availableModules = {};
   this.moduleDir = path.join(__dirname + '/../../', "modules");
 
