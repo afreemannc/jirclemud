@@ -22,7 +22,7 @@ MudJS is an extensible text based multi-user dungeon engine based loosely on the
 
 - Full color terminal support
 - Modular design for easy customization
-- Supports realtime world building
+- Supports in-game world building
 
 ## Resources
 

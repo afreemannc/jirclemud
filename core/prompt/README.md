@@ -174,9 +174,35 @@ testConditionalField.conditional = {
 ## Additional field properties
 
 ### replaceInPrefix (select types only)
+Both select fields are opinionated about how the use prompt is formatted. Setting this option to true
+forces the field to skip automated prompt formatting and attempt option token replacement in the promptMessage.
+
+Example:
+    startField.name = 'start';
+    startField.options = {l:'l', c:'c', q:'q'};
+    startField.formatPrompt('[::l::]og in, [::c::]reate a character, or [::q::]uit', true);
+
+Outputs:
+
+[L]og in, [C]reate a character, or [Q]uit
 
 
+### saveRawInput (select types only)
+By default select and multiselect fields store the value associated with the option key input by the user.
 
+Example:
+myField.options = {y:'yes', n:'no'};
+
+User would enter y or n, field stores yes or no.
+
+Example 2:
+myField.options = {y:'yes', n:'no'};
+myField.saveRawInput = true;
+
+User enters y or n, field stores y or n.
+
+### maxint (int field only)
+Set a maximum acceptable value on an int field. If a user inputs a number larger than this a validation fails and an error is displayed.
 
 ## Overriding field behaviors
 
