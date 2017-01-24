@@ -1,18 +1,17 @@
 // @file Administration console features.
 
-function admin() {
-  this.tasks = {};
-};
+function admin() {};
 
+// Storage for admin tasks registered by core/modules.
+admin.prototype.tasks = {};
 
-admin.prototype.inputHandler  = function(session, inputRaw) {
-  var input = inputRaw.replace(/(\r\n|\n|\r)/gm,"");
-
-  if (input === '') {
-    Admin.listTasks(session);
-  }
-}
-
+/**
+ * Primary admin task selection screen.
+ *
+ * @param session
+ *   Character session object.
+ *
+ */
 admin.prototype.listTasks = function(session) {
   var taskKeys = Object.keys(Admin.tasks);
   var taskOptions = {};
@@ -38,6 +37,15 @@ admin.prototype.listTasks = function(session) {
   taskPrompt.start();
 }
 
+/**
+ * Prompt completion callback for the admin task selection screen.
+ *
+ * @param session
+ *   Character session object.
+ *
+ * @param fieldValues
+ *   User selection values.
+ */
 admin.prototype.taskDispatcher = function(session, fieldValues) {
   var selection = fieldValues.task;
   var selectedTask = Admin.tasks[selection];

@@ -1,3 +1,7 @@
+/**
+ * @file Prompt system class and related methods.
+ */
+
 function Prompt(session, completionCallback) {
   this.session = session;
   this.fields = [];
@@ -6,18 +10,12 @@ function Prompt(session, completionCallback) {
   this.quittable = true;
   this.fieldGroups = {};
 
-  // TODO: this could probably be replaced with a loader.
-  this.fieldTypes = {
-    text: require('./fields/text.js'),
-    multitext: require('./fields/multi-text.js'),
-    select: require('./fields/select.js'),
-    multiselect: require('./fields/multi-select.js'),
-    value: require('./fields/value.js'),
-    int: require('./fields/int.js'),
-    dice: require('./fields/dice.js'),
-    fieldgroup: require('./fields/fieldgroup.js')
-  },
-
+  /**
+   * Prompt user for input for current field.
+   *
+   * @return
+   *   Returns true if prompt was displayed, otherwise false.
+   */
   this.promptUser = function() {
     // Skip prompting on conditional fields where condition is not met
     if (typeof this.currentField.conditional === 'object') {
@@ -39,6 +37,13 @@ function Prompt(session, completionCallback) {
     return true;
   }
 
+  /**
+   * Parse user input while user is interacting with this prompt.
+   *
+   * @param input
+   *   User input.
+   *
+   */
   this.inputHandler = function(input) {
     if (input.toString().replace(/(\r\n|\n|\r)/gm,"") === '@q' && this.quittable === true) {
       this.session.inputContext = 'command';
@@ -91,6 +96,9 @@ function Prompt(session, completionCallback) {
     }
   }
 
+  /**
+   * Reset to the first field in this prompt.
+   */
   this.resetPrompt = function(fieldIndex) {
     if (typeof fieldIndex === 'undefined') {
       for (var i = 0; i < this.fields.length; ++i) {
@@ -103,21 +111,39 @@ function Prompt(session, completionCallback) {
     }
   }
 
-
+  /**
+   *  Display an error and reset the prompt if prompt completion callback fails.
+   *
+   * @param error
+   *   Error message to display.
+   */
   this.displayCompletionError = function(error) {
     this.resetPrompt(session);
     this.session.socket.write(color.red(error));
     this.start();
   }
 
+  /**
+   * Create a new instance of a given field type.
+   *
+   * @param type
+   *   Field type to create.
+   */
   this.newField = function(type) {
     var field = this.fieldTypes[type].new;
     return field();
   }
 
+  /**
+   * Add a field to this prompt's fields array.
+   *
+   * @param field
+   *   Field object to add.
+   */
   this.addField = function(field) {
     this.fields.push(field);
     if (field.fieldGroup !== false) {
+      // TODO: replace this with code in fieldgroup cacheInput
       if (typeof this.fieldGroups[field.fieldGroup] === 'undefined') {
         this.fieldGroups[field.fieldGroup] = {
           delta: 0,
@@ -133,7 +159,16 @@ function Prompt(session, completionCallback) {
     }
   }
 
-
+  /**
+   * Look up the numeric index of a given field.
+   *
+   * @param name
+   *   field.name to search for.
+   *
+   * @return
+   *   Returns numeric index of field position in prompt fields array
+   *   or false if no field is found.
+   */
   this.getFieldIndex = function(name) {
     for (var i = 0; i < this.fields.length; ++i) {
       if (this.fields[i].name === name) {
@@ -143,6 +178,9 @@ function Prompt(session, completionCallback) {
     return false;
   }
 
+  /**
+   * Start prompting the user for input.
+   */
   this.start = function() {
     this.session.inputContext = 'prompt';
     this.session.prompt = this;
@@ -156,6 +194,20 @@ function Prompt(session, completionCallback) {
     }
   }
 }
+
+/**
+ * Field type definitions.
+ */
+Prompt.prototype.fieldTypes = {
+  text: require('./fields/text.js'),
+  multitext: require('./fields/multi-text.js'),
+  select: require('./fields/select.js'),
+  multiselect: require('./fields/multi-select.js'),
+  value: require('./fields/value.js'),
+  int: require('./fields/int.js'),
+  dice: require('./fields/dice.js'),
+  fieldgroup: require('./fields/fieldgroup.js')
+};
 
 module.exports.new = function(session, completionCallback) {
   return new Prompt(session, completionCallback);

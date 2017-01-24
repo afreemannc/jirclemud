@@ -4,46 +4,58 @@
  * The variables global and it's associated db table provide a convenient storage mechanism
  * in instances where defining a separate database table would be overkill.
  */
-function Variables() {
-  this.variables = {};
+function Variables() {};
 
-  this.get = function(variableName) {
-    if (typeof Variables.variables[variableName] === false) {
-      return false;
-    }
-    else {
-      return Variables.variables[variableName];
-    }
+Variables.prototype.variables = {};
+
+Variables.prototype.get = function(variableName) {
+  if (typeof Variables.variables[variableName] === false) {
+    return false;
+  }
+  else {
+    return Variables.variables[variableName];
+  }
+}
+
+/**
+ * Create or update a variable setting.
+ *
+ * @param variableName
+ *   Name key for this variable.
+ *
+ * @param value
+ *   Value to store
+ */
+Variables.prototype.set = function(variableName, value) {
+  Variables.variables[variableName] = value;
+
+  if (typeof value !== 'string') {
+    value = JSON.stringify(value);
   }
 
-  this.set = function(variableName, value) {
-    Variables.variables[variableName] = value;
-
-    if (typeof value !== 'string') {
-      value = JSON.stringify(value);
+  var Variable = Models.Variable;
+  var values = {
+    name: 'variableName',
+    value: value,
+  }
+  Variable.findOrCreate(values).then(function(instance, created) {
+    if (created === false) {
+      Variable.update({where:{name:variableName}});
     }
+  });
+}
 
-    var Variable = Models.Variable;
-    var values = {
-      name: 'variableName',
-      value: value,
-    }
-    Variable.findOrCreate(values).then(function(instance, created) {
-      if (created === false) {
-        Variable.update({where:{name:variableName}});
-      }
+/**
+ * Load all saved variables into memory.
+ */
+Variables.prototype.loadVariables = function() {
+  var Variable = Models.Variable;
+  Variable.findAll().then(function(instances) {
+    instances.forEach(function(instance) {
+      var variable = instance.dataValues;
+      Variables.variables[variable.name] = JSON.parse(variable.value);
     });
-  }
-
-  this.loadVariables = function() {
-    var Variable = Models.Variable;
-    Variable.findAll().then(function(instances) {
-      instances.forEach(function(instance) {
-        var variable = instance.dataValues;
-        Variables.variables[variable.name] = JSON.parse(variable.value);
-      });
-    });
-  }
+  });
 }
 
 module.exports = new Variables();

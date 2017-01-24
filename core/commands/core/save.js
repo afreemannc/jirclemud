@@ -16,15 +16,15 @@ var Command = function() {
     var Character = Models.Character;
     var id = session.character.id;
     var values = {
-      perms: JSON.stringify(session.character.perms);
-      stats: JSON.stringify(session.character.stats);
-      effects: JSON.stringify(session.character.effects);
-      equipment: JSON.stringify(session.character.equipment);
-      inventory: JSON.stringify(session.character.inventory);
+      perms: JSON.stringify(session.character.perms),
+      stats: JSON.stringify(session.character.stats),
+      effects: JSON.stringify(session.character.effects),
+      equipment: JSON.stringify(session.character.equipment),
+      inventory: JSON.stringify(session.character.inventory)
     }
     Character.update(values, {where:{id:id}}).then(function() {
       session.write('Character saved.');
-    }
+    });
   }
 }
 

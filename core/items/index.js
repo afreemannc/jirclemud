@@ -1,9 +1,16 @@
+/**
+ * @file container class and associated methods for handling items.
+ */
+
 var Events = require('events');
 
 var item = function(){
+  // Modules may register listeners to this event to act when
+  // items are loaded.
   this.event = new Events.EventEmitter();
 };
 
+// TODO: move flag definitions out of here and make them overrideable and bundled with effect callbacks or similar.
 item.prototype.flags = {
     0:  'NONE',
     c:  'CONTAINER',
@@ -13,29 +20,47 @@ item.prototype.flags = {
     u:  'CURSE',
     b:  'BLESS',
     h:  'HUM',
-    t:  'TAKE',
+    ta: 'TAKE',
     wi: 'WIELD',
     h:  'HOLD',
     th: 'TWO-HANDED',
     po: 'PORTAL',
+    li: 'LIGHT',
+    nta: '!TAKE'
 }
 
+/**
+ * Apply stat changes based on item effects.
+ *
+ * @param recipient
+ *   Character or mobile object to apply stat changes to.
+ *
+ * @param item
+ *   Item object we are checking for effects.
+ *
+ */
 item.prototype.applyEffects = function(recipient, item) {
   var effects = item.properties.effects;
-  for (i = 0; i < effects.length; ++i) {
+  for (var i = 0; i < effects.length; ++i) {
     var effect = effects[i];
-    if (effect.effectType === 'stat') {
-      recipient.stats[effect.affectedStat] += parseInt(effect.bonus);
-    }
-    else {
-      recipient.stats.hit += parseInt(effect.bonus);
-    }
+    recipient.stats[effect.affectedStat] += parseInt(effect.bonus);
   }
 }
 
+/**
+ * Remove item effects from mobile or character.
+ *
+ * Typically executed when equipment is removed.
+ *
+ * @param recipient
+ *   Character or mobile object to remove stat changes from.
+ *
+ * @param item
+ *   Item object we are checking for effects.
+ */
 item.prototype.removeEffects = function(recipient, item) {
   var effects = item.properties.effects;
-  for (i = 0; i < effects.length; ++i) {
+  for (var i = 0; i < effects.length; ++i) {
     var effect = effects[i];
     if (effect.effectType === 'stat') {
       recipient.stats[effect.affectedStat] -= parseInt(effect.bonus);
@@ -46,7 +71,12 @@ item.prototype.removeEffects = function(recipient, item) {
   }
 }
 
-
+/**
+ * Item creation screen.
+ *
+ * @param session
+ *   Character session object.
+ */
 item.prototype.createItem = function(session) {
   var roomId = session.character.current_room;
   var zid = Rooms.room[roomId].zid;
@@ -189,6 +219,15 @@ item.prototype.createItem = function(session) {
   itemPrompt.start();
 }
 
+/**
+ * Build item properties from user input.
+ *
+ * @param fieldValues
+ *   User input from item creation screen.
+ *
+ * @return
+ *   Returns formatted item properties object.
+ */
 item.prototype.setItemProperties = function(fieldValues) {
   var properties = {
     flags: fieldValues.flags,
@@ -198,17 +237,25 @@ item.prototype.setItemProperties = function(fieldValues) {
     equipment_slot: fieldValues.equipment_slot,
     damage_dice: fieldValues.damage_dice,
   };
-// TODO: deal with container stuff
-  // TODO: deal with weapon dice
   return properties;
 }
 
+/**
+ * Completion callback for item creation screen.
+ *
+ * @param session
+ *   Player session object.
+ *
+ * @param fieldValues
+ *   User input values from item creation screen.
+ */
 item.prototype.saveNewItem = function(session, fieldValues) {
   var roomId = session.character.current_room;
   var zid = Rooms.room[roomId].zid;
   // Whatever happens next the prompt that got us here has
   // completed so we need to switch input context to escape the
   // prompt system
+  // TODO: update prompt system to render this unnecessary.
   session.inputContext = 'command';
   var properties = {};
   var values = {
@@ -222,30 +269,8 @@ item.prototype.saveNewItem = function(session, fieldValues) {
 
   Item.create(values).then(function(newItem) {
     session.write('New item type saved.');
-    if (fieldValues.create === 'Yes') {
-      var values = {
-        iid:newItemInstance.get('iid'),
-        properties: newItemInstance.get('.properties')
-      }
-      var ItemInstance = Models.ItemInstance;
-      ItemInstance.create(values).then((newItemInstance) => {
-        session.write('New instance of item saved.');
-        var values = {
-          cid: session.character.inventory.id,
-          instance_id: newItemInstance.get('instance_id')
-        }
-        var ContainerInventory = Models.ContainerInventory;
-        ContainerInventory.create(values).then((newContainerInventory) => {
-          session.write('New item created. Check your inventory.');
-        }).catch(function(error) {
-          console.log('something has gone wrong adding a new item to inventory:' + error);
-        });
-      }).catch(function(error) {
-        console.log('something has gone wrong saving a new item instance:' + error);
-      });
-    }
   }).catch(function(error) {
-    console.log('something has gone wrong saving an item:' + error);
+    console.log('Something has gone wrong saving an item:' + error);
   });
 }
 
@@ -322,11 +347,22 @@ item.prototype.inventoryDisplay = function(inventory, room, showEmptySlots) {
   return output;
 }
 
+/**
+ * Generate an instance of a given item type and place it in game.
+ *
+ * @param iid
+ *   Item id.
+ *
+ * @param destination
+ *   Inventory (room, character, or mobile) to add item to.
+ *
+ * @param key
+ *   Optional, defines a key position in inventory to add the item to.
+ *   Note: this is currently only used when equipping mobs.
+ *
+ */
 item.prototype.generateItemInstance = function(iid, destination, key) {
-  // load item from database
-  console.log('generating item:' + iid);
   var Item = Models.Item;
-  console.log('iid:' + iid);
   Item.findOne({where:{iid:iid}}).then(function(instance) {
     var generatedItem = instance.dataValues;
     generatedItem.properties = JSON.parse(generatedItem.properties);
@@ -335,6 +371,27 @@ item.prototype.generateItemInstance = function(iid, destination, key) {
   });
 }
 
+/**
+ * Search an inventory for an item.
+ *
+ * @param input
+ *   Search term
+ *
+ * @param field
+ *   Item field name to search for a match (typically name).
+ *
+ * @param inventory
+ *   Inventory to search
+ *
+ * @param like
+ *   Boolean, if true search will look for partial matches on the search term.
+ *   Otherwise === is used to test for matches.
+ *
+ * @return
+ *   If inventory is an array, returns the numeric index of the found item in inventory.
+ *   If inventory is an object, returns the object key pointing to the found item.
+ *   If no matches are found returns false.
+ */
 item.prototype.findItemInContainer = function(input, field, inventory, like) {
     var foundIndex = false;
     // Standard container inventories are arrays.
@@ -381,6 +438,19 @@ item.prototype.findItemInContainer = function(input, field, inventory, like) {
     }
 }
 
+/**
+ * Move an item from one inventory to another.
+ *
+ * @param session
+ *   Player session object.
+ *
+ * @param transferDetails
+ *   Object containing the following keys:
+ *
+ *    item: The item object to transfer.
+ *    transferType: The type of transfer being performed.
+ *
+ */
 item.prototype.transferItemInstance = function(session, transferDetails) {
     // Note: inventory alterations to containers, rooms, and players must be syncronous to prevent
     // race conditions and item duping.
@@ -446,6 +516,6 @@ item.prototype.transferItemInstance = function(session, transferDetails) {
       default:
         break;
     }
-  }
+}
 
 module.exports = new item();

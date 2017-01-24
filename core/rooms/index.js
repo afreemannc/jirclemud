@@ -1,10 +1,30 @@
+/**
+ * @file Container class and associated methods for working with rooms.
+ */
 
 var room = function(){
   this.room = {};
 };
 
+/**
+ * Display a message to all characters in a given room.
+ *
+ * @param session
+ *   Player session of the character that initiated the message event.
+ *
+ * @param roomId
+ *   Numeric room id (rid) of the room to message.
+ *   If false message will be displayed to all characters globally.
+ *
+ * @param message
+ *   Message to display
+ *
+ * @param skipCharacter
+ *   Optional. If set to true the message will not be displayed to the character that
+ *   triggered the message. This is useful for cases where other players should see
+ *   a different message than the character that sent the message.
+ */
 room.prototype.message = function(session, roomId, message, skipCharacter) {
-  console.log('message room id:' + roomId);
   for (var i = 0; i < Sessions.length; ++i) {
     // If roomID is false global message
     if (roomId === false) {
@@ -28,6 +48,18 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
   }
 }
 
+/**
+ * Test if a given string correlates to an exit label in the current room.
+ *
+ * @param session
+ *   Character session object.
+ *
+ * @param input
+ *   Input string to test against exit labels.
+ *
+ * #return
+ *   Returns true if input is an exit label otherwise false.
+ */
 room.prototype.inputIsExit = function(session, input) {
   var roomId = session.character.current_room;
   var currentExits = Object.keys(Rooms.room[roomId].exits);
@@ -40,7 +72,9 @@ room.prototype.inputIsExit = function(session, input) {
   }
 }
 
-// Load all rooms into memory
+/**
+ * Load rooms into memory.
+ */
 room.prototype.loadRooms = function() {
   var Room = Models.Room;
   Room.findAll().then(function(instances) {
@@ -50,24 +84,15 @@ room.prototype.loadRooms = function() {
       room.inventory = JSON.parse(room.inventory);
       room.exits = {};
       room.mobiles = [];
-      // TODO: make Rooms.room go away.
       Rooms.room[room.rid] = room;
-      //Zones.zone[room.zid].rooms.push(room.rid);
     });
     Rooms.loadExits();
     Mobiles.loadMobiles();
   });
 }
 
-// TODO: this should be deprecated by room.message
-room.prototype.exitMessage = function(session, input) {
-  var roomId = session.character.current_room;
-  var name = session.character.name;
-  Rooms.message(session, roomId, name + " leaves heading " + input, true);
-}
-
 /**
- * Add exit data to room loaded in memory.
+ * Add exit data to rooms loaded in memory.
  *
  * @param rid
  *   Numeric room id.
@@ -299,6 +324,7 @@ room.prototype.deleteRoomPrompt = function(session) {
       return true;
     }
     else {
+      // TODO: perhaps moving this to the validation callback would be less weird.
       // This is unusual for a cache function. Since there is a cancel option we want to gracefully bail out of
       // prompt mode without triggering the prompt completion callback.
       session.inputContext = 'command';
@@ -307,7 +333,6 @@ room.prototype.deleteRoomPrompt = function(session) {
     }
   };
   deleteRoomPrompt.addField(roomIdField);
-
   deleteRoomPrompt.start();
 }
 

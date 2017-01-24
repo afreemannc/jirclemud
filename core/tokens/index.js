@@ -1,10 +1,27 @@
-// Token Replacement
+// @file Token Replacement class
+
 var colors = require('colors/safe');
-// TODO: make session optional, add support for additional token types (room, zone, etc)
+
+/**
+ * Perform token replacement based on supplied values.
+ *
+ * @param string
+ *   String to perform token replacement on.
+ *
+ * @param values
+ *   An object containing keyed instances of any objects that should be used to perform token replacement.
+ *   Example:
+ *     '%character.name%' token is replaced with value in values['character'].name if set.
+ *     '%room.name% token is replaced with value in values['room'].name if set.
+ *
+ * @return
+ *   Returns a copy of "string" with tokens replaced.
+ */
 module.exports.replace = function(string, values) {
+  // Attempt token replacement from objects passed in values.
   if (values) {
     var valueKeys = Object.keys(values);
-    for (i = 0; i < valueKeys.length; ++i) {
+    for (var i = 0; i < valueKeys.length; ++i) {
       var value = valueKeys[i];
       // No sense in processing a thing that was passed in if there are no tokens that require it.
       if (!string.includes('%' + value)) {
@@ -32,10 +49,28 @@ module.exports.replace = function(string, values) {
       });
     }
   }
-
   return string;
 }
 
+/**
+ * Recursively check for and replace object property tokens.
+ *
+ * @param string
+ *   String to perform token replacement on
+ *
+ * @param target
+ *   Object that token values are taken from
+ *
+ * @param token
+ *   Token string based on current position in target.
+ *   Example:
+ *     if a character object is passed in as target token starts as 'character'
+ *     this is expanded to character.name when name token is checked.
+ *     this continues until all properties of the target object have been checked.
+ *
+ * @return
+ *   Returns string with tokens replaced.
+ */
 module.exports.replaceRecursive = function (string, target, token) {
   for (var key in target) {
     var tokenString = token + '.' + key;

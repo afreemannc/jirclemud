@@ -14,16 +14,31 @@ function Session() {
     return "\n" + prompt;
   }
 
+  /**
+   * Display a message to this session.
+   *
+   * @param message
+   *   Message to display.
+   */
   this.write = function(message){
     this.socket.write(message);
     this.socket.write(this.characterPrompt());
   }
 
+  /**
+   * Display an error message to this session.
+   *
+   * @param message
+   *   Error message to display.
+   */
   this.error = function(message) {
     this.socket.write(Tokens.replace('%red%' + message + '%red%'));
     this.socket.write(this.characterPrompt());
   }
 
+  /**
+   * Player start prompt.
+   */
   this.start = function() {
     var message = 'Welcome to ' + Config.mudName + '\n';
     // TODO: display splash screen.
@@ -68,7 +83,6 @@ function Session() {
     }
   }
 }
-
 
 module.exports.new = function() {
   return new Session();

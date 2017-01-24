@@ -17,7 +17,15 @@ function commands() {
   }
 }
 
-  // Load optional plugins
+/**
+ * Command loader
+ *
+ * Scans a given dir for .js files and loads them as commands.
+ *
+ * @param dir
+ *   File path of directory to scan for commands.
+ *
+ */
 commands.prototype.loadCommands = function(dir) {
 
   var pluginCommands = require("fs").readdirSync(dir);
@@ -35,6 +43,15 @@ commands.prototype.loadCommands = function(dir) {
   }
 }
 
+/**
+ * Process user input and execute commands.
+ *
+ * @param session
+ *   Character session object.
+ *
+ * @param inputRaw
+ *   User input.
+ */
 commands.prototype.inputHandler  = function(session, inputRaw) {
   var input = inputRaw.replace(/(\r\n|\n|\r)/gm,"");
   // Prevent user session from dropping into limbo if a blank newline is sent.
@@ -48,6 +65,8 @@ commands.prototype.inputHandler  = function(session, inputRaw) {
   var arg = commandSegments.join(' ');
 
   // If input matches an exit label for the current room treat as move.
+  // TODO: all standard exit labels should test true even if exit does not exist in that direction.
+  //       If an exit does not exist should display "You cannot go that way." or similar.
   if (Rooms.inputIsExit(session, input) === true) {
     this.triggers.move(session, input);
     return;
@@ -60,11 +79,14 @@ commands.prototype.inputHandler  = function(session, inputRaw) {
       // Command found, check perms and execute if authorized.
       if (typeof this.commands[keys[i]].permsRequired !== 'undefined') {
         var perm = this.commands[keys[i]].permsRequired;
+        // Character does not have the required permission to access this command.
         if (session.character.perms.includes(perm) === false) {
           session.write('Do what??');
           return false;
         }
       }
+      // Command callback functions are pushed to this.triggers when commands are loaded.
+      // triggers is keyed by command name.
       this.triggers[keys[i]](session, arg);
       return true;
     }
@@ -72,6 +94,5 @@ commands.prototype.inputHandler  = function(session, inputRaw) {
   // Command not found.
   session.write('Do what??');
 }
-
 
 module.exports = new commands();
