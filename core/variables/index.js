@@ -4,16 +4,16 @@
  * The variables global and it's associated db table provide a convenient storage mechanism
  * in instances where defining a separate database table would be overkill.
  */
-function Variables() {};
+function variables() {
+  this.data = {};
+};
 
-Variables.prototype.variables = {};
-
-Variables.prototype.get = function(variableName) {
-  if (typeof Variables.variables[variableName] === false) {
+variables.prototype.get = function(variableName) {
+  if (typeof Variables.data[variableName] === false) {
     return false;
   }
   else {
-    return Variables.variables[variableName];
+    return Variables.data[variableName];
   }
 }
 
@@ -26,12 +26,8 @@ Variables.prototype.get = function(variableName) {
  * @param value
  *   Value to store
  */
-Variables.prototype.set = function(variableName, value) {
-  Variables.variables[variableName] = value;
-
-  if (typeof value !== 'string') {
-    value = JSON.stringify(value);
-  }
+variables.prototype.set = function(variableName, value) {
+  Variables.data[variableName] = value;
 
   var Variable = Models.Variable;
   var values = {
@@ -48,14 +44,15 @@ Variables.prototype.set = function(variableName, value) {
 /**
  * Load all saved variables into memory.
  */
-Variables.prototype.loadVariables = function() {
+variables.prototype.loadVariables = function() {
   var Variable = Models.Variable;
   Variable.findAll().then(function(instances) {
     instances.forEach(function(instance) {
       var variable = instance.dataValues;
-      Variables.variables[variable.name] = JSON.parse(variable.value);
+      console.log(Variables);
+      Variables.data[variable.name] = variable.value;
     });
   });
 }
 
-module.exports = new Variables();
+module.exports = new variables();

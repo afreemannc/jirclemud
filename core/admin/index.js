@@ -49,6 +49,7 @@ admin.prototype.listTasks = function(session) {
 admin.prototype.taskDispatcher = function(session, fieldValues) {
   var selection = fieldValues.task;
   var selectedTask = Admin.tasks[selection];
+  console.log(selectedTask);
   selectedTask.callback(session);
   return true;
 }

@@ -74,9 +74,10 @@ modules.prototype.loadEnabledModules = function() {
       instances.forEach(function(instance) {
         var currentModule = instance.dataValues;
         currentModule.features = JSON.parse(currentModule.features);
+        console.log(currentModule.features);
         Modules.modules[currentModule.name] = require(currentModule.filepath + '/index.js');
-
-        if (currentModule.features.includes('commands')) {
+        console.log(Modules.modules[currentModule.name]);
+        if (typeof currentModule.features !== 'undefined' && currentModule.features.includes('commands')) {
           // load commands into memory
           var commandFolderPath = currentModule.filepath + '/commands';
           Commands.loadCommands(commandFolderPath);
@@ -134,14 +135,21 @@ modules.prototype.saveModuleChanges = function(session, fieldValues) {
   switch (fieldValues.start) {
     case 'enable':
       var module = Modules.availableModules[name];
+      if (typeof module.install !== 'undefined') {
+        module.install();
+      }
       if (typeof module.mid === 'undefined') {
         var Module = Models.Module;
         var values = {
           name: module.name,
+          features: null,
           description: module.description,
           status: 1,
           filepath: module.filePath,
           varsion: module.version
+        }
+        if (Array.isArray(module.features)) {
+          values.features = JSON.stringify(module.features);
         }
         Module.create(values).then(function() {
           session.write('Module status updated. This change will not take effect until the mud is restarted.');

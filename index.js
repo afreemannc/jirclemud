@@ -61,6 +61,8 @@ function newSocket(socket) {
 // Load data models
 loadModels('core');
 
+Variables.loadVariables();
+
 // Initialize service and set listening port
 var server = net.createServer(newSocket);
 server.listen(Config.port);
@@ -113,6 +115,10 @@ function loadModels(dir) {
     })
     .forEach(function(file) {
       var model = require('./' + path.join(dir, file));
-      Models[model.name] = sequelize.define(model.name, model.fields);
+      var config = false;
+      if (typeof model.config !== 'undefined') {
+        config = model.config;
+      }
+      Models[model.name] = sequelize.define(model.name, model.fields, model.config);
     });
 }
