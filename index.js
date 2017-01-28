@@ -105,6 +105,7 @@ function closeSession(session) {
  *  string directory name to scan.
  */
 function loadModels(dir) {
+  var associations = {};
   fs.readdirSync(dir)
     .filter(function(file) {
       var filepath = path.join(dir, file);
@@ -119,6 +120,18 @@ function loadModels(dir) {
       if (typeof model.config !== 'undefined') {
         config = model.config;
       }
-      Models[model.name] = sequelize.define(model.name, model.fields, model.config);
+      Models[model.name] = sequelize.define(model.name, model.fields, config);
+      if (typeof model.associations !== 'undefined') {
+         associations[model.name] = model.associations;
+      }
     });
+  // Assign associations after models are loaded
+  associationKeys = Object.keys(associations);
+  for (var i = 0; i < associationKeys.length; ++i) {
+    var name = associationKeys[i];
+    console.log('establishing association:' + name);
+    var association = associations[name];
+    console.log(association);
+    Models[name].belongsTo(Models[association.belongsTo], association.config);
+  }
 }

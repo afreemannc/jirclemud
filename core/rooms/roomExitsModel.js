@@ -26,3 +26,7 @@ module.exports.fields = {
     type: Sequelize.TEXT
   }
 };
+module.exports.associations = {
+  belongsTo: 'Room',
+  config: {foreignKey: 'rid', targetKey: 'rid'}
+}

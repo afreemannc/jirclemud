@@ -91,8 +91,9 @@ function Module() {
 
   this.exportZone = function(session, fieldValues) {
     var fs = require('fs');
+    var zid = fieldValues.exportZone;
     var Zone = Models.Zone;
-    Zone.findOne({where:{zid:fieldValues.exportZone}}).then(function(instance) {
+    Zone.findOne({where:{zid: zid}}).then(function(instance) {
       var exportPath = Variables.get('exportsExportFilepath');
       var zoneName = instance.get('name');
       var zoneDir = exportPath + zoneName.split(' ').join('_');
@@ -105,6 +106,101 @@ function Module() {
           }
           else {
             console.log('zone details exported');
+            // rooms
+            var roomData = [];
+            var Room = Models.Room;
+            Room.findAll({where:{zid: zid}}).then(function(instances) {
+              var roomData = [];
+              instances.forEach(function(instance) {
+                // Having to export numeric ids is unfortunate and problematic. Some
+                // better way of uniquely identifying a room that ensures no collisions
+                // with existing room ids on import while still being able to easily
+                // define exit parent rooms and targets would be nice. Maybe replace db defined
+                // primary keys with some kind of code generated hash?
+                var values = {
+                  rid: instance.get('rid'),
+                  name: instance.get('name'),
+                  description: instance.get('description'),
+                  flags: instance.get('flags'),
+                  inventory: instance.get('inventory')
+                }
+                roomData.push(values);
+              });
+              var roomFileData = JSON.stringify(roomData);
+              fs.writeFile(zoneDir + '/rooms.json', roomFileData, function(error) {
+                if (error) {
+                  console.log('Exports error: unable to write room file! ' + error);
+                }
+                else {
+                  console.log('room details exported');
+                }
+              });
+            });
+
+
+            var RoomExit = Models.RoomExit;
+            RoomExit.findAll({where:{'Room.zid': zid}, include: [{model: Room, as: Room.tableName}]}).then(function(instances) {
+              var exitData = [];
+              instances.forEach(function(instance) {
+                var values = {
+                  rid: instance.get('rid'),
+                  target_rid: instance.get('target_rid'),
+                  label: instance.get('label'),
+                  description: instance.get('description'),
+                  properties: instance.get('properties')
+                }
+                exitData.push(values);
+              });
+              var exitFileData = JSON.stringify(exitData);
+              fs.writeFile(zoneDir + '/exits.json', exitFileData, function(error) {
+
+              });
+            });
+
+            // items
+            var Item = Models.Item;
+            Item.findAll({where:{zid: zid}}).then(function(instances) {
+              var itemData = [];
+              instances.forEach(function(instance) {
+                var values = {
+                  name: instance.get('name'),
+                  room_description: instance.get('room_description'),
+                  full_description: instance.get('full_description'),
+                  properties: instance.get('properties')
+                }
+                itemData.push(values);
+              });
+              var itemFileData = JSON.stringify(itemData);
+              fs.writeFile(zoneDir + '/items.json', itemFileData, function(error) {
+
+              });
+            });
+
+            // mob types
+            var Mobile = Models.Mobile;
+            Mobile.findAll({where:{zid: zid}}).then(function(instances) {
+              var mobData = [];
+              instances.forEach(function(instance) {
+                var values = {
+                   mid: instance.get('mid'),
+                   start_rid:  instance.get('start_rid'),
+                   name:  instance.get('name'),
+                   short_name:  instance.get('short_name'),
+                   description:  instance.get('description'),
+                   stats:  instance.get('stats'),
+                   effects:  instance.get('effects'),
+                   equipment:  instance.get('equipment'),
+                   inventory:  instance.get('inventory'),
+                   extra:  instance.get('extra')
+                }
+                mobData.push(values);
+              });
+              var mobFileData = JSON.stringify(mobData);
+              fs.writeFile(zoneDir + '/mobiles.json', mobFileData, function(error) {
+
+              });
+            });
+            // mob instances
           }
         });
       }
