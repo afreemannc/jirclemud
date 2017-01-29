@@ -139,7 +139,7 @@ function Module() {
 
 
             var RoomExit = Models.RoomExit;
-            RoomExit.findAll({where:{'Room.zid': zid}, include: [{model: Room, as: Room.tableName}]}).then(function(instances) {
+            RoomExit.findAll({include: [{model: Room, as: 'Room', where:{zid: zid}}]}).then(function(instances) {
               var exitData = [];
               instances.forEach(function(instance) {
                 var values = {
