@@ -26,3 +26,7 @@ module.exports.fields = {
     type: Sequelize.TEXT
   }
 };
+module.exports.associations = {
+  hasMany: 'RoomExit',
+  config: {foreignKey: 'rid', targetKey: 'rid'}
+}

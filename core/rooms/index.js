@@ -109,44 +109,9 @@ room.prototype.loadExits = function() {
   });
 }
 
-room.prototype.createRoom = function(session) {
-
-  var roomId = session.character.current_room;
-  var current_room = Rooms.room[roomId];
-
-  var createRoomPrompt = Prompt.new(session, this.saveRoom);
-
-  var zoneIdField = createRoomPrompt.newField('value');
-  zoneIdField.name = 'zid';
-  zoneIdField.value = current_room.zid;
-  createRoomPrompt.addField(zoneIdField);
-
-  var nameField = createRoomPrompt.newField('text');
-  nameField.name = 'name';
-  nameField.formatPrompt('Enter room name. (This is displayed at the top of the room description)');
-  createRoomPrompt.addField(nameField);
-
-  var fullDescField = createRoomPrompt.newField('multitext');
-  fullDescField.name = 'description';
-  fullDescField.formatPrompt('Enter full room description. (This is displayed whenever a player enters the room)');
-  createRoomPrompt.addField(fullDescField);
-
-
-  var flagsField = createRoomPrompt.newField('multiselect');
-  var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
-  flagsField.name = 'flags';
-  flagsField.options = {0:'none', sh:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DARK', sa:'SAVEPOINT', sm:'SMALL', rip:'DEATHTRAP'};
-  flagsField.formatPrompt(message);
-  createRoomPrompt.addField(flagsField);
-
-    var inventoryField = createRoomPrompt.newField('value');
-  inventoryField.name = 'inventory';
-  inventoryValue = [];
-  createRoomPrompt.addField(inventoryValue);
-
-  createRoomPrompt.start();
-}
-
+/**
+ * Prompt for editing room name.
+ */
 room.prototype.editRoomName = function(session) {
   var roomId = session.character.current_room;
   var current_room = Rooms.room[roomId];
@@ -459,6 +424,7 @@ room.prototype.displayRoom = function(session, roomId) {
   // display mobiles
   if (current_room.mobiles.length > 0) {
     current_room.mobiles.forEach(function(mobile) {
+      // TODO: implement module alteration of output so the following can move to the builder module
       if (session.character.stats.flags.includes('BUILDER')) {
         output += Tokens.replace('%mobile.name%%yellow%[%mobile.miid%]%yellow%\n', {mobile:mobile});
       }

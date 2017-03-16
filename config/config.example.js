@@ -66,7 +66,9 @@ module.exports = {
     fi: 'FINGER',
     wa: 'WAIST',
     l:  'LEGS',
-    fe: 'FEET'
+    fe: 'FEET',
+    wi: 'WIELD',
+    ho: 'HOLD'
   },
 
   // Determines if items all load all the time. Item scarcity is typically a critical part of establishing an in-game economy

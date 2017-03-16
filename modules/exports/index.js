@@ -6,6 +6,7 @@ function Module() {
 
   this.install = function() {
     Variables.set('exportsExportFilepath', './zonefiles/exports/');
+    Variables.set('exportsImportFilepath', './zonefiles/imports/');
   }
 
   this.load = function() {
@@ -52,7 +53,24 @@ function Module() {
   };
 
   this.listImportableZones = function() {
-    return {n:'nothing', t:'test'};
+    var fs = require('fs');
+    var path = require('path');
+    var zones = {};
+    var count = 0;
+
+    var importFilePath = Variables.get('exportsImportFilePath');
+    fs.readdirSync(importFilePath)
+      .filter(function(file) {
+        return (file === "zone.js");
+      })
+      .forEach(function(file) {
+        var zone = require(path.join(dir, file));
+        zones[count] = zone.name;
+        ++count;
+      });
+
+
+    return zones;
   }
 
   this.listExportableZones = function() {
@@ -87,6 +105,7 @@ function Module() {
 
   this.importZone = function(session, fieldValues) {
     session.write('import triggered');
+    var fs = require('fs');
   };
 
   this.exportZone = function(session, fieldValues) {
@@ -201,6 +220,29 @@ function Module() {
               });
             });
             // mob instances
+            var MobilesInstance = Models.MobilesInstance;
+            MobilesInstance.findAll({include: [{model: Moobile, as: 'Mobile', where:{zid: zid}}]}).then(function(instances) {
+              var mobInstanceData = [];
+              instances.forEach(function(instance) {
+                var values = {
+                  mid: instance.get('mid'),
+                  start_rid: instance.get('start_rid'),
+                  name: instance.get('name'),
+                  short_name: instance.get('short_name'),
+                  description: instance.get('description'),
+                  stats: instance.get('stats'),
+                  effects: instance.get('effects'),
+                  equipment: instance.get('equipment'),
+                  inventory: instance.get('inventory'),
+                  extra: instance.get('extra')
+                };
+                mobInstanceData.push(values);
+              });
+              var mobInstanceFileData = JSON.stringify(mobInstanceData);
+              fs.writeFile(zoneDir + '/mobilesinstances.json', mobInstanceFileData, function(error) {
+
+              });
+            });
           }
         });
       }

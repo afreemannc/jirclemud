@@ -132,6 +132,12 @@ function loadModels(dir) {
     console.log('establishing association:' + name);
     var association = associations[name];
     console.log(association);
-    Models[name].belongsTo(Models[association.belongsTo], association.config);
+    if (typeof association.belongsTo !== 'undefined') {
+      Models[name].belongsTo(Models[association.belongsTo], association.config);
+    }
+    if (typeof association.hasMany !== 'undefined') {
+      console.log('has many assoc implemented');
+      Models[name].hasMany(Models[association.hasMany], association.config);
+    }
   }
 }
