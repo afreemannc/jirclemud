@@ -1,3 +1,5 @@
+var editRoomPrompts = require('./prompts/editRoomPrompts.js');
+
 var Command = function() {
   this.trigger = 'edit';
   this.permsRequired = 'BUILDER';
@@ -8,6 +10,14 @@ var Command = function() {
          edit room name (change room name)
          edit room desc (change room description)
          edit room flags (change room flags)
+
+         edit item name (change name for all instances of item)
+         edit item roomdesc (change room description for all instances of item)
+         edit item fulldesc (change full description for all instances of item)
+         edit item properties (change item properties for all instances of item)
+
+         Note: editing item properties on existing items will wipe out any customizations
+         to any existing copies of that item.
 
   %yellow%Example:%yellow%
          > edit room name
@@ -33,17 +43,17 @@ var Command = function() {
         }
         // room name (ex: 'edit room name')
         if (commandArgs[1] === 'name') {
-          Rooms.editRoomName(session);
+          editRoomPrompts.editRoomName(session);
           break;
         }
         // long desc (ex: 'edit room desc')
         if (commandArgs[1] === 'desc') {
-          Rooms.editRoomDesc(session);
+          editRoomPrompts.editRoomDesc(session);
           break;
         }
         // flags (ex: 'edit room flags')
         if (commandArgs[1] === 'flags') {
-          Rooms.editRoomFlags(session);
+          editRoomPrompts.editRoomFlags(session);
           break;
         }
         // Garbled 2nd arg

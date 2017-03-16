@@ -26,12 +26,12 @@ var Command = function() {
       roomItems[item.iid] = item.name;
     }
 
-        // Prompt builder for equipment changes.
+    // Prompt builder for equipment changes.
     var itemPrompt = Prompt.new(session, alterEquipment);
 
     var roomIdField = itemPrompt.newField('value');
     roomIdField.name = 'roomId';
-    roomIDField.value = roomId;
+    roomIdField.value = roomId;
     itemPrompt.addField(roomIdField);
 
     // Having op selectable only makes sense if items are present in room inventory that could be
