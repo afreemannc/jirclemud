@@ -23,7 +23,7 @@ admin.prototype.listTasks = function(session) {
     promptOptions += '%green%[' + taskKey + '] ' + task.name + '%green%\n';
   }
 
-  var taskPrompt = Prompt.new(session, Admin.taskDispatcher);
+  var taskPrompt = Prompt.new(session, Admin.taskDispatcher, 'adminTasks');
   var taskSelectField = taskPrompt.newField('select');
   taskSelectField.name = 'task';
   taskSelectField.options = taskOptions;
@@ -49,7 +49,6 @@ admin.prototype.listTasks = function(session) {
 admin.prototype.taskDispatcher = function(session, fieldValues) {
   var selection = fieldValues.task;
   var selectedTask = Admin.tasks[selection];
-  console.log(selectedTask);
   selectedTask.callback(session);
   return true;
 }

@@ -144,7 +144,7 @@ room.prototype.saveRoom = function(session, values) {
 room.prototype.deleteRoomPrompt = function(session) {
   var roomId = session.character.current_room;
 
-  var deleteRoomPrompt = Prompt.new(session, this.deleteRoom);
+  var deleteRoomPrompt = Prompt.new(session, this.deleteRoom, 'deleteRoom');
 
   var roomIdField = deleteRoomPrompt.newField('value');
   roomIdField.name = 'rid';

@@ -91,7 +91,7 @@ modules.prototype.loadEnabledModules = function() {
 }
 
 modules.prototype.moduleAdmin = function(session) {
-  moduleAdminPrompt = Prompt.new(session, Modules.saveModuleChanges);
+  moduleAdminPrompt = Prompt.new(session, Modules.saveModuleChanges, 'moduleAdmin');
 
   adminStartField = moduleAdminPrompt.newField('select');
   adminStartField.name = 'start';
@@ -135,7 +135,7 @@ modules.prototype.saveModuleChanges = function(session, fieldValues) {
   switch (fieldValues.start) {
     case 'enable':
       var module = Modules.availableModules[name];
-      if (typeof module.install !== 'undefined') {
+      if (module.install && typeof module.install !== 'undefined') {
         module.install();
       }
       if (typeof module.mid === 'undefined') {

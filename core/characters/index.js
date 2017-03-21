@@ -1,13 +1,10 @@
 // user stuff
 var dice = require('./dice');
 var crypto = require('crypto');
-var Events = require('events');
 // Session mode handler for login
 
 var characters = function(){};
 
-// Register an event emitter for character-related events.
-characters.prototype.event = new Events.EventEmitter();
 
 /**
  * Login screen.
@@ -17,7 +14,7 @@ characters.prototype.event = new Events.EventEmitter();
  */
 characters.prototype.login = function(session) {
 
-  var loginPrompt = Prompt.new(session, this.loginAuthenticate);
+  var loginPrompt = Prompt.new(session, this.loginAuthenticate, 'login');
   loginPrompt.quittable = false;
 
   var loginField = loginPrompt.newField('text');
@@ -58,7 +55,7 @@ characters.prototype.loginAuthenticate = function(session, fieldValues) {
           var character = results.dataValues;
           session.character = character;
           Characters.loadCharacterDetails(session);
-          Characters.event.emit('characterLoad', session);
+          Events.emit('characterLoad', session);
         }
         else {
           // Authentication failed.
@@ -115,7 +112,7 @@ characters.prototype.initializeEqSlots = function() {
  * Character creation prompt.
  */
 characters.prototype.createCharacter = function(session) {
-  var createCharacterPrompt = Prompt.new(session, this.saveNewCharacter);
+  var createCharacterPrompt = Prompt.new(session, this.saveNewCharacter, 'createCharacter');
   createCharacterPrompt.quittable = false;
 
   var saltField = createCharacterPrompt.newField('value');
@@ -133,12 +130,6 @@ characters.prototype.createCharacter = function(session) {
   passwordField.name = 'password';
   passwordField.formatPrompt('Password:\n');
   createCharacterPrompt.addField(passwordField);
-
-  var classField = createCharacterPrompt.newField('select');
-  classField.name = 'characterclass';
-  classField.options = Classes.selectionOptions();
-  classField.formatPrompt('Please select a character class:');
-  createCharacterPrompt.addField(classField);
 
   createCharacterPrompt.start();
 }

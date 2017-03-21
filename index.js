@@ -1,6 +1,8 @@
 var fs = require("fs");
 var path = require("path");
 var net = require('net');
+var eventEmitter = require('events');
+Events = new eventEmitter();
 Config = require('./config/config.js');
 Variables = require('./core/variables');
 Admin = require('./core/admin');

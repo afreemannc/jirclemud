@@ -85,6 +85,16 @@ commands.prototype.inputHandler  = function(session, inputRaw) {
           return false;
         }
       }
+      // Run validation if present
+      if (typeof this.commands[keys[i]].validation !== 'undefined') {
+        var validationPassed = this.commands[keys[i]].validation(session, arg);
+        if (validationPassed === true) {
+          this.triggers[keys[i]](session, arg);
+        }
+        else {
+          return false;
+        }
+      }
       // Command callback functions are pushed to this.triggers when commands are loaded.
       // triggers is keyed by command name.
       this.triggers[keys[i]](session, arg);

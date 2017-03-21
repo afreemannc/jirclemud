@@ -2,11 +2,13 @@
  * @file Prompt system class and related methods.
  */
 
-function Prompt(session, completionCallback) {
+function Prompt(session, completionCallback, id) {
+  this.id = id;
   this.session = session;
   this.fields = [];
   this.currentField = false;
   this.completionCallback = completionCallback;
+  this.alterCallbacks = [];
   this.quittable = true;
   this.fieldGroups = {};
 
@@ -182,6 +184,13 @@ function Prompt(session, completionCallback) {
    * Start prompting the user for input.
    */
   this.start = function() {
+    if (this.alterCallbacks.length > 0) {
+      console.log(this.alterCallbacks);
+      for (var i = 0; i < this.alterCallbacks.length; ++i) {
+        console.log(this);
+        this.alterCallbacks[i](this);
+      }
+    }
     this.session.inputContext = 'prompt';
     this.session.prompt = this;
     for (var i = 0; i < this.fields.length; ++i) {
@@ -209,6 +218,10 @@ Prompt.prototype.fieldTypes = {
   fieldgroup: require('./fields/fieldgroup.js')
 };
 
-module.exports.new = function(session, completionCallback) {
-  return new Prompt(session, completionCallback);
+
+module.exports.new = function(session, completionCallback, id) {
+  var newPrompt =  new Prompt(session, completionCallback, id);
+  console.log('emitting event: prompt:' + id);
+  Events.emit('prompt:' + id, newPrompt);
+  return newPrompt;
 }
