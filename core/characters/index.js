@@ -173,9 +173,8 @@ characters.prototype.saveNewCharacter = function(session, fieldValues) {
     status: 1,
     current_room: Config.startRoomId,
     perms: JSON.stringify([]),
-    stats: Characters.startProperties(fieldValues.characterclass),
-    effects: Characters.startEffects(),
-    equipment: JSON.stringify(Characters.initializeEqSlots()),
+    stats: JSON.stringify({}),
+    effects: Characters.startEffects(), equipment: JSON.stringify(Characters.initializeEqSlots()),
     inventory: JSON.stringify([])
   };
 
@@ -186,31 +185,6 @@ characters.prototype.saveNewCharacter = function(session, fieldValues) {
     session.inputContext = 'command';
     Commands.triggers.look(session, '');
   });
-}
-
-/**
- * Build starting character properties based on initial class selection during character creation.
- */
-characters.prototype.startProperties = function(characterClass) {
-  // TODO: implement some kind of stat system. Probably standard D20 style to start.
-  var characterClass = Classes.classFromSelection(characterClass);
-  // TODO: add con bonus once stats are implemented.
-  var startingHP = dice.roll(characterClass.hitDice);
-  var startingMana = 10; //TODO: implement some mana thing once casters are in.
-  var properties = {
-    class: characterClass.name,
-    class_level: 1,
-    maxhp: startingHP,
-    currenthp: startingHP,
-    maxmana: startingMana,
-    currentmana: startingMana,
-    xp: 1,
-    current_room: Config.startRoom,
-    flags: []
-  }
-  // TODO: add stats based on stat system
-  // TODO: add currency placeholders based on currency system
-  return JSON.stringify(properties);
 }
 
 /**

@@ -32,7 +32,6 @@ Session = require('./core/session');
 Commands = require('./core/commands');
 Characters = require('./core/characters');
 Rooms = require('./core/rooms');
-Classes = require('./core/classes');
 Items = require('./core/items');
 Prompt = require('./core/prompt');
 Zones = require('./core/zones');

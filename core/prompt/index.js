@@ -185,8 +185,10 @@ function Prompt(session, completionCallback, id) {
    */
   this.start = function() {
     if (this.alterCallbacks.length > 0) {
+      console.log('alter callbacks:');
       console.log(this.alterCallbacks);
       for (var i = 0; i < this.alterCallbacks.length; ++i) {
+        console.log('running alter callback');
         console.log(this);
         this.alterCallbacks[i](this);
       }
