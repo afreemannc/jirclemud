@@ -43,6 +43,34 @@ TicQueues.prototype.startQueues = function() {
 }
 
 /**
+ * Start individual queue.
+ */
+TicQueues.prototype.startQueue = function(queueName) {
+  for (var i = 0; i < Tics.queues.length; ++i) {
+    if (Tics.queues[i].name == queueName) {
+      var queue = Tics.queues[i];
+      var interval = setInterval(function(queue) {
+        queue.event.emit(queue.name);
+      }, queue.interval * 1000, queue);
+      Tics.queues[i].started = true;
+      break;
+    }
+  }
+}
+
+/**
+ * Stop a specific queue.
+ */
+TicQueues.prototype.stopQueue = function(queueName) {
+  for (var i = 0; i < Tics.queues.length; ++i) {
+    if (Tics.queues[i].name == queueName) {
+      Tics.queues.splice(i, 1);
+      break;`
+    }
+  }
+}
+
+/**
  * Look up a queue by name.
  *
  * @param queueName
