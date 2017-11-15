@@ -79,5 +79,6 @@ module.exports = {
   // World tic triggers mob movement and other events.
   //
   // Number of seconds between world tics
-  worldTicInterval: 120
+  worldTicInterval: 120,
+  combatTicInterval: 3,
 }
