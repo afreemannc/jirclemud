@@ -43,6 +43,7 @@ var Command = function() {
           return false;
         }
         else {
+          Rooms.message(session, session.character.current_room, session.character.name + ' steps into the ' + portal.name + ' and dissapears.', true);
           session.character.current_room = target_rid;
           session.socket.write('You step into the ' + portal.name + ' and disappear.');
           Commands.triggers.look(session, '');
