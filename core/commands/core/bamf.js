@@ -20,7 +20,6 @@ var Command = function() {
          > Derp is standing here.
   `;
   this.callback = function(session, input) {
-    // TODO: confirm current user has GOD or DEMI flag
     if (input.length === 0 || typeof Rooms.room[input] === 'undefined') {
       session.error("Bamf where??\n");
     }

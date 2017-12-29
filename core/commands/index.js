@@ -78,7 +78,7 @@ commands.prototype.inputHandler  = function(session, inputRaw) {
       if (typeof this.commands[keys[i]].permsRequired !== 'undefined') {
         var perm = this.commands[keys[i]].permsRequired;
         // Character does not have the required permission to access this command.
-        if (session.character.perms.includes(perm) === false) {
+        if (Characters.hasPerm(session, perm) === false) {
           session.write('Do what??');
           return false;
         }
