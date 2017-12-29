@@ -62,9 +62,10 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
  */
 room.prototype.inputIsExit = function(session, input) {
   var roomId = session.character.current_room;
+  var standardExits = ['n','s','e','w','u','d'];
   var currentExits = Object.keys(Rooms.room[roomId].exits);
 
-  if (currentExits.includes(input) === true) {
+  if (currentExits.includes(input) === true || standardExits.includes(input)) {
     return true;
   }
   else {

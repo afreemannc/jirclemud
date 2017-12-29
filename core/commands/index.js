@@ -64,9 +64,7 @@ commands.prototype.inputHandler  = function(session, inputRaw) {
   commandSegments.splice(0, 1);
   var arg = commandSegments.join(' ');
 
-  // If input matches an exit label for the current room treat as move.
-  // TODO: all standard exit labels should test true even if exit does not exist in that direction.
-  //       If an exit does not exist should display "You cannot go that way." or similar.
+  // If input matches a standard exit or custom exit label for the current room treat as move.
   if (Rooms.inputIsExit(session, input) === true) {
     this.triggers.move(session, input);
     return;
