@@ -25,8 +25,9 @@ var Command = function() {
       session.error("Bamf where??\n");
     }
     else {
-      var exitMessage = 'Bamf!';
+      Rooms.message(session, session.character.current_room, "BAMF!\n" + session.character.name + ' disappears with a bang.', true);
       session.character.current_room = input;
+      Rooms.message(session, input, session.character.name + ' appears in a cloud of brimstone.', true);
       Commands.triggers.look(session, '');
     }
   }
