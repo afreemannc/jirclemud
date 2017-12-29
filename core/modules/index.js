@@ -154,13 +154,15 @@ modules.prototype.saveModuleChanges = function(session, fieldValues) {
         Module.create(values).then(function() {
           session.write('Module status updated. This change will not take effect until the mud is restarted.');
         });
-        break;
       }
-      // intentionally fall through to update if there is already a record
-      // for this module in the db (true if mid is set).
-    case 'disable':
-      var Module = Models.Module;
+      break;
 
+    case 'disable':
+      var module = Modules.availableModules[name];
+      if (typeof module.uninstall !== 'undefined') {
+        module.uninstall();
+      }
+      var Module = Models.Module;
       Module.update({status:moduleStatus}, {where:{name:name}}).then(function() {
         session.write('Module status updated. This change will not take effect until the mud is restarted.');
         Modules.availableModules[name].status = moduleStatus;
