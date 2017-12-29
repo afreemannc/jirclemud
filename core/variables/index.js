@@ -57,7 +57,7 @@ variables.prototype.set = function(variableName, setValue) {
 variables.prototype.del = function(variableName) {
   if (typeof Variable.data[variableName] !== 'undefined') {
     Variable.data.splice(variableName, 1);
-    Variable.destroy({where: {name: variableName}});=
+    Variable.destroy({where: {name: variableName}});
   }
 }
 
