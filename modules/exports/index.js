@@ -5,8 +5,13 @@ function Module() {
   this.features = [];
 
   this.install = function() {
-    Variables.set('exportsExportFilepath', './zonefiles/exports/');
-    Variables.set('exportsImportFilepath', './zonefiles/imports/');
+    Variables.set('exportsExportFilepath', '.modules/exports/zonefiles/exports/');
+    Variables.set('exportsImportFilepath', '.modules/exports/zonefiles/imports/');
+  }
+
+  this.uninstall = function() {
+    Variables.del('exportsExportFilepath');
+    Variables.del('exportsImportFilepath');
   }
 
   this.load = function() {
@@ -17,7 +22,6 @@ function Module() {
   }
 
   this.exportAdmin = function(session) {
-    console.log(this);
     exportAdminPrompt = Prompt.new(session, this.exportActions.bind(this));
 
     var opField = exportAdminPrompt.newField('select');
@@ -59,6 +63,8 @@ function Module() {
     var count = 0;
 
     var importFilePath = Variables.get('exportsImportFilePath');
+    console.log('import file path:' + importFilePath);
+    console.log('cwd:' + process.cwd());
     fs.readdirSync(importFilePath)
       .filter(function(file) {
         return (file === "zone.js");

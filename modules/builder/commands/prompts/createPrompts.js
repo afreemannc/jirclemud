@@ -182,7 +182,8 @@ module.exports.createRoom = function(session) {
   flagsField.formatPrompt(message);
   createRoomPrompt.addField(flagsField);
 
-    var inventoryField = createRoomPrompt.newField('value');
+  // Placeholder value for db record creation. Room inventory gets populated by item and mobile placement commands.
+  var inventoryField = createRoomPrompt.newField('value');
   inventoryField.name = 'inventory';
   inventoryValue = [];
   createRoomPrompt.addField(inventoryValue);
