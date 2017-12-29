@@ -256,5 +256,17 @@ characters.prototype.searchActiveCharactersByName = function(name) {
   return false;
 }
 
+/**
+ * Check character for permission.
+ *
+ * @param session
+ *   session object
+ *
+ * @param perm
+ *   permission flag to check for (ex. ADMIN)
+ */
+characters.prototype.hasPerm = function(session, perm) {
+  return session.character.perms.includes(perm);
+}
 
 module.exports = new characters();
