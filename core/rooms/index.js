@@ -34,7 +34,7 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
       continue;
     }
     // Otherwise only message players in the specified room.
-    checkSession = Sessions[i];
+    var checkSession = Sessions[i];
     // They ain't here.
     if (checkSession.character.current_room !== roomId) {
       return;
@@ -46,6 +46,16 @@ room.prototype.message = function(session, roomId, message, skipCharacter) {
       checkSession.write(message);
     }
   }
+}
+
+room.prototype.listPlayersInRoom = function(roomId) {
+  var players = [];
+  for (var i = 0; i < Sessions.length; ++i) {
+    if (Sessions[i].character.current_room === roomId) {
+      players.push(Sessions[i].character.name);
+    }
+  }
+  return players;
 }
 
 /**
@@ -272,7 +282,7 @@ room.prototype.displayRoom = function(session, roomId) {
   var standardExits = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'u', 'd'];
   if (exitKeys.length > 0) {
     var exitDisplay = []
-    for (i = 0; i < standardExits.length; ++i) {
+    for (var i = 0; i < standardExits.length; ++i) {
       if (exitKeys.indexOf(standardExits[i]) !== -1) {
         // Skip closed doors.
         if (typeof exits[standardExits[i]].properties.flags !== 'undefined') {
@@ -304,6 +314,18 @@ room.prototype.displayRoom = function(session, roomId) {
         output += Tokens.replace(mobile.name + "\n", {mobile: mobile});
       }
     });
+  }
+
+  // display characters
+  var characterNames = Rooms.listPlayersInRoom(roomId);
+  if (characterNames.length > 0) {
+    output += "\n\n";
+    for (var i = 0; i < characterNames.length; ++i) {
+      if (session.character.name !== characterNames[i]) {
+        // If colorized character names become a thing (saints preserve us) this will need to invoke Tokens.replace().
+        output += characterNames + " is $POSITIION_SIGNIFIER here.\n";
+      }
+    }
   }
   session.write(Tokens.replace(output, {room:current_room}));
 }
