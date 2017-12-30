@@ -268,7 +268,7 @@ room.prototype.displayRoom = function(session, roomId) {
   var current_room = Rooms.room[roomId];
   var output = '';
   // display room title
-  if (session.character.stats.flags.includes('BUILDER')) {
+  if (Characters.hasPerm(session, 'BUILDER')) {
     output += "\n%bold%%room.name%%bold% %green%[%room.rid%]%green%\n";
   }
   else {
@@ -307,7 +307,7 @@ room.prototype.displayRoom = function(session, roomId) {
   if (current_room.mobiles.length > 0) {
     current_room.mobiles.forEach(function(mobile) {
       // TODO: implement module alteration of output so the following can move to the builder module
-      if (session.character.stats.flags.includes('BUILDER')) {
+      if (Characters.hasPerm(session, 'BUILDER')) {
         output += Tokens.replace('%mobile.name%%yellow%[%mobile.miid%]%yellow%\n', {mobile:mobile});
       }
       else {
