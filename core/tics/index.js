@@ -65,7 +65,7 @@ TicQueues.prototype.stopQueue = function(queueName) {
   for (var i = 0; i < Tics.queues.length; ++i) {
     if (Tics.queues[i].name == queueName) {
       Tics.queues.splice(i, 1);
-      break;`
+      break;
     }
   }
 }

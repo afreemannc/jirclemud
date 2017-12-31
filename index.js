@@ -5,6 +5,7 @@ var eventEmitter = require('events');
 Events = new eventEmitter();
 Config = require('./config/config.js');
 Variables = require('./core/variables');
+Prompt = require('./core/prompt');
 Admin = require('./core/admin');
 Sequelize = require('sequelize');
 
@@ -33,7 +34,6 @@ Commands = require('./core/commands');
 Characters = require('./core/characters');
 Rooms = require('./core/rooms');
 Items = require('./core/items');
-Prompt = require('./core/prompt');
 Zones = require('./core/zones');
 Tokens = require('./core/tokens');
 Mobiles = require('./core/mobiles');
@@ -77,9 +77,11 @@ Modules.loadEnabledModules();
 
 // TODO: move to session object, rely on this.socket as socket is passed during session creation.
 function parseData(session, data) {
-
+  console.log('data:' + data);
+  console.log('context:' + session.inputContext);
   switch (session.inputContext) {
     case 'prompt':
+      console.log(session.prompt);
       // certain prompts require collection of multi-line inputs so raw data is provided here.
       session.prompt.inputHandler(data.toString());
       break;

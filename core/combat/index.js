@@ -60,4 +60,4 @@ module.exports.new = function () {
    // add skip code/message if validation fails
    // add support for turn skip/lag count on combat commands
   // end event
-});
+}
