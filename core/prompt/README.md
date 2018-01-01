@@ -35,7 +35,26 @@ To start prompt:
 
 ## Overriding Prompt behavior
 
-TODO
+The prompt system supports altering registered prompts from within modules or other custom code.
+
+To alter an existing prompt, start by retrieving a copy of current registered values:
+
+existingPrompt = Prompt.get('existingprompt');
+
+Adding Fields:
+
+existingPrompt.fields['mynewfield'] = {
+  name: 'mynewfield',
+  type: 'text',
+  title: 'My New Field:'
+}
+
+Note: in most instances the existing prompt completion callback function isn't going to know what to do
+with values in any new fields you define, and as such will ignore them.
+
+For all but the most trivial stylistic changes to existing prompts, you will also need to replace the original completion callback,
+either with a wrapper function that knows what to do with the extra fields, or that entirely replaces the original behavior.
+
 
 ## Field Types
 
@@ -173,7 +192,7 @@ container size.
 
 ### Usage
 
-To make a field conditional simply set the .conditional property to an object with field and value properties:
+To make a field conditional simply set the conditional property to an object with field and value properties:
 
 fields['myconditional'] = {
   name: 'myconditional',
@@ -189,8 +208,8 @@ Above example only renders if the current value of "someOtherFieldName" is true.
 ## Additional field properties
 
 ### replaceInPrefix (select types only)
-Both select fields are opinionated about how the use prompt is formatted. Setting this option to true
-forces the field to skip automated prompt formatting and attempt option token replacement in the promptMessage.
+Both select field types are opinionated about how the field title is formatted. Setting the replaceInPrefix property to true
+forces the field to skip automated prompt formatting and attempt option token replacement in the title.
 
 Example:
     fields['start'] = {
@@ -239,6 +258,6 @@ Any input larger than 10 results in a validation error.
 
 ## Overriding field behaviors
 
-TODO
+Currently unsupported.
 
 
