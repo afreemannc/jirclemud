@@ -3,27 +3,39 @@
 
 ## Usage
 
-  Start by creating a new prompt. Pass in the user's socket object and a function to call when the last field in the prompt has been completed.
+Define any callbacks (prompt completion, custom field validation, etc).
 
-    var myPrompt = Prompt.new(socket, my.completionCallbackFunction);
+Define your fields:
 
+  var creationFields = [];
+  creationFields['salt'] = {
+    name: 'salt',
+    type: 'value',
+    title: '',
+    value: crypto.randomBytes(Math.ceil(4)).toString('hex').slice(0, 8),
+  }
+  creationFields['charactername'] = {
+    name: 'charactername',
+    type: 'text',
+    title: 'Character Name:',
+    validate: this.validateCharacterName,
+  }
+  creationFields['password'] = {
+    name: 'password',
+    type: 'text',
+    title: 'Password:'
+  }
 
-  Define one or more fields as needed:
+Then register your prompt:
+  Prompt.register('createcharacter', creationFields, this.saveNewCharater, false);
 
-    // create a new text field:
-    var myTexField = myPrompt.newField('text');
+To start prompt:
 
-    // Set field properties
-    myTextField.name = 'mytextfield';
-    myTextField.formatPrompt('My Text Field:');
+  Prompt.start('myPromptId', session);
 
-    // add field to prompt
-    myPrompt.addField(myTextField);
+## Overriding Prompt behavior
 
-  Lastly, run the prompt .start() method to begin prompting the user for input.
-
-    myprompt.start();
-
+TODO
 
 ## Field Types
 
@@ -163,13 +175,16 @@ container size.
 
 To make a field conditional simply set the .conditional property to an object with field and value properties:
 
-var testConditionalField = myPrompt.newField('text');
-testConditionalField.name = 'test';
-testConditionalField.formatPrompt('Enter a value');
-testConditionalField.conditional = {
-  field: 'someOtherFieldName',
-  value: true
+fields['myconditional'] = {
+  name: 'myconditional',
+  type: 'text',
+  conditional: {
+    field: 'someOtherFieldName',
+    value: true,
+  }
 }
+
+Above example only renders if the current value of "someOtherFieldName" is true.
 
 ## Additional field properties
 
@@ -178,10 +193,12 @@ Both select fields are opinionated about how the use prompt is formatted. Settin
 forces the field to skip automated prompt formatting and attempt option token replacement in the promptMessage.
 
 Example:
-    startField.name = 'start';
-    startField.options = {l:'l', c:'c', q:'q'};
-    startField.formatPrompt('[::l::]og in, [::c::]reate a character, or [::q::]uit', true);
-
+    fields['start'] = {
+      name: 'start',
+      options: {l:'l', c:'c', q:'q'},
+      replaceInPrefix: true,
+      title: '[::l::]og in, [::c::]reate a character, or [::q::]uit'
+    }
 Outputs:
 
 [L]og in, [C]reate a character, or [Q]uit
@@ -191,20 +208,37 @@ Outputs:
 By default select and multiselect fields store the value associated with the option key input by the user.
 
 Example:
-myField.options = {y:'yes', n:'no'};
+  fields['myselect'] = {
+    ...
+    options: {y:'yes', n:'no'},
+    ...
+  }
 
 User would enter y or n, field stores yes or no.
 
 Example 2:
-myField.options = {y:'yes', n:'no'};
-myField.saveRawInput = true;
+
+  fields['myselect'] = {
+    ...
+    options: {y:'yes', n:'no'},
+    saveRawInput: true
+  }
 
 User enters y or n, field stores y or n.
 
 ### maxint (int field only)
 Set a maximum acceptable value on an int field. If a user inputs a number larger than this a validation fails and an error is displayed.
 
+  fields['myint'] = {
+    ...
+    maxint: 10,
+    ...
+  }
+
+Any input larger than 10 results in a validation error.
+
 ## Overriding field behaviors
 
+TODO
 
 

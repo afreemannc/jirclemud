@@ -20,7 +20,7 @@ var characters = function(){
             // Authentication successful, load character details.
             var character = results.dataValues;
             session.character = character;
-            this.loadCharacterDetails(session);
+            Characters.loadCharacterDetails(session);
             Events.emit('characterLoad', session);
           }
           else {
@@ -76,6 +76,29 @@ var characters = function(){
   }
 
   /**
+   * Load additional character details like stats, spell effects, and item inventory.
+   */
+  this.loadCharacterDetails = function(session) {
+    var character = session.character;
+    // Unpack stored properties
+    session.character.stats = JSON.parse(character.stats);
+    session.character.effects = JSON.parse(character.effects);
+    session.character.equipment = JSON.parse(character.equipment);
+    session.character.perms = JSON.parse(character.perms);
+    session.character.inventory = JSON.parse(character.inventory);
+
+    var values = {
+      containerType: 'player_inventory',
+      parentId: character.id
+    }
+
+    // Raw socket write is used here since the command prompt will be displayed after "look" runs.
+    session.socket.write('Welcome back ' + character.name + '\n');
+    session.inputContext = 'command';
+    Commands.triggers.look(session, '');
+  }
+
+  /**
    * Completion callback for character creation screen.
    *
    * @param session
@@ -122,7 +145,7 @@ var characters = function(){
     type: 'text',
     title: 'Password:'
   }
-  Prompt.register('login', loginFields, this.loginAuthenticate);
+  Prompt.register('login', loginFields, this.loginAuthenticate, false);
 
   // Register character creation prompt
   var creationFields = [];
@@ -143,7 +166,7 @@ var characters = function(){
     type: 'text',
     title: 'Password:'
   }
-  Prompt.register('createcharacter', creationFields, this.saveNewCharater, false);
+  Prompt.register('createcharacter', creationFields, this.saveNewCharater, true);
 
 };
 
@@ -159,26 +182,13 @@ characters.prototype.login = function(session) {
 }
 
 /**
- * Load additional character details like stats, spell effects, and item inventory.
+ * Character creation screen.
+ *
+ * @param session
+ *   Session object.
  */
-characters.prototype.loadCharacterDetails = function(session) {
-  var character = session.character;
-  // Unpack stored properties
-  session.character.stats = JSON.parse(character.stats);
-  session.character.effects = JSON.parse(character.effects);
-  session.character.equipment = JSON.parse(character.equipment);
-  session.character.perms = JSON.parse(character.perms);
-  session.character.inventory = JSON.parse(character.inventory);
-
-  var values = {
-    containerType: 'player_inventory',
-    parentId: character.id
-  }
-
-  // Raw socket write is used here since the command prompt will be displayed after "look" runs.
-  session.socket.write('Welcome back ' + character.name + '\n');
-  session.inputContext = 'command';
-  Commands.triggers.look(session, '');
+characters.prototype.createCharacter = function(session) {
+  Prompt.start('createcharacter', session);
 }
 
 /**

@@ -24,14 +24,21 @@ function promptSystem() {
   this.start = function(id, session) {
     var cachedPrompt = this.registered[id];
     console.log(cachedPrompt);
-    var newPrompt = this.Prompt.new(id, session, cachedPrompt.completionCallback);
+    var newPrompt = this.Prompt.new(id, session, cachedPrompt.completionCallback, cachedPrompt.quittable);
     newPrompt.quittable = cachedPrompt.quittable;
     var fieldNames = Object.keys(cachedPrompt.fields);
     for (var i = 0; i < fieldNames.length; ++i) {
       var currentField = cachedPrompt.fields[fieldNames[i]];
       var newField = newPrompt.newField(currentField.type);
       Object.assign(newField, currentField);
-      newField.formatPrompt(currentField.title);
+      var replaceInPrefix = false;
+      if (typeof currentField.replaceInPrefix !== 'undefined') {
+        replaceInPrefix = currentField.replaceInPrefix;
+      }
+      if (newField.formatPrompt !== false) {
+        console.log('format prompt type:' + typeof newField.formatPrompt);
+        newField.formatPrompt(currentField.title, replaceInPrefix);
+      }
       newPrompt.addField(newField);
     }
     console.log(newPrompt);

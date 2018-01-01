@@ -40,7 +40,7 @@ function Session() {
    * Player start prompt.
    */
   this.start = function() {
-    this.write('Welcome to ' + Config.mudName + '\n');
+    this.socket.write('Welcome to ' + Config.mudName + '\n');
     // The standard prompt bailout doesn't make sense on this screen.
     Prompt.start('sessionstart', this);
   }
@@ -79,7 +79,8 @@ function Session() {
     name: 'start',
     type: 'select',
     title: '[::l::]og in, [::c::]reate a character, or [::q::]uit',
-    options: {l:'l', c:'c', q:'q'}
+    options: {l:'l', c:'c', q:'q'},
+    replaceInPrefix: true,
   }
   Prompt.register('sessionstart', fields, this.startSwitch, false);
 }
