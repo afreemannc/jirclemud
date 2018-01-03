@@ -1,3 +1,99 @@
+/**
+ * @file
+ * Builder creation prompts.
+ */
+function creationPrompts() {
+  itemCreationFields = [];
+  itemCreationFields['zid'] = {
+    name: 'zid',
+    type: 'value',
+    value: '',
+  }
+
+  itemCreationFields['name'] = {
+    name: 'name',
+    type: 'text',
+    title: 'What do you want to name it? Note the name is what is displayed in personal inventory or when equipped.'
+  }
+
+  itemCreationFields['room_description'] = {
+    name: 'room_description',
+    type: 'text',
+    title: 'Provide a short description of the item that will be shown when it is sitting out in a room.'
+  }
+
+  itemCreationFields['full_description'] = {
+    name: 'full_description',
+    type: 'multitext',
+    title: 'Provide a thorough description. This is what will be displayed if this item is examined.'
+  }
+
+  if (typeof Config.itemScarcity !== 'undefined' && Config.itemScarcity === true) {
+
+    itemCreationFields['max_count'] = {
+      name: 'max_count',
+      type: 'int',
+      title: 'How many of this item can exist in the world at one time? (-1 for unlimited)'
+    }
+
+    itemCreationFields['load_chance'] = {
+      name: 'load_chance',
+      type: 'int',
+      title: '% chance this item will load on zone respawn (100 for always)',
+      maxint: 100
+    }
+  }
+
+  itemCreationFields['flags'] = {
+    name: 'flags',
+    type: 'multiselect',
+    title: 'Select one or more flags to assign to this item:
+    options: Item.flags
+  }
+
+  itemCreationField['target_rid'] = {
+    name: 'target_rid',
+    type: 'int',
+    title: 'Enter numeric room id this portal should lead to:',
+    conditional: {
+      field: 'flags',
+      value: 'PORTAL'
+    }
+  }
+
+  itemCreationField['container_size'] = {
+    name: 'container_size',
+    type: 'int',
+    title: 'Enter container size as a number:',
+    conditional: {
+      field: 'flags',
+      value: 'CONTAINER'
+    }
+  }
+
+  itemCreationField['equipment_slot'] = {
+    name: 'equipment_slot',
+    type: 'select',
+    title: 'Where can this be worn?',
+    options: Config.equipmentSlots,
+    conditional: {
+      field: 'flags',
+      value: 'WEARABLE'
+    }
+  }
+
+  itemCreationField['damage_dice'] = {
+    name: 'damage_dice',
+    type: 'dice',
+    title: 'Weapon base damage dice:',
+    conditional: {
+      field: 'flags',
+      value: 'WIELD'
+    }
+  }
+}
+
+
 
 /**
  * Item creation screen.
@@ -9,96 +105,9 @@ module.exports.createItem = function(session) {
   var roomId = session.character.current_room;
   var zid = Rooms.room[roomId].zid;
 
-  var itemPrompt = Prompt.new(session, this.saveNewItem);
-
   // Item definitions are tied to a specific zone to make life easier
   // when equipping mobiles. Having zid in this table makes listing
   // items associated with the zone trivial.
-
-  var zidField = itemPrompt.newField('value');
-  zidField.name = 'zid';
-  zidField.value = zid;
-  itemPrompt.addField(zidField);
-
-  var nameField = itemPrompt.newField('text');
-  nameField.name = 'name';
-  nameField.inputCacheName = 'name';
-  nameField.formatPrompt('What do you want to name it? Note the name is what is displayed in personal inventory or when equipped.');
-  itemPrompt.addField(nameField);
-
-  var roomDescriptionField = itemPrompt.newField('text');
-  roomDescriptionField.name = 'room_description';
-  roomDescriptionField.formatPrompt('Provide a short description of the item that will be shown when it is sitting out in a room.');
-  itemPrompt.addField(roomDescriptionField);
-
-  var fullDescriptionField = itemPrompt.newField('multitext');
-  fullDescriptionField.name = 'full_description';
-  fullDescriptionField.formatPrompt('Provide a thorough description. This is what will be displayed if this item is examined.');
-  itemPrompt.addField(fullDescriptionField);
-
-  // Required to drive item scarcity if it is enabled.
-  if (typeof Config.itemScarcity !== 'undefined' && Config.itemScarcity === true) {
-    var maxCountField = itemPrompt.newField('int');
-    maxCountField.name = 'max_count';
-    maxCountField.formatPrompt('How many of this item can exist in the world at one time? (-1 for unlimited)');
-    itemPrompt.addField(maxCountField);
-
-    var loadChanceField = itemPrompt.newField('int');
-    loadChanceField.name = 'load_chance';
-    loadChanceField.maxint = 100;
-    loadChanceField.formatPrompt('What are is % chance of this item loading on respawn? (100 for always)');
-    itemPrompt.addField(loadChanceField);
-  }
-
-  var flagsField = itemPrompt.newField('multiselect');
-  flagsField.name = 'flags';
-  flagsField.options = Items.flags;
-  flagsField.formatPrompt('Select one or more flags to assign to this item');
-  itemPrompt.addField(flagsField);
-
-  // Conditional fields
-
-  // PORTAL destination room id
-  var portalDestinationField = itemPrompt.newField('int');
-  portalDestinationField.name = 'target_rid',
-  portalDestinationField.conditional = {
-    field: 'flags',
-    value: 'PORTAL',
-  }
-  portalDestinationField.formatPrompt('Enter numeric room id this portal should lead to.');
-  itemPrompt.addField(portalDestinationField);
-
-  // container size
-  var containerSizeField = itemPrompt.newField('int');
-  containerSizeField.name = 'containerSize';
-  containerSizeField.conditional = {
-    field: 'flags',
-    value: 'CONTAINER'
-  };
-  containerSizeField.formatPrompt('Enter container size as a number.');
-  itemPrompt.addField(containerSizeField);
-
-  // Wear slot
-  var wearSlotField = itemPrompt.newField('select');
-  wearSlotField.name = 'equipment_slot';
-  wearSlotField.options = Config.equipmentSlots;
-  wearSlotField.conditional = {
-    field: 'flags',
-    value: 'WEARABLE',
-  }
-  wearSlotField.formatPrompt('Where can this be worn?');
-  itemPrompt.addField(wearSlotField);
-
-  // Wield fields
-  // base damage dice
-  var damageDiceField = itemPrompt.newField('dice');
-  damageDiceField.name = 'damage_dice';
-  damageDiceField.formatPrompt('Weapon base damage dice');
-  damageDiceField.conditional = {
-    field: 'flags',
-    value: 'WIELD',
-  }
-  itemPrompt.addField(damageDiceField);
 
    // TODO: spell affect
       // spell
