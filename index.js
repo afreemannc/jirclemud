@@ -6,6 +6,7 @@ Events = new eventEmitter();
 Config = require('./config/config.js');
 Variables = require('./core/variables');
 Prompt = require('./core/prompt');
+Rules = require('./core/rules');
 Admin = require('./core/admin');
 Sequelize = require('sequelize');
 
