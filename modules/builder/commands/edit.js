@@ -34,8 +34,11 @@ var Command = function() {
   `;
   this.callback = function (session, input) {
     commandArgs = input.split(' ');
+
     switch (commandArgs[0]) {
       case 'room':
+        var roomId = session.character.current_room;
+        var currentRoom = Rooms.room[roomId];
         // room name (no argument passed (ex: 'edit room')
         if (commandArgs.length === 1) {
           session.error('What do you want to change?');
@@ -43,20 +46,40 @@ var Command = function() {
         }
         // room name (ex: 'edit room name')
         if (commandArgs[1] === 'name') {
-          editRoomPrompts.editRoomName(session);
+          Prompt.startEdit('room_creation', session, 'name', currentRoom);
           break;
         }
         // long desc (ex: 'edit room desc')
         if (commandArgs[1] === 'desc') {
-          editRoomPrompts.editRoomDesc(session);
+          Prompt.startEdit('room_creation', session, 'description', currentRoom);
           break;
         }
         // flags (ex: 'edit room flags')
         if (commandArgs[1] === 'flags') {
-          editRoomPrompts.editRoomFlags(session);
+          Prompt.startEdit('room_creation', session, 'flags', currentRoom);
           break;
         }
         // Garbled 2nd arg
+        session.error('Edit what??');
+        break;
+      case 'zone':
+        var zoneId = Zones.getCurrentZoneId(session);
+        var currentZone = Zones.zone[zoneId];
+        // zone name
+        if (commandArgs[1] === 'name') {
+          Prompt.startEdit('zone_creation', session, 'name', currentZone);
+          break;
+        }
+        // zone description
+        if (commandArgs[1] === 'desc') {
+          Prompt.startEdit('zone_creation', session, 'description', currentZone);
+          break;
+        }
+        // zone rating
+        if (commandArgs[1] === 'rating') {
+          Prompt.startEdit('zone_creation', session, 'rating', currentZone);
+          break;
+        }
         session.error('Edit what??');
         break;
       default:
@@ -67,5 +90,8 @@ var Command = function() {
   }
 
 }
-
+// TODO: implement item edit
+// TODO: implement zone edit
+// TODO: implement exit edit
+// TODO: implement door edit (?)
 module.exports = new Command();
