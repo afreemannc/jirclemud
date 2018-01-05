@@ -91,134 +91,106 @@ function creationPrompts() {
       value: 'WIELD'
     }
   }
-}
 
-
-
-/**
- * Item creation screen.
- *
- * @param session
- *   Character session object.
- */
-module.exports.createItem = function(session) {
-  var roomId = session.character.current_room;
-  var zid = Rooms.room[roomId].zid;
-
-  // Item definitions are tied to a specific zone to make life easier
-  // when equipping mobiles. Having zid in this table makes listing
-  // items associated with the zone trivial.
-
-   // TODO: spell affect
-      // spell
-      // percentage fire
-      // strength ??
-    // additional effects
-  var selectEffectField = itemPrompt.newField('select');
-  selectEffectField.name = 'effectType';
-  selectEffectField.options = {d:'dam', h:'hit', a:'ac', s:'stat'};
-  selectEffectField.formatPrompt('What additional effects does this equipment have?');
-  selectEffectField.conditional = {
-    field: 'flags',
-    value: ['WIELD', 'HOLD', 'WEARABLE']
+  itemCreationField['effect_type'] = {
+    name: 'effect_type',
+    type: 'select',
+    title: 'What additional effects does this equipment have?',
+    options: {d:'dam', h:'hit', a:'ac', s:'stat'},
+    conditional: {
+      field: 'flags',
+      value: ['WIELD', 'HOLD', 'WEARABLE']
+    }
   }
-  itemPrompt.addField(selectEffectField);
 
-  var statField = itemPrompt.newField('select');
-  statField.name = 'affectedStat';
-  statField.options = {i:'int', w:'wis', ch:'cha', s:'str', co:'con', d:'dex'};
-  statField.formatPrompt('Select a stat to buff');
-  statField.conditional = {
-    field: 'effectType',
-    value: 'stat',
+  itemCreationField['affected_stat'] = {
+    name: 'affected_stat',
+    type: 'select',
+    title: 'Select a stat to buff:',
+    options: {i:'int', w:'wis', ch:'cha', s:'str', co:'con', d:'dex'} // TODO: move to world mechanics module
+    conditional: {
+      field: 'effect_type',
+      value: 'stat'
+    }
   }
-  itemPrompt.addField(statField);
 
-  var bonusField = itemPrompt.newField('int');
-  bonusField.name = 'bonus';
-  bonusField.formatPrompt('Effect bonus (positive or negative numbers only)');
-  bonusField.conditional = {
-    field: 'effectType',
-    value: ['dam', 'hit', 'ac', 'stat']
+  itemCreationField['bonus'] = {
+    name: 'bonus',
+    type: 'int',
+    title: 'Effect bonus (positive or negative numbers only):'
+    conditional: {
+      field: 'effect_type',
+      value: 'stat'
+    }
   }
-  itemPrompt.addField(bonusField);
-  // bonus reiteration handled by fieldGroup processing code. No need to add
-  // additional prompt logic here.
-  var bonusFieldGroup = itemPrompt.newField('fieldgroup');
-  bonusFieldGroup.name = 'effects',
-  bonusFieldGroup.fields = ['effectType', 'affectedStat', 'bonus'],
-  bonusFieldGroup.formatPrompt('Do you wish to add another effect to this item?');
-  bonusFieldGroup.conditional = {
-    field: 'effectType',
-    value: ['dam', 'hit', 'ac', 'stat']
+
+  itemCreationField['effects'] = {
+    name: 'effects',
+    tyoe: 'fieldgroup',
+    title: 'Do you wish to add another effect to this item?',
+    fields: ['effect_type', 'affected_stat', 'bonus'],
+    conditional: {
+      field: 'effect_type',
+      value: ['dam', 'hit', 'ac', 'stat']
+    }
   }
-  itemPrompt.addField(bonusFieldGroup);
 
-  itemPrompt.start();
-}
+  Prompt.register('item_creation', itemCreationFields);
 
+  var roomCreationFields = [];
 
-/**
- * Room creation prompt.
- */
-module.exports.createRoom = function(session) {
+  roomCreationFields['zid'] = {
+    name: 'zid',
+    type: 'value',
+    value: '',
+  }
 
-  var roomId = session.character.current_room;
-  var current_room = Rooms.room[roomId];
+  roomCreationFields['name'] = {
+    name: 'name',
+    type: 'text',
+    title: 'Enter room name. (This is displayed at the top of the room description)'
+  }
 
-  var createRoomPrompt = Prompt.new(session, this.saveRoom);
+  roomCreationFields['description'] = {
+    name: 'description',
+    type: 'multitext',
+    title: 'Enter full room description. (This is displayed whenever a player enters the room)'
+  }
 
-  var zoneIdField = createRoomPrompt.newField('value');
-  zoneIdField.name = 'zid';
-  zoneIdField.value = current_room.zid;
-  createRoomPrompt.addField(zoneIdField);
+  roomCreationFields['flags'] = {
+    name: 'flags',
+    type: 'multiselect',
+    title: 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)',
+    options: {0:'none', sh:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DARK', sa:'SAVEPOINT', sm:'SMALL', rip:'DEATHTRAP'}
+  }
 
-  var nameField = createRoomPrompt.newField('text');
-  nameField.name = 'name';
-  nameField.formatPrompt('Enter room name. (This is displayed at the top of the room description)');
-  createRoomPrompt.addField(nameField);
+  roomCreationFields['inventory'] = {
+    name: 'inventory',
+    type: 'value',
+    value: []
+  }
 
-  var fullDescField = createRoomPrompt.newField('multitext');
-  fullDescField.name = 'description';
-  fullDescField.formatPrompt('Enter full room description. (This is displayed whenever a player enters the room)');
-  createRoomPrompt.addField(fullDescField);
+  Prompt.register('room_creation', roomCreationFields);
 
+  var zoneCreationFields = [];
 
-  var flagsField = createRoomPrompt.newField('multiselect');
-  var message = 'What flags should be applied to this room? (Use these sparingly, especially DEATHTRAP)\n';
-  flagsField.name = 'flags';
-  flagsField.options = {0:'none', sh:'SHOP', h:'HOT', c:'COLD', a:'AIR', w:'UNDERWATER', d:'DARK', sa:'SAVEPOINT', sm:'SMALL', rip:'DEATHTRAP'};
-  flagsField.formatPrompt(message);
-  createRoomPrompt.addField(flagsField);
+  zoneCreationFields['name'] = {
+    name: 'name',
+    type: 'text',
+    title: 'Enter zone name:',
+  }
 
-  // Placeholder value for db record creation. Room inventory gets populated by item and mobile placement commands.
-  var inventoryField = createRoomPrompt.newField('value');
-  inventoryField.name = 'inventory';
-  inventoryValue = [];
-  createRoomPrompt.addField(inventoryValue);
+  zoneCreationFields['description'] = {
+    name: 'description',
+    type: 'multitext',
+    title: 'Describe this zone:'
+  }
 
-  createRoomPrompt.start();
-}
-
-/**
- * Zone creation prompt.
- */
-module.exports.createZone = function(session) {
-  var createZonePrompt = Prompt.new(session, this.saveZone);
-
-  // name
-  var nameField = createZonePrompt.newField('text');
-  nameField.name = 'name';
-  nameField.validate = this.validateZoneName;
-  nameField.formatPrompt('Enter zone name.');
-  createZonePrompt.addField(nameField);
-  // descrption
-  var descriptionField = createZonePrompt.newField('multitext');
-  descriptionField.name = 'description';
-  descriptionField.formatPrompt('Describe this zone.');
-  createZonePrompt.addField(descriptionField);
-
-  var options = {
+  zoneCreationFields['rating'] = {
+    name: 'rating',
+    type: 'select',
+    title: 'How hard is this zone?',
+    options: {
       0:'Unpopulated rooms, simple navigation, no threats.',
       1:'Unarmed mobs with less than 3 hp, straightforward navigation, no room effects or DTs',
       2:'Armed or unarmed mobs with low damage, less than 20 hp, straightforward navigation, no room effects or DTs',
@@ -230,26 +202,131 @@ module.exports.createZone = function(session) {
       8:'Cannot be solod effectively, ocassionally kills entire groups. Mobs with 3k+ HP everywhere, high level spell use ubiquitous, awkward navigation, room effects and DTs guaranteed',
       9:'Cannot be solod at all, frequently kills full groups. Mob HP set to ludicrous levels, spell effects ubiquitous, mazy navigation, puzzles, and deadly room effects guaranteed',
      10:'Routinely kills full groups of high level characters with top end equipment. No trick is too dirty.',
-  };
-  // rating
-  var ratingField = createZonePrompt.newField('select');
-  ratingField.name = 'rating';
-  ratingField.options = options;
-  ratingField.formatPrompt('How hard is this zone?');
-  ratingField.sanitizeInput = function(input) {
-    input = input.toString().replace(/(\r\n|\n|\r)/gm,"");
-    input = parseInt(input.toLowerCase());
-    return input;
+    },
+    sanitizeInput = function(input) {
+      input = input.toString().replace(/(\r\n|\n|\r)/gm,"");
+      input = parseInt(input.toLowerCase());
+      return input;
+    },
+    saveRawInput: true,
   }
-  ratingField.saveRawInput = true;
-  createZonePrompt.addField(ratingField);
 
-  var ticIntervalField = createZonePrompt.addField('int');
-  ticIntervalField.name = 'tic_interval';
-  ticInterval.formatPrompt('How frequently (in seconds) should this zone refresh? (ex. 3600 = 1 hour)');
-  createZonePrompt.addField(ticIntervalField);
+  zoneCreationFields['tic_interval'] = {
+    name: 'tic_interval',
+    type: 'int',
+    title: 'How frequently (in seconds) should this zone refresh? (ex. 3600 = 1 hour)'
+  }
 
-  createZonePrompt.start();
+  Prompt.register('zone_creation');
+
+  var mobileCreationFields = [];
+
+  mobileCreationFields['zid' = {
+    name: 'zid',
+    type: 'value',
+    valye: '',
+  }
+
+  mobileCreationFields['name'] = {
+    name: 'name',
+    type: 'text',
+    title: 'What should this mobile be named? (Name displays in room.)'
+  }
+
+  mobileCreationFields['short_name'] = {
+    name: 'short_name',
+    type: 'text',
+    title: 'Provide a short name: (Displays during move, by "scan", etc.)'
+  }
+
+  mobileCreationFields['description'] = {
+    name: 'description',
+    type: 'multitext',
+    title: 'Describe this mobile. (Description displayed by "look" command'
+  }
+
+  mobileCreationFields['hp'] = {
+    name: 'hp',
+    type: 'int',
+    title: 'How many hitpoints does this mob have?',
+  }
+  // TODO: this should be altered into existence as needed by world mechanics module
+  mobileCreationFields['mana'] = {
+    name: 'mana',
+    type: 'int',
+    title: 'How many mana points does this mob have?'
+  }
+
+  mobileCreationFields['level'] = {
+    name: 'level',
+    type: 'int',
+    title: 'What level is this mob?'
+  }
+
+  mobileCreationFields['hit'] = {
+    name: 'hit',
+    type: 'int',
+    title: 'To hit bonus:'
+  }
+
+  mobileCreationFields['dam'] = {
+    name: 'dam',
+    type: 'int',
+    title: 'Damage bonus:'
+  }
+
+  // TODO: flags field and options should be defined by world mechanics module
+  mobileCreationFields['flags'] = {
+    name: 'flags',
+    type: 'multiselect',
+    title: 'What additional flags should this mob have?',
+    options: {n:'NONE', c:'CASTER', p:'PATROL', s:'SKILLED', a:'AGGRO', z:'ZONEHUNTER', w:'WORLDHUNTER'}
+  }
+  // Placeholder until spells/skills are a thing
+  mobileCreationFields['effects'] = {
+    name: 'effects',
+    type: 'value',
+    value: JSON.stringify([])
+  }
+  // Note: extra is a placeholder for any additional data required by complex mobprogs.
+  mobileCreationFields['extra'] = {
+    name: 'extra',
+    type: 'value',
+    value: JSON.stringify([])
+  }
+
+  Prompt.register('mobile_creation', mobileCreationFields);
+}
+
+/**
+ * Item creation screen.
+ *
+ * @param session
+ *   Character session object.
+ */
+module.exports.createItem = function(session) {
+  var roomId = session.character.current_room;
+  var zid = Rooms.room[roomId].zid;
+
+  Prompt.start('item_creation', session);
+}
+
+/**
+ * Room creation prompt.
+ */
+module.exports.createRoom = function(session) {
+
+  var roomId = session.character.current_room;
+  var current_room = Rooms.room[roomId];
+
+  Prompt.start('room_creation', session);
+}
+
+/**
+ * Zone creation prompt.
+ */
+module.exports.createZone = function(session) {
+  Prompt.start('zone_creation', session);
 }
 
 /**
@@ -260,78 +337,5 @@ module.exports.createZone = function(session) {
  *
  */
 module.exports.createMobile = function(session) {
-  var createMobilePrompt = Prompt.new(session, this.saveNewMobile);
-
-  // Name
-  var mobileNameField = createMobilePrompt.newField('text');
-  mobileNameField.name = 'name',
-  mobileNameField.formatPrompt('What should this mobile be named? (Name displays in room.)'),
-  createMobilePrompt.addField(mobileNameField);
-
-  var mobileShortNameField = createMobilePrompt.newField('text');
-  mobileShortNameField.name = 'short_name',
-  mobileShortNameField.formatPrompt('Provide a short name: (Displays during move, by "scan", etc.)'),
-  createMobilePrompt.addField(mobileShortNameField);
-
-
-  // Description
-  var mobileDescField = createMobilePrompt.newField('multitext');
-  mobileDescField.name = 'description',
-  mobileDescField.formatPrompt('Describe this mobile. (Description displayed by "look")'),
-  createMobilePrompt.addField(mobileDescField);
-
-  // Zone ID
-  var mobileZidField = createMobilePrompt.newField('value');
-  mobileZidField.name = 'zid';
-  mobileZidField.value = Zones.getCurrentZoneId(session);
-  createMobilePrompt.addField(mobileZidField);
-
-  // HP
-  var mobileHPField = createMobilePrompt.newField('int');
-  mobileHPField.name = 'hp';
-  mobileHPField.formatPrompt('How many hitpoints does this mob have?');
-  createMobilePrompt.addField(mobileHPField);
-
-  // MANA
-  var mobileManaField = createMobilePrompt.newField('int');
-  mobileManaField.name = 'mana';
-  mobileManaField.formatPrompt('How many mana points does this mob have?');
-  createMobilePrompt.addField(mobileManaField);
-
-  // LEVEL
-  var mobileLVLField = createMobilePrompt.newField('int');
-  mobileLVLField.name = 'level';
-  mobileLVLField.formatPrompt('What level is this mob?');
-  createMobilePrompt.addField(mobileLVLField);
-
-  var mobileHitField = createMobilePrompt.newField('int');
-  mobileHitField.name = 'hit';
-  mobileHitField.formatPrompt('To hit bonus:');
-  createMobilePrompt.addField(mobileHitField);
-
-  var mobileDamField = createMobilePrompt.newField('int');
-  mobileDamField.name = 'dam';
-  mobileDamField.formatPrompt('Damage bonus:');
-  createMobilePrompt.addField(mobileDamField);
-
-  // flags
-  var mobileFlagsField = createMobilePrompt.newField('multiselect');
-  mobileFlagsField.name = 'flags';
-  mobileFlagsField.options = {n:'NONE', c:'CASTER', p:'PATROL', s:'SKILLED', a:'AGGRO', z:'ZONEHUNTER', w:'WORLDHUNTER'},
-  mobileFlagsField.formatPrompt('What additional flags should this mob have?');
-  createMobilePrompt.addField(mobileFlagsField);
-
-  // TODO: effects field once spells are a thing
-  var mobileEffectsField = createMobilePrompt.newField('value');
-  mobileEffectsField.name = 'effects';
-  mobileEffectsField.value = JSON.stringify([]);
-  createMobilePrompt.addField(mobileEffectsField);
-
-  // Note: extra is a placeholder for any additional data required by complex mobprogs.
-  var mobileExtraField = createMobilePrompt.newField('value');
-  mobileExtraField.name = 'extra';
-  mobileExtraField.value = JSON.stringify({});
-  createMobilePrompt.addField(mobileExtraField);
-
-  createMobilePrompt.start();
+  Prompt.start('mobile_creation', mobileCreationFields);
 }
