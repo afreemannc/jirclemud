@@ -1,5 +1,3 @@
-var createPrompts = require('./prompts/createPrompts.js');
-
 var Command = function() {
   this.trigger = 'create';
   this.permsRequired = 'BUILDER';
@@ -12,16 +10,16 @@ var Command = function() {
     else {
       switch (context) {
         case 'zone':
-          createPrompts.createZone(session);
+          Prompt.start('create_zone', session);
           break;
         case 'room':
-          createPrompts.createRoom(session);
+          Prompt.start('create_room', session);
           break;
         case 'item':
-          createPrompts.createItem(session);
+          Prompt.start('create_item', session);
           break;
         case 'mob':
-          createPrompts.createMobile(session);
+          Prompt.start('create_mobile', session);
           break;
         default:
           session.error('Create what??\n');
