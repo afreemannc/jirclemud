@@ -1,4 +1,3 @@
-var editRoomPrompts = require('./prompts/editRoomPrompts.js');
 
 var Command = function() {
   this.trigger = 'edit';

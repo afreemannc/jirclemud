@@ -60,7 +60,7 @@ function promptSystem() {
     newPrompt.start();
   }
 
-  this.startEdit(id, session, fieldName, values) {
+  this.startEdit = function(id, session, fieldName, values) {
     var cachedPrompt = this.registered[id];
     var newPrompt = this.Prompt.new(id, sessions, cachedPrompt.completionCallback, cachedPrompt.quittable);
     var fieldNames = Object.keys(cachedPrompt.fields);
