@@ -4,7 +4,7 @@ function Int() {
   this.type = '';
   this.maxint = false;
   this.value = false;
-  this.promptMessage = '';
+  this.title = '';
   this.validated = false;
   this.conditional = false;
   this.fieldGroup = false;
@@ -19,12 +19,12 @@ function Int() {
     }
   }
 
-  this.formatPrompt = function(message) {
+  this.formatPrompt = function() {
     if (this.maxint === false) {
-      this.promptMessage =  message + '\n';
+      this.title =  this.message + '\n';
     }
     else {
-      this.promptMessage = message + ' (max: ' + this.maxint + ')\n';
+      this.title = this.title + ' (max: ' + this.maxint + ')\n';
     }
   };
 

@@ -74,6 +74,7 @@ function Session() {
   }
 
   // Register user login/create prompt
+  this.registerPrompt = function() {
   var fields = [];
   fields['start'] = {
     name: 'start',
@@ -83,6 +84,10 @@ function Session() {
     replaceInPrefix: true,
   }
   Prompt.register('sessionstart', fields, this.startSwitch, false);
+  }
+  console.log('registering session start prompt');
+  console.log(this);
+  this.registerPrompt();
 }
 
 module.exports.new = function() {

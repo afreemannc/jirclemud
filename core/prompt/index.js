@@ -2,7 +2,7 @@
  * @file Prompt system class and related methods.
  */
 function promptSystem() {
-  this.Prompt = require('./prompt');
+  this.makePrompt = require('./prompt');
   this.registered = [];
   this.register = function(id, fields, completionCallback, quittable = true) {
     this.registered[id] = {
@@ -44,9 +44,10 @@ function promptSystem() {
    *   User session to prompt.
    */
   this.start = function(id, session) {
-
+    console.log('session in prompt:');
+    console.log(session);
     var cachedPrompt = this.registered[id];
-    var newPrompt = this.Prompt.new(id, session, cachedPrompt.completionCallback, cachedPrompt.quittable);
+    var newPrompt = this.makePrompt.new(id, session, cachedPrompt.completionCallback, cachedPrompt.quittable);
     newPrompt.quittable = cachedPrompt.quittable;
     var fieldNames = Object.keys(cachedPrompt.fields);
 

@@ -2,14 +2,14 @@
  * @file Prompt system class and related methods.
  */
 
-function Prompt(id, session, completionCallback) {
+function makePrompt(id, session, completionCallback, quittable = true) {
   this.id = id;
   this.session = session;
   this.fields = [];
   this.currentField = false;
   this.completionCallback = completionCallback;
   this.alterCallbacks = [];
-  this.quittable = true;
+  this.quittable = quittable;
   this.fieldGroups = {};
 
   /**
@@ -19,6 +19,8 @@ function Prompt(id, session, completionCallback) {
    *   Returns true if prompt was displayed, otherwise false.
    */
   this.promptUser = function() {
+    console.log('promptUser invoked:');
+    console.log(this);
     // Skip prompting on conditional fields where condition is not met
     if (typeof this.currentField.conditional === 'object') {
       var field = this.currentField.conditional.field;
@@ -31,10 +33,12 @@ function Prompt(id, session, completionCallback) {
         return false;
       }
     }
-    var message = this.currentField.promptMessage;
+    this.currentField.formatPrompt();
+    var message = this.currentField.title;
     if (this.quittable === true) {
       message += Tokens.replace('%yellow% (@q to quit)%yellow%\n');
     }
+    console.log('message:' + message);
     this.session.socket.write(Tokens.replace(message));
     return true;
   }
@@ -190,21 +194,16 @@ function Prompt(id, session, completionCallback) {
    * Start prompting the user for input.
    */
   this.start = function() {
-    if (this.alterCallbacks.length > 0) {
-      console.log('alter callbacks:');
-      console.log(this.alterCallbacks);
-      for (var i = 0; i < this.alterCallbacks.length; ++i) {
-        console.log('running alter callback');
-        console.log(this);
-        this.alterCallbacks[i](this);
-      }
-    }
     this.session.inputContext = 'prompt';
     this.session.prompt = this;
+    console.log('fields in prompt start:');
+    console.log(this.fields);
     for (var i = 0; i < this.fields.length; ++i) {
       // skip value fields
       if (this.fields[i].formatPrompt !== false) {
         this.currentField = this.fields[i];
+        console.log('prompting user on field:');
+        console.log(this.currentField);
         this.promptUser(this.currentField);
         break;
       }
@@ -215,7 +214,7 @@ function Prompt(id, session, completionCallback) {
 /**
  * Field type definitions.
  */
-Prompt.prototype.fieldTypes = {
+makePrompt.prototype.fieldTypes = {
   text: require('../fields/text.js'),
   multitext: require('../fields/multi-text.js'),
   select: require('../fields/select.js'),
@@ -227,7 +226,7 @@ Prompt.prototype.fieldTypes = {
 };
 
 
-module.exports.new = function(id, session, completionCallback) {
-  var newPrompt =  new Prompt(id, session, completionCallback);
+module.exports.new = function(id, session, completionCallback, quittable = true) {
+  var newPrompt =  new makePrompt(id, session, completionCallback, quittable);
   return newPrompt;
 }

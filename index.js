@@ -57,6 +57,8 @@ function newSocket(socket) {
 
   session.socket = socket;
   Sessions.push(session);
+  console.log('session pre-start');
+  console.log(session);
   session.start();
 }
 

@@ -7,7 +7,7 @@ function FieldGroup() {
   var staticOptions = {y:'Yes', n:'No'};
 
   this.value = [];
-  this.promptMessage = '';
+  this.title = '';
   this.validated = false;
   this.conditional = false;
   this.fieldGroup = false;
@@ -17,18 +17,18 @@ function FieldGroup() {
   // at the moment and likely unnecessary in any case.
   this.checkConditional = false;
 
-  this.formatPrompt = function(prefix) {
-    this.promptMessage = prefix + '\n';
+  this.formatPrompt = function() {
+    this.title = this.title + '\n';
     var keys = Object.keys(staticOptions);
 
     for (var i = 0; i < keys.length; ++i) {
       if (this.replaceInPrefix === true) {
         pattern = '[::' + keys[i] + '::]';
         replacement = '[%yellow%' + keys[i].toUpperCase() + '%yellow%]';
-        this.promptMessage = this.promptMessage.replace(pattern, replacement);
+        this.title = this.title.replace(pattern, replacement);
       }
       else {
-        this.promptMessage += '[%yellow%' + keys[i].toUpperCase() + '%yellow%] ' + staticOptions[keys[i]] + '\n';
+        this.title += '[%yellow%' + keys[i].toUpperCase() + '%yellow%] ' + staticOptions[keys[i]] + '\n';
       }
     }
   };

@@ -3,15 +3,15 @@ function Text() {
   this.name = '';
   this.type = '';
   this.value = false;
-  this.promptMessage = '';
+  this.title = '';
   this.validated = false;
   this.conditional = false;
   this.checkConditional = false;
   this.fieldGroup = false;
   this.replaceInPrefix = false;
 
-  this.formatPrompt = function(message) {
-    this.promptMessage =  message + '\n';
+  this.formatPrompt = function() {
+    this.title =  this.title + '\n';
   };
 
   this.sanitizeInput = function(input) {

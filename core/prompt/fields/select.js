@@ -3,7 +3,7 @@ function Select() {
   this.name = '';
   this.options = {};
   this.value = false;
-  this.promptMessage = '';
+  this.title = '';
   this.validated = false;
   this.conditional = false;
   this.fieldGroup = false;
@@ -29,18 +29,18 @@ function Select() {
     }
   }
 
-  this.formatPrompt = function(prefix) {
-    this.promptMessage = prefix + '\n';
+  this.formatPrompt = function() {
+    this.title = this.title + '\n';
     var keys = Object.keys(this.options);
-
+    console.log('replace:' + this.replaceInPrefix);
     for (var i = 0; i < keys.length; ++i) {
       if (this.replaceInPrefix === true) {
         pattern = '[::' + keys[i] + '::]';
         replacement = '[%yellow%' + keys[i].toUpperCase() + '%yellow%]';
-        this.promptMessage = this.promptMessage.replace(pattern, replacement);
+        this.title = this.title.replace(pattern, replacement);
       }
       else {
-        this.promptMessage += '[%yellow%' + keys[i].toUpperCase() + '%yellow%] ' + this.options[keys[i]] + '\n';
+        this.title += '[%yellow%' + keys[i].toUpperCase() + '%yellow%] ' + this.options[keys[i]] + '\n';
       }
     }
   };
