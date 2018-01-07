@@ -12,6 +12,20 @@ function promptSystem() {
     }
   }
 
+  /**
+   * Register prompts defined in modules.
+   */
+  this.loadPrompts = function(filepath) {
+    var pluginPrompts = require("fs").readdirSync(filepath);
+    for (var i = 0; i < pluginPrompts.length; ++i) {
+      if (pluginPrompts[i].endsWith('.js')) {
+        var file = pluginCommands[i];
+        var pluginPrompt = require(dir + "/" + file);
+        this.register(pluginPrompt.id, pluginPrompt.fields, pluginPrompt.completionCallback, pluginPrompt.quittable);
+      }
+    }
+  }
+
   this.getPrompt = function(id) {
     if (typeof this.registered[id] !== 'undefined') {
       return this.registered[id];

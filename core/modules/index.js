@@ -77,10 +77,17 @@ modules.prototype.loadEnabledModules = function() {
         console.log(currentModule.features);
         Modules.modules[currentModule.name] = require(currentModule.filepath + '/index.js');
         console.log(Modules.modules[currentModule.name]);
-        if (typeof currentModule.features !== 'undefined' && currentModule.features.includes('commands')) {
-          // load commands into memory
-          var commandFolderPath = currentModule.filepath + '/commands';
-          Commands.loadCommands(commandFolderPath);
+        // Features check
+        if (typeof currentModule.features !== 'undefined') {
+          if (currentModule.features.includes('commands')) {
+            // load commands into memory
+            var commandFolderPath = currentModule.filepath + '/commands';
+            Commands.loadCommands(commandFolderPath);
+          }
+          if (currentModule.features.includes('prompts')) {
+            var promptFolderPath = currentModule.filepath + '/prompts';
+            Prompt.loadPrompts(promptFolderPath);
+          }
         }
         if (typeof  Modules.modules[currentModule.name].load !== 'undefined') {
           Modules.modules[currentModule.name].load();

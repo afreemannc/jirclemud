@@ -8,7 +8,7 @@ var item = function(){
   // Modules may register listeners to this event to act when
   // items are loaded.
   this.event = new Events.EventEmitter();
-
+  //TODO: make this configurable
   this.flags = {
     0:  'NONE',
     c:  'CONTAINER',
