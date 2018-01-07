@@ -11,6 +11,10 @@ var Command = function() {
          edit room desc (change room description)
          edit room flags (change room flags)
 
+         edit zone name (change zone name)
+         edit zone desc (change zone description)
+         edit zone rating (change difficulty rating)
+
          edit item name (change name for all instances of item)
          edit item roomdesc (change room description for all instances of item)
          edit item fulldesc (change full description for all instances of item)
@@ -82,6 +86,12 @@ var Command = function() {
         }
         session.error('Edit what??');
         break;
+      case 'item':
+        session.error('item editing currently unsupported, check back tomorrow');
+        break;
+      case 'mob':
+        session.error('mob editing currently unsupported, check back tomorrow');
+        break;
       default:
         // Unknown 1st arg
         session.error('Edit what??');
@@ -91,7 +101,6 @@ var Command = function() {
 
 }
 // TODO: implement item edit
-// TODO: implement zone edit
 // TODO: implement exit edit
 // TODO: implement door edit (?)
 module.exports = new Command();
