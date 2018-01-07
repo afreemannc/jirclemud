@@ -11,17 +11,18 @@ function FieldGroup() {
   this.validated = false;
   this.conditional = false;
   this.fieldGroup = false;
+  this.replaceInPrefix = false;
   this.fields = [];
   // Making this compatible with conditionals is a bigger lift than I'm willing to take
   // at the moment and likely unnecessary in any case.
   this.checkConditional = false;
 
-  this.formatPrompt = function(prefix, replaceInPrefix) {
+  this.formatPrompt = function(prefix) {
     this.promptMessage = prefix + '\n';
     var keys = Object.keys(staticOptions);
 
     for (var i = 0; i < keys.length; ++i) {
-      if (replaceInPrefix === true) {
+      if (this.replaceInPrefix === true) {
         pattern = '[::' + keys[i] + '::]';
         replacement = '[%yellow%' + keys[i].toUpperCase() + '%yellow%]';
         this.promptMessage = this.promptMessage.replace(pattern, replacement);

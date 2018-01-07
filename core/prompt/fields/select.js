@@ -7,7 +7,8 @@ function Select() {
   this.validated = false;
   this.conditional = false;
   this.fieldGroup = false;
-  this.saveRawInput = false
+  this.saveRawInput = false;
+  this.replaceInPrefix = false;
 
   this.checkConditional = function(input) {
     if (Array.isArray(input)) {
@@ -28,12 +29,12 @@ function Select() {
     }
   }
 
-  this.formatPrompt = function(prefix, replaceInPrefix) {
+  this.formatPrompt = function(prefix) {
     this.promptMessage = prefix + '\n';
     var keys = Object.keys(this.options);
 
     for (var i = 0; i < keys.length; ++i) {
-      if (replaceInPrefix === true) {
+      if (this.replaceInPrefix === true) {
         pattern = '[::' + keys[i] + '::]';
         replacement = '[%yellow%' + keys[i].toUpperCase() + '%yellow%]';
         this.promptMessage = this.promptMessage.replace(pattern, replacement);

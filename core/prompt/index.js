@@ -20,28 +20,29 @@ function promptSystem() {
       return false;
     }
   }
-
+  /**
+   * Initiate prompt sequence.
+   *
+   * @param id
+   *   ID of prompt to execute.
+   *
+   * @param session
+   *   User session to prompt.
+   */
   this.start = function(id, session) {
+
     var cachedPrompt = this.registered[id];
-    console.log(cachedPrompt);
     var newPrompt = this.Prompt.new(id, session, cachedPrompt.completionCallback, cachedPrompt.quittable);
     newPrompt.quittable = cachedPrompt.quittable;
     var fieldNames = Object.keys(cachedPrompt.fields);
+
     for (var i = 0; i < fieldNames.length; ++i) {
       var currentField = cachedPrompt.fields[fieldNames[i]];
       var newField = newPrompt.newField(currentField.type);
+      // Newly created field inherits properties from the cached copy of the field.
       Object.assign(newField, currentField);
-      var replaceInPrefix = false;
-      if (typeof currentField.replaceInPrefix !== 'undefined') {
-        replaceInPrefix = currentField.replaceInPrefix;
-      }
-      if (newField.formatPrompt !== false) {
-        console.log('format prompt type:' + typeof newField.formatPrompt);
-        newField.formatPrompt(currentField.title, replaceInPrefix);
-      }
       newPrompt.addField(newField);
     }
-    console.log(newPrompt);
     newPrompt.start();
   }
 

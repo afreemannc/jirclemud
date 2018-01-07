@@ -8,8 +8,9 @@ function Dice() {
   this.conditional = false;
   this.checkConditional = false;
   this.fieldGroup = false;
+  this.replaceInPrefix = false;
 
-  this.formatPrompt = function(prefix, replaceInPrefix) {
+  this.formatPrompt = function(prefix) {
     this.promptMessage = prefix + '  (ex: 1d6, 2d8, etc)\n';
   };
 

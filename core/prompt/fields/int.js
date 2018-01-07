@@ -8,6 +8,7 @@ function Int() {
   this.validated = false;
   this.conditional = false;
   this.fieldGroup = false;
+  this.replaceInPrefix = false;
 
   this.checkConditional = function(input) {
     if (this.value === input) {
