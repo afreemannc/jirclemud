@@ -60,13 +60,15 @@ Mobile.prototype.loadMobiles = function() {
   // delete
 
   // save
-Mobile.prototype.saveNewMobile = function(session, fieldValues) {
-  var values = {
-    zid: fieldValues.zid,
-    name: fieldValues.name,
-    short_name: fieldValues.short_name,
-    description: fieldValues.description,
-    stats: JSON.stringify({
+Mobile.prototype.saveMobile = function(session, fieldValues) {
+  var Mobile = Models.Mobile;
+  // TODO: move details of stats group to world settings module, extend Prompt as needed
+  // to support correct value grouping in fieldValues.
+
+  // TODO: examine viability of fields being pre-stringified by Prompt. It would be nice to eliminate this
+  // kind of conversion cropping up in all of the save functions.
+  if (typeof fieldValues.mid !== 'undefined' && fieldValues.mid) {
+    fieldValues.stats = JSON.stringify({
       hit: fieldValues.hit,
       dam: fieldValues.dam,
       max_hp: fieldValues.hp,
@@ -74,18 +76,45 @@ Mobile.prototype.saveNewMobile = function(session, fieldValues) {
       max_mana: fieldValues.mana,
       current_mana: fieldValues.mana,
       level: fieldValues.level
-    }),
-    effects: JSON.stringify(fieldValues.effects),
-    equipment: JSON.stringify(Characters.initializeEqSlots()),
-    inventory: JSON.stringify([]),
-    extra: JSON.stringify({flags:fieldValues.flags})
-  }
+    });
+    fieldValues.effects = JSON.stringify(fieldValues.effects);
+    fieldValues.equipment = JSON.stringify(Characters.initializeEqSlots()),
+    fieldValuesinventory = JSON.stringify([]),
+    fieldValues.extra = JSON.stringify({flags:fieldValues.flags})
 
-  var Mobile = Models.Mobile;
-  Mobile.create(values).then(function(mobileInstance) {
-    session.inputContext = 'command';
-    session.write('New mob type saved.');
-  });
+    Mobile.update(fieldValues, {where: {mid:fieldValues.mid}}).then(function(response) {
+      session.inputContext = 'command';
+      session.write('Mobile changes saved.');
+    });
+  }
+  else {
+    var values = {
+      zid: fieldValues.zid,
+      name: fieldValues.name,
+      short_name: fieldValues.short_name,
+      description: fieldValues.description,
+      stats: JSON.stringify({
+        hit: fieldValues.hit,
+        dam: fieldValues.dam,
+        max_hp: fieldValues.hp,
+        current_hp: fieldValues.hp,
+        max_mana: fieldValues.mana,
+        current_mana: fieldValues.mana,
+        level: fieldValues.level
+      }),
+      effects: JSON.stringify(fieldValues.effects),
+      equipment: JSON.stringify(Characters.initializeEqSlots()),
+      inventory: JSON.stringify([]),
+      extra: JSON.stringify({flags:fieldValues.flags})
+    }
+
+    Mobile.create(values).then(function(mobileInstance) {
+      // TODO: have Prompt handle this automatically when completion callback is invoked. Having
+      // to manually specify this behavior in a bunch of places is tedious and unnecessary.
+      session.inputContext = 'command';
+      session.write('New mob type saved.');
+    });
+  }
 }
 
 Mobile.prototype.moveMobs = function() {
