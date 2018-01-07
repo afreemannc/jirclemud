@@ -102,26 +102,38 @@ item.prototype.setItemProperties = function(fieldValues) {
 item.prototype.saveNewItem = function(session, fieldValues) {
   var roomId = session.character.current_room;
   var zid = Rooms.room[roomId].zid;
-  // Whatever happens next the prompt that got us here has
-  // completed so we need to switch input context to escape the
-  // prompt system
-  // TODO: update prompt system to render this unnecessary.
-  session.inputContext = 'command';
-  var properties = {};
-  var values = {
-    zid: zid,
-    name:fieldValues.name,
-    room_description:fieldValues.room_description,
-    full_description:fieldValues.full_description,
-    properties: JSON.stringify(Items.setItemProperties(fieldValues))
-  }
   var Item = Models.Item;
 
-  Item.create(values).then(function(newItem) {
-    session.write('New item type saved.');
-  }).catch(function(error) {
-    console.log('Something has gone wrong saving an item:' + error);
-  });
+  if (typeof fieldValues.iid !== 'undefined' && fieldValues.iid) {
+    fieldValues.properties = JSON.stringify(fieldValues.properties);
+    Item.update(fieldValues, {where: {iid:fieldValues.iid}}).then(function(response) {
+      session.inputContext = 'command';
+      session.write('Item changes saved.');
+    });
+  }
+  else {
+    // Whatever happens next the prompt that got us here has
+    // completed so we need to switch input context to escape the
+    // prompt system
+    // TODO: update prompt system to render this unnecessary.
+    session.inputContext = 'command';
+    var properties = {};
+    var values = {
+      zid: zid,
+      name:fieldValues.name,
+      room_description:fieldValues.room_description,
+      full_description:fieldValues.full_description,
+      properties: JSON.stringify(Items.setItemProperties(fieldValues))
+    }
+
+    Item.create(values).then(function(newItem) {
+      session.write('New item type saved.');
+      session.inputContext = 'command';
+    }).catch(function(error) {
+      session.error('Something has gone wrong saving an item:' + error);
+      session.inputContext = 'command';
+    });
+  }
 }
 
 
