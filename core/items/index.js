@@ -82,7 +82,7 @@ item.prototype.setItemProperties = function(fieldValues) {
  * @param fieldValues
  *   User input values from item creation screen.
  */
-item.prototype.saveNewItem = function(session, fieldValues) {
+item.prototype.saveItem = function(session, fieldValues) {
   var roomId = session.character.current_room;
   var zid = Rooms.room[roomId].zid;
   var Item = Models.Item;
@@ -90,16 +90,10 @@ item.prototype.saveNewItem = function(session, fieldValues) {
   if (typeof fieldValues.iid !== 'undefined' && fieldValues.iid) {
     fieldValues.properties = JSON.stringify(fieldValues.properties);
     Item.update(fieldValues, {where: {iid:fieldValues.iid}}).then(function(response) {
-      session.inputContext = 'command';
       session.write('Item changes saved.');
     });
   }
   else {
-    // Whatever happens next the prompt that got us here has
-    // completed so we need to switch input context to escape the
-    // prompt system
-    // TODO: update prompt system to render this unnecessary.
-    session.inputContext = 'command';
     var properties = {};
     var values = {
       zid: zid,
@@ -111,10 +105,8 @@ item.prototype.saveNewItem = function(session, fieldValues) {
 
     Item.create(values).then(function(newItem) {
       session.write('New item type saved.');
-      session.inputContext = 'command';
     }).catch(function(error) {
       session.error('Something has gone wrong saving an item:' + error);
-      session.inputContext = 'command';
     });
   }
 }

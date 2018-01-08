@@ -94,6 +94,9 @@ function makePrompt(id, session, completionCallback, quittable = true) {
           for (var i = 0; i < this.fields.length; ++i) {
             fieldValues[this.fields[i].name] = this.fields[i].value;
           }
+          // Whatever else happens in the completion callback this prompt has run it's
+          // course so it's time to hand input processing back to the command system.
+          this.session.inputContext = 'command';
           this.completionCallback(this.session, fieldValues);
         }
       }

@@ -133,7 +133,6 @@ room.prototype.saveRoom = function(session, values) {
       for (i = 0; i < keys.length; ++i) {
         Rooms.room[values.rid][keys[i]] = values[keys[i]];
       }
-      session.inputContext = 'command';
       session.write('Room changes saved.');
       Commands.triggers.look(session, '');
     });
@@ -146,12 +145,11 @@ room.prototype.saveRoom = function(session, values) {
       newRoom.flags = JSON.parse(newRoom.flags);
       Rooms.room[newRoom.rid] = newRoom;
 
-      session.inputContext = 'command';
       session.write('New room created (rid:' + instance.get('rid') + ')');
     });
   }
 }
-
+// TODO: move to Builder module
 room.prototype.deleteRoomPrompt = function(session) {
   var roomId = session.character.current_room;
 
@@ -174,7 +172,6 @@ room.prototype.deleteRoomPrompt = function(session) {
       // TODO: perhaps moving this to the validation callback would be less weird.
       // This is unusual for a cache function. Since there is a cancel option we want to gracefully bail out of
       // prompt mode without triggering the prompt completion callback.
-      session.inputContext = 'command';
       session.write('Primal chaos recedes as you turn your thoughts away from destruction.');
       return false;
     }

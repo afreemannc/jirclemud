@@ -174,7 +174,6 @@ modules.prototype.saveModuleChanges = function(session, fieldValues) {
         session.write('Module status updated. This change will not take effect until the mud is restarted.');
         Modules.availableModules[name].status = moduleStatus;
       });
-      session.inputContext = 'command';
       Modules.moduleAdmin(session);
       break;
     case 'list':
@@ -185,17 +184,14 @@ modules.prototype.saveModuleChanges = function(session, fieldValues) {
         output += module.name + ' : ' + module.status + ' : ' + module.description + '\n';
       }
       session.write(output);
-      session.inputContext = 'command';
       Modules.moduleAdmin(session);
       return true;
       break;
     case 'quit':
-      session.inputContext = 'command';
       Admin.listTasks(session);
       return true;
       break;
     default:
-      session.inputContext = 'command';
       return false;
   }
 }

@@ -83,7 +83,6 @@ Mobile.prototype.saveMobile = function(session, fieldValues) {
     fieldValues.extra = JSON.stringify({flags:fieldValues.flags})
 
     Mobile.update(fieldValues, {where: {mid:fieldValues.mid}}).then(function(response) {
-      session.inputContext = 'command';
       session.write('Mobile changes saved.');
     });
   }
@@ -109,9 +108,6 @@ Mobile.prototype.saveMobile = function(session, fieldValues) {
     }
 
     Mobile.create(values).then(function(mobileInstance) {
-      // TODO: have Prompt handle this automatically when completion callback is invoked. Having
-      // to manually specify this behavior in a bunch of places is tedious and unnecessary.
-      session.inputContext = 'command';
       session.write('New mob type saved.');
     });
   }

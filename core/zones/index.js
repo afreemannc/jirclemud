@@ -117,7 +117,6 @@ zones.prototype.saveZone = function(session, fieldValues) {
       Zones.zone[values.zid].description = values.description;
       Zones.zone[values.zid].rating = values.rating;
       session.write('Zone changes saved.');
-      session.inputContext = 'command';
     });
   }
   else {
@@ -127,7 +126,6 @@ zones.prototype.saveZone = function(session, fieldValues) {
       newZone.rooms = [];
       Zones.zone[zoneInstance.get('rid')] = newZone;
       session.write('New zone saved.');
-      session.inputContext = 'command';
       // Once a new zone is created we will need to also create a starter room so
       // construction can start. Otherwise I'm stuck adding a zone selection field to the
       // room creation and edit forms to no good purpose. Much simpler to make a room and then

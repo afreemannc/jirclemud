@@ -94,7 +94,6 @@ var characters = function(){
 
     // Raw socket write is used here since the command prompt will be displayed after "look" runs.
     session.socket.write('Welcome back ' + character.name + '\n');
-    session.inputContext = 'command';
     Commands.triggers.look(session, '');
   }
 
@@ -107,30 +106,39 @@ var characters = function(){
    * @param fieldValues
    *   user input values from character creation screen.
    */
-  this.saveNewCharacter = function(session, fieldValues) {
+  this.saveCharacter = function(session, fieldValues) {
     var Character = Models.Character;
     var hashedPassword = Characters.passHash(fieldValues.salt, fieldValues.password);
+    if (typeof fieldValues.cid !== 'undefined' && fieldValues.cid) {
+      fieldValues.perms = JSON.stringify(fieldValues.perms);
+      fieldValues.stats = JSON.stringify(fieldValues.stats);
+      fieldValues.effects = JSON.stringify(fieldValues.effects);
+      fieldValues.inventory = JSON.stringify(fieldValues.inventory);
+      Character.update(fieldValues, {where: {cid:fieldValues.cid}}).then(function(response) {
+        session.write('Character changes saved.');
+      });
+    }
+    else {
+      var values = {
+        name: fieldValues.charactername,
+        pass: hashedPassword,
+        salt: fieldValues.salt,
+        last_login: 0,
+        status: 1,
+        current_room: Config.startRoomId,
+        perms: JSON.stringify([]),
+        stats: JSON.stringify({}),
+        effects: Characters.startEffects(), equipment: JSON.stringify(Characters.initializeEqSlots()),
+        inventory: JSON.stringify([])
+      };
 
-    var values = {
-      name: fieldValues.charactername,
-      pass: hashedPassword,
-      salt: fieldValues.salt,
-      last_login: 0,
-      status: 1,
-      current_room: Config.startRoomId,
-      perms: JSON.stringify([]),
-      stats: JSON.stringify({}),
-      effects: Characters.startEffects(), equipment: JSON.stringify(Characters.initializeEqSlots()),
-      inventory: JSON.stringify([])
-    };
-
-    Character.create(values).then(function(instance) {
-      // Attach character to active session.
-      session.character = instance.dataValues;
-      session.socket.write('Welcome ' + values.name + '\n');
-      session.inputContext = 'command';
-      Commands.triggers.look(session, '');
-    });
+      Character.create(values).then(function(instance) {
+        // Attach character to active session.
+        session.character = instance.dataValues;
+        session.socket.write('Welcome ' + values.name + '\n');
+        Commands.triggers.look(session, '');
+      });
+    }
   }
 
   // Register user login prompt
