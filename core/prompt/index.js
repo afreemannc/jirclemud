@@ -44,8 +44,6 @@ function promptSystem() {
    *   User session to prompt.
    */
   this.start = function(id, session) {
-    console.log('session in prompt:');
-    console.log(session);
     var cachedPrompt = this.registered[id];
     var newPrompt = this.makePrompt.new(id, session, cachedPrompt.completionCallback, cachedPrompt.quittable);
     newPrompt.quittable = cachedPrompt.quittable;
@@ -81,7 +79,6 @@ function promptSystem() {
         replaceInPrefix = currentField.replaceInPrefix;
       }
       if (newField.formatPrompt !== false) {
-        console.log('format prompt type:' + typeof newField.formatPrompt);
         newField.formatPrompt(currentField.title + '\n%green%Currently: ' + values[fieldName] + '%green%', replaceInPrefix);
       }
       newPrompt.addField(newField);

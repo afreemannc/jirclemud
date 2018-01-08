@@ -63,7 +63,7 @@ var characters = function(){
       if (character !== null) {
         var message = name + ' is already in use. Please select a different character name.\n';
         session.socket.write(message);
-        this.promptUser(session.prompt.currentField);
+        session.prompt.promptUser();
       }
       else {
         session.prompt.currentField.cacheInput(name);

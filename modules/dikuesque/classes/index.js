@@ -10,7 +10,7 @@ classes.prototype.list = function() {
 
 classes.prototype.cleric = {
   name: 'cleric',
-  label: '[::1::]leric',
+  label: '[::c::]leric',
   selectOption: 'c',
   description: 'Godbothering for fun and profit. Mostly profit. Two words: collection plate.',
   flags: ['DIVINE_CASTER', 'MEDIUM_ARMOR'],
@@ -20,7 +20,7 @@ classes.prototype.cleric = {
 
 classes.prototype.fighter = {
   name: 'fighter',
-  label: '[::2::]ighter',
+  label: '[::f::]ighter',
   selectOption: 'f',
   description: 'Dumb, strong, heavily armed. What more do you want?',
   flags: ['HEAVY_ARMOR', 'MEDIUM_ARMOR'],
@@ -30,7 +30,7 @@ classes.prototype.fighter = {
 
 classes.prototype.paladin = {
   name: 'paladin',
-  label: '[::3::]aladin',
+  label: '[::p::]aladin',
   selectOption: 'p',
   description: 'Seminary frowned on stabbing things so here you are.',
   flags: ['MEDIUM_ARMOR', 'HEAVY_ARMOR', 'DIVINE_CASTER'],
@@ -40,7 +40,7 @@ classes.prototype.paladin = {
 
 classes.prototype.mage = {
   name: 'mage',
-  label: '[::4::]age',
+  label: '[::m::]age',
   selectOption: 'm',
   description: "Imagine a ragey librarian who could blow shit up just by mumbling and giving it the finger. Yeah.",
   flags: ['CASTER', 'LIGHT_ARMOR'],
@@ -50,7 +50,7 @@ classes.prototype.mage = {
 
 classes.prototype.thief = {
   name: 'thief',
-  label: '[::5::]hief',
+  label: '[::t::]hief',
   selectOption: 't',
   description: "Because acting like a meth head is somehow glamorous in a fantasy setting.",
   flags: ['MEDIUM_ARMOR'],
@@ -69,7 +69,7 @@ classes.prototype.selectionOptions = function() {
   return options;
 }
 
-classes.prototype.selectionPrompt = function() {
+classes.prototype.selectionTitle = function() {
   var list = this.list();
   var prompt = ':: ';
   for (var i = 0; i < list.length; ++i) {

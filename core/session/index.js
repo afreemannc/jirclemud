@@ -75,18 +75,16 @@ function Session() {
 
   // Register user login/create prompt
   this.registerPrompt = function() {
-  var fields = [];
-  fields['start'] = {
-    name: 'start',
-    type: 'select',
-    title: '[::l::]og in, [::c::]reate a character, or [::q::]uit',
-    options: {l:'l', c:'c', q:'q'},
-    replaceInPrefix: true,
+    var fields = [];
+    fields['start'] = {
+      name: 'start',
+      type: 'select',
+      title: '[::l::]og in, [::c::]reate a character, or [::q::]uit',
+      options: {l:'l', c:'c', q:'q'},
+      replaceInPrefix: true,
+    }
+    Prompt.register('sessionstart', fields, this.startSwitch, false);
   }
-  Prompt.register('sessionstart', fields, this.startSwitch, false);
-  }
-  console.log('registering session start prompt');
-  console.log(this);
   this.registerPrompt();
 }
 

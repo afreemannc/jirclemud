@@ -19,8 +19,6 @@ function makePrompt(id, session, completionCallback, quittable = true) {
    *   Returns true if prompt was displayed, otherwise false.
    */
   this.promptUser = function() {
-    console.log('promptUser invoked:');
-    console.log(this);
     // Skip prompting on conditional fields where condition is not met
     if (typeof this.currentField.conditional === 'object') {
       var field = this.currentField.conditional.field;
@@ -38,7 +36,6 @@ function makePrompt(id, session, completionCallback, quittable = true) {
     if (this.quittable === true) {
       message += Tokens.replace('%yellow% (@q to quit)%yellow%\n');
     }
-    console.log('message:' + message);
     this.session.socket.write(Tokens.replace(message));
     return true;
   }
@@ -51,7 +48,7 @@ function makePrompt(id, session, completionCallback, quittable = true) {
    *
    */
   this.inputHandler = function(input) {
-    console.log('prompt input handler input:' + input);
+
     if (input.toString().replace(/(\r\n|\n|\r)/gm,"") === '@q' && this.quittable === true) {
       this.session.inputContext = 'command';
       Commands.triggers.look(this.session, '');
@@ -59,12 +56,10 @@ function makePrompt(id, session, completionCallback, quittable = true) {
     }
 
     var inputComplete = false;
-    console.log('currentField:' + this.currentField);
+
     if (typeof this.currentField !== 'undefined') {
       if (typeof this.currentField.sanitizeInput === 'function') {
-        console.log('sanitizing input');
         input = this.currentField.sanitizeInput(input);
-        inputComplete = this.currentField.cacheInput(input);
       }
       // Custom validation handlers can be used by overwriting the default .validate function on the field object.
       if (typeof this.currentField.validate === 'function') {
@@ -74,18 +69,16 @@ function makePrompt(id, session, completionCallback, quittable = true) {
       }
       else {
         inputComplete = this.currentField.cacheInput(input);
-        console.log('input complete:' + inputComplete);
       }
       // The current field has completed gathering input.
       if (inputComplete) {
         fieldIndex = this.getFieldIndex(this.currentField.name);
-        console.log('current field index:' + fieldIndex);
         // Iterate past hidden fields if needed.
         while (fieldIndex < this.fields.length - 1) {
           ++fieldIndex;
           var field = this.fields[fieldIndex];
           this.currentField = field;
-          if (this.currentField.promptMessage !== false) {
+          if (this.currentField.title !== false) {
             // Conditional fields may not prompt if conditions are not met.
             // In this case promptUser returns false and the current field
             // is skipped.
@@ -96,7 +89,6 @@ function makePrompt(id, session, completionCallback, quittable = true) {
           }
         }
         // Complete form submission if we have reached the last available field.
-        console.log('completion callback type:' + typeof this.completionCallback);
         if (fieldIndex === (this.fields.length - 1) && typeof this.completionCallback === 'function') {
           var fieldValues = {};
           for (var i = 0; i < this.fields.length; ++i) {

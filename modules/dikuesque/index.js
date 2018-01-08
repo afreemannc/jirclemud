@@ -12,7 +12,7 @@ function Module() {
     characterCreationPrompt.fields['class'] = {
       name: 'class',
       type: 'select',
-      title: Classes.selectionPrompt(),
+      title: Classes.selectionTitle(),
       options: Classes.selectionOptions(),
       replaceInPrefix: true
     }
