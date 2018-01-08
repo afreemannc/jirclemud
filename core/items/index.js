@@ -8,24 +8,7 @@ var item = function(){
   // Modules may register listeners to this event to act when
   // items are loaded.
   this.event = new Events.EventEmitter();
-  //TODO: make this configurable
-  this.flags = {
-    0:  'NONE',
-    c:  'CONTAINER',
-    i:  'INVISIBLE',
-    pi: 'PLAYERINVISIBLE',
-    we: 'WEARABLE',
-    u:  'CURSE',
-    b:  'BLESS',
-    h:  'HUM',
-    ta: 'TAKE',
-    wi: 'WIELD',
-    h:  'HOLD',
-    th: 'TWO-HANDED',
-    po: 'PORTAL',
-    li: 'LIGHT',
-    nta: '!TAKE'
-  }
+  this.flags = {};
 };
 /**
  * Apply stat changes based on item effects.
