@@ -107,6 +107,9 @@ var characters = function(){
    *   user input values from character creation screen.
    */
   this.saveCharacter = function(session, fieldValues) {
+    console.log('character save invoked');
+    console.log(fieldValues);
+
     var Character = Models.Character;
     var hashedPassword = Characters.passHash(fieldValues.salt, fieldValues.password);
     if (typeof fieldValues.cid !== 'undefined' && fieldValues.cid) {
@@ -131,7 +134,8 @@ var characters = function(){
         effects: Characters.startEffects(), equipment: JSON.stringify(Characters.initializeEqSlots()),
         inventory: JSON.stringify([])
       };
-
+      console.log('save values:');
+      console.log(values);
       Character.create(values).then(function(instance) {
         // Attach character to active session.
         session.character = instance.dataValues;
@@ -174,7 +178,7 @@ var characters = function(){
     type: 'text',
     title: 'Password:'
   }
-  Prompt.register('createcharacter', creationFields, this.saveNewCharater, true);
+  Prompt.register('createcharacter', creationFields, this.saveCharacter, true);
 
 };
 

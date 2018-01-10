@@ -9,7 +9,7 @@ var modules = function() {
   this.modules = {};
   this.availableModules = {};
   this.moduleDir = path.join(__dirname + '/../../', "modules");
-
+  console.log('registered admin task');
   Admin.tasks['m'] = {
     name: 'Manage Modules',
     callback: this.moduleAdmin
@@ -58,6 +58,40 @@ var modules = function() {
       });
     });
   }
+
+  // Register module administration prompt
+
+  var adminFields = [];
+
+  adminFields['start'] = {
+    name: 'start',
+    type: 'select',
+    title: 'Module administration options:',
+    options: {l:'list', e:'enable', d:'disable', q:'quit'},
+  }
+
+  adminFields['enable'] = {
+    name: 'enable',
+    type: 'select',
+    title: 'Select a module to enable:',
+    options: Modules.listModuleOptions(0),
+    conditional: {
+      field: 'start',
+      value: 'enable'
+    }
+  }
+
+  adminFields['disable'] = {
+    name: 'disable',
+    type: 'select',
+    title: 'Select a module to disable:',
+    options: Modules.listModuleOptions(1),
+    conditional = {
+      field: 'start',
+      value: 'disable'
+    }
+  }
+  Prompt.register('moduleadmin', adminFields, Modules.saveModuleChanges, true);
 }
 
 /**
@@ -98,35 +132,7 @@ modules.prototype.loadEnabledModules = function() {
 }
 
 modules.prototype.moduleAdmin = function(session) {
-  moduleAdminPrompt = Prompt.new(session, Modules.saveModuleChanges, 'moduleAdmin');
-
-  adminStartField = moduleAdminPrompt.newField('select');
-  adminStartField.name = 'start';
-  adminStartField.options = {l:'list', e:'enable', d:'disable', q:'quit'};
-  adminStartField.formatPrompt('Module administration options:');
-  moduleAdminPrompt.addField(adminStartField);
-
-  adminEnableField = moduleAdminPrompt.newField('select');
-  adminEnableField.name = 'enable';
-  adminEnableField.options = Modules.listModuleOptions(0);
-  adminEnableField.formatPrompt('Select a module to enable:');
-  adminEnableField.conditional = {
-    field: 'start',
-    value: 'enable'
-  }
-  moduleAdminPrompt.addField(adminEnableField);
-
-  adminDisableField = moduleAdminPrompt.newField('select');
-  adminDisableField.name = 'disable';
-  adminDisableField.options = Modules.listModuleOptions(1);
-  adminDisableField.formatPrompt('Select a module to disable:');
-  adminDisableField.conditional = {
-    field: 'start',
-    value: 'disable'
-  }
-  moduleAdminPrompt.addField(adminDisableField);
-
-  moduleAdminPrompt.start();
+  Prompt.start('moduleadmin', session);
 }
 
 modules.prototype.saveModuleChanges = function(session, fieldValues) {

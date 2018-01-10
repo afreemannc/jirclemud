@@ -115,6 +115,8 @@ room.prototype.loadExits = function() {
     instances.forEach(function(instance) {
       var exit = instance.dataValues;
       exit.properties = JSON.parse(exit.properties);
+      var rid = instance.get('rid');
+      console.log('rid:' + rid);
       Rooms.room[instance.get('rid')].exits[instance.get('label')] = exit;
     });
   });
@@ -261,20 +263,16 @@ room.prototype.hasExits = function(room) {
     }
   }
 
-room.prototype.displayRoom = function(session, roomId) {
-  var current_room = Rooms.room[roomId];
-  var output = '';
-  // display room title
-  if (Characters.hasPerm(session, 'BUILDER')) {
-    output += "\n%bold%%room.name%%bold% %green%[%room.rid%]%green%\n";
-  }
-  else {
-    output += "%bold%%room.name%%bold%\n";
-  }
-  // display room description
-  output += "%room.description%\n";
-  // display exits
-  var exits = Rooms.room[roomId].exits;
+room.prototype.displayRoomName = function(room) {
+  return "\n%bold%%room.name%%bold%\n";
+}
+
+room.prototype.displayRoomDescription = function(room) {
+  return room.description + "\n";
+}
+
+room.prototype.displayRoomExits = function(room) {
+  var exits = room.exits;
   var exitKeys = Object.keys(exits);
   var standardExits = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'u', 'd'];
   if (exitKeys.length > 0) {
@@ -284,24 +282,75 @@ room.prototype.displayRoom = function(session, roomId) {
         // Skip closed doors.
         if (typeof exits[standardExits[i]].properties.flags !== 'undefined') {
           if (exits[standardExits[i]].properties.flags.includes('CLOSED')) {
+            // Hide closed doors in exit list.
             continue;
           }
         }
         exitDisplay.push(standardExits[i]);
       }
     }
-    output += "Exits: [ %yellow%" + exitDisplay.join(' ') + "%yellow% ]\n\n";
+    return "Exits: [ %yellow%" + exitDisplay.join(' ') + "%yellow% ]\n\n";
   }
   else {
-    output += "Exits: [none]\n\n";
+    return "Exits: [none]\n\n";
   }
-  // display room inventory
-  if (current_room.inventory.length > 0) {
-    var display = Items.inventoryDisplay(curent_room.inventory, true);
-    output += display + "\n";
+}
+
+room.prototype.displayRoomInventory = function(room) {
+  if (room.inventory.length > 0) {
+    var display = Items.inventoryDisplay(room.inventory, true);
+    return display + "\n";
   }
+  else {
+    return '';
+  }
+}
+
+room.prototype.displayRoomMobiles = function(room) {
+  var output = '';
+  if (typeof room.mobiles !== 'undefined' && room.mobiles.length > 0) {
+    room.mobiles.forEach(function(mobile) {
+        output += Tokens.replace(mobile.name + "\n", {mobile: mobile});
+    });
+  }
+  return output;
+}
+
+room.prototype.displayRoomPlayers = function(roomId, characterName) {
+  var output = '';
+  var characterNames = Rooms.listPlayersInRoom(roomId);
+  console.log(characterNames);
+  console.log(characterName);
+  if (characterNames.length > 1) {
+    output += "\n\n";
+    for (var i = 0; i < characterNames.length; ++i) {
+      if (characterName !== characterNames[i]) {
+        // If colorized character names become a thing (saints preserve us) this will need to invoke Tokens.replace().
+        //TODO: implement position and position signifiers.
+        output += characterNames + " is $POSITIION_SIGNIFIER here.\n";
+      }
+    }
+  }
+  return output;
+}
+
+room.prototype.displayRoom = function(session, roomId) {
+  var currentRoom = Rooms.room[roomId];
+  var output = this.displayRoomName(currentRoom);
+  output += this.displayRoomDescription(currentRoom);
+  output += this.displayRoomExits(currentRoom);
+  output += this.displayRoomInventory(currentRoom);
+  output += this.displayRoomMobiles(currentRoom);
+  output += this.displayRoomPlayers(roomId, session.character.name);
+  // display room title
+  /*
+  if (Characters.hasPerm(session, 'BUILDER')) {
+    output += "\n%bold%%room.name%%bold% %green%[%room.rid%]%green%\n";
+  }*/
+
   // display mobiles
-  if (current_room.mobiles.length > 0) {
+  /*
+  if (typeof current_room.mobiles !== 'undefined' && current_room.mobiles.length > 0) {
     current_room.mobiles.forEach(function(mobile) {
       // TODO: implement module alteration of output so the following can move to the builder module
       if (Characters.hasPerm(session, 'BUILDER')) {
@@ -311,20 +360,9 @@ room.prototype.displayRoom = function(session, roomId) {
         output += Tokens.replace(mobile.name + "\n", {mobile: mobile});
       }
     });
-  }
+  }*/
 
-  // display characters
-  var characterNames = Rooms.listPlayersInRoom(roomId);
-  if (characterNames.length > 0) {
-    output += "\n\n";
-    for (var i = 0; i < characterNames.length; ++i) {
-      if (session.character.name !== characterNames[i]) {
-        // If colorized character names become a thing (saints preserve us) this will need to invoke Tokens.replace().
-        output += characterNames + " is $POSITIION_SIGNIFIER here.\n";
-      }
-    }
-  }
-  session.write(Tokens.replace(output, {room:current_room}));
+  session.write(Tokens.replace(output, {room:currentRoom}));
 }
 
 module.exports = new room();

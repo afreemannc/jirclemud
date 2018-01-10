@@ -41,7 +41,6 @@ function Session() {
    */
   this.start = function() {
     this.socket.write('Welcome to ' + Config.mudName + '\n');
-    // The standard prompt bailout doesn't make sense on this screen.
     Prompt.start('sessionstart', this);
   }
 

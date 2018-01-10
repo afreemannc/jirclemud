@@ -71,6 +71,7 @@ function makePrompt(id, session, completionCallback, quittable = true) {
         inputComplete = this.currentField.cacheInput(input);
       }
       // The current field has completed gathering input.
+      console.log('inputComplete:' + inputComplete);
       if (inputComplete) {
         fieldIndex = this.getFieldIndex(this.currentField.name);
         // Iterate past hidden fields if needed.
@@ -84,12 +85,17 @@ function makePrompt(id, session, completionCallback, quittable = true) {
             // is skipped.
             prompted = this.promptUser();
             if (prompted === true) {
+              console.log('bailed on prompted === true');
               return;
             }
           }
         }
+        console.log('fieldIndex:' + fieldIndex);
+        console.log('fields length:' + this.fields.length);
+        console.log('completion callback typeof:' + typeof this.completionCallback);
         // Complete form submission if we have reached the last available field.
         if (fieldIndex === (this.fields.length - 1) && typeof this.completionCallback === 'function') {
+          console.log('prompt completed, invoking completion callback');
           var fieldValues = {};
           for (var i = 0; i < this.fields.length; ++i) {
             fieldValues[this.fields[i].name] = this.fields[i].value;

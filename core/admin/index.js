@@ -5,7 +5,10 @@ function admin() {
 
   this.taskDispatcher = function(session, fieldValues) {
     var selection = fieldValues.task;
-    var selectedTask = this.tasks[selection];
+    console.log('available tasks:');
+    console.log(Admin.tasks);
+    console.log('selection:' + selection);
+    var selectedTask = Admin.tasks[selection];
     selectedTask.callback(session);
     return true;
   }
@@ -15,7 +18,8 @@ function admin() {
     name: 'task',
     type: 'select',
     title: '\n%green%Options:%green%\n\n',
-    options: {}
+    options: {},
+    saveRawInput: true
   }
   Prompt.register('admintasks', fields, this.taskDispatcher);
 
@@ -31,7 +35,6 @@ function admin() {
     }
     var cachedPrompt = Prompt.getPrompt('admintasks');
     cachedPrompt.fields['task'].options = taskOptions;
-    cachedPrompt.fields['task'].title = '\n%green%Options:%green%\n\n' + promptOptions;
     Prompt.start('admintasks', session);
   }
 };
