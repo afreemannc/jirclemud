@@ -59,6 +59,18 @@ var modules = function() {
     });
   }
 
+  this.listModuleOptions = function(status) {
+    var moduleKeys = Object.keys(this.availableModules);
+    var options = {};
+    for (var i = 0; i < moduleKeys.length; ++i) {
+      var module = Modules.availableModules[moduleKeys[i]];
+      if (module.status === status) {
+        options[i] = module.name;
+      }
+    }
+    return options;
+  }
+
   // Register module administration prompt
 
   var adminFields = [];
@@ -74,7 +86,7 @@ var modules = function() {
     name: 'enable',
     type: 'select',
     title: 'Select a module to enable:',
-    options: Modules.listModuleOptions(0),
+    options: {},
     conditional: {
       field: 'start',
       value: 'enable'
@@ -85,13 +97,13 @@ var modules = function() {
     name: 'disable',
     type: 'select',
     title: 'Select a module to disable:',
-    options: Modules.listModuleOptions(1),
-    conditional = {
+    options: {},
+    conditional: {
       field: 'start',
       value: 'disable'
     }
   }
-  Prompt.register('moduleadmin', adminFields, Modules.saveModuleChanges, true);
+  Prompt.register('moduleadmin', adminFields, this.saveModuleChanges, true);
 }
 
 /**
@@ -132,6 +144,10 @@ modules.prototype.loadEnabledModules = function() {
 }
 
 modules.prototype.moduleAdmin = function(session) {
+  // load module options
+  moduleAdminPrompt = Prompt.getPrompt('moduleadmin');
+  moduleAdminPrompt.fields['enable'].options = Modules.listModuleOptions(0);
+  moduleAdminPrompt.fields['disable'].options = Modules.listModuleOptions(1);
   Prompt.start('moduleadmin', session);
 }
 
@@ -200,18 +216,6 @@ modules.prototype.saveModuleChanges = function(session, fieldValues) {
     default:
       return false;
   }
-}
-
-modules.prototype.listModuleOptions = function(status) {
-  var moduleKeys = Object.keys(Modules.availableModules);
-  var options = {};
-  for (var i = 0; i < moduleKeys.length; ++i) {
-    var module = Modules.availableModules[moduleKeys[i]];
-    if (module.status === status) {
-      options[i] = module.name;
-    }
-  }
-  return options;
 }
 
 module.exports = new modules();
