@@ -7,13 +7,13 @@ var Config = require('./config/config.js');
 
 var dbSettings = {
   dialect: Config.dbDialect,
+  logging: false
 }
 if (typeof Config.dbUnixSocket !== 'undefined') {
   dbSettings['dialectOptions'] = {
-    socketPath: Config.dbUnixSocket
+    socketPath: Config.dbUnixSocket,
   }
 }
-console.log(dbSettings);
 
 sequelize = new Sequelize(
   Config.dbName,
@@ -90,6 +90,7 @@ function setVariables() {
 }
 
 function promptForAdminAcct() {
+  console.log('Admin account details:'
   prompt.get(['name', 'password'], function(err, result) {
     console.log('character name:' + result.name);
     console.log('password:' + result.password);
