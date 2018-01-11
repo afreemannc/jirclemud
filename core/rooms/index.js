@@ -160,38 +160,10 @@ room.prototype.saveRoom = function(session, values) {
     });
   }
 }
-// TODO: move to Builder module
-room.prototype.deleteRoomPrompt = function(session) {
-  var roomId = session.character.current_room;
-
-  var deleteRoomPrompt = Prompt.new(session, this.deleteRoom, 'deleteRoom');
-
-  var roomIdField = deleteRoomPrompt.newField('value');
-  roomIdField.name = 'rid';
-  roomIdField.value = roomId;
-  deleteRoomPrompt.addField(roomIdField);
-
-  var confirmField = deleteRoomPrompt.newField('select');
-  confirmField.name = 'confirm';
-  confirmField.options = {d:'Delete', c:'Cancel'};
-  confirmField.formatPrompt('If you proceed this room and its contents will be unrecoverably destroyed. Are you certain you want to do this?');
-  confirmField.cacheInput = function(input) {
-    if (input === 'd') {
-      return true;
-    }
-    else {
-      // TODO: perhaps moving this to the validation callback would be less weird.
-      // This is unusual for a cache function. Since there is a cancel option we want to gracefully bail out of
-      // prompt mode without triggering the prompt completion callback.
-      session.write('Primal chaos recedes as you turn your thoughts away from destruction.');
-      return false;
-    }
-  };
-  deleteRoomPrompt.addField(roomIdField);
-  deleteRoomPrompt.start();
-}
 
 room.prototype.deleteRoom = function(session, fieldValues) {
+  console.log('delete room invoked');
+  console.log(fieldValues);
   // unload room from memory if present
   // delete db record for room
   // delete all room exits
@@ -289,7 +261,7 @@ room.prototype.displayRoomDescription = function(room) {
 /**
  * Render room exits for display.
  */
-room.prototype.displayRoomExits = function(room) {
+room.prototype.displayRoomExits = function(room, session) {
   var exits = room.exits;
   var exitKeys = Object.keys(exits);
   var standardExits = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw', 'u', 'd'];
@@ -343,8 +315,9 @@ room.prototype.displayRoomMobiles = function(room) {
 /**
  * Display players in room.
  */
-room.prototype.displayRoomPlayers = function(roomId, characterName) {
+room.prototype.displayRoomPlayers = function(roomId, session) {
   var output = '';
+  var characterName = session.character.name;
   var characterNames = Rooms.listPlayersInRoom(roomId);
   console.log(characterNames);
   console.log(characterName);
@@ -354,7 +327,7 @@ room.prototype.displayRoomPlayers = function(roomId, characterName) {
       if (characterName !== characterNames[i]) {
         // If colorized character names become a thing (saints preserve us) this will need to invoke Tokens.replace().
         //TODO: implement position and position signifiers.
-        output += characterNames + " is $POSITIION_SIGNIFIER here.\n";
+        output += Tokens.replace(characterNames + " is %character.position% here.\n", {character:session.character});
       }
     }
   }
@@ -366,12 +339,13 @@ room.prototype.displayRoomPlayers = function(roomId, characterName) {
  */
 room.prototype.displayRoom = function(session, roomId) {
   var currentRoom = Rooms.room[roomId];
-  var output = this.displayRoomName(currentRoom);
-  output += this.displayRoomDescription(currentRoom);
-  output += this.displayRoomExits(currentRoom);
-  output += this.displayRoomInventory(currentRoom);
-  output += this.displayRoomMobiles(currentRoom);
-  output += this.displayRoomPlayers(roomId, session.character.name);
+  // Extra session parameter available for use in overrides.
+  var output = this.displayRoomName(currentRoom, session);
+  output += this.displayRoomDescription(currentRoom, session);
+  output += this.displayRoomExits(currentRoom, session);
+  output += this.displayRoomInventory(currentRoom, session);
+  output += this.displayRoomMobiles(currentRoom, session);
+  output += this.displayRoomPlayers(roomId, session);
   session.write(Tokens.replace(output, {room:currentRoom}));
 }
 
