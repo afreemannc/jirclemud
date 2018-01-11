@@ -122,6 +122,15 @@ room.prototype.loadExits = function() {
   });
 }
 
+/**
+ * Create new or update existing room data.
+ *
+ * @param session
+ *   User session object
+ *
+ * @param values
+ *   Room object values to save.
+ */
 room.prototype.saveRoom = function(session, values) {
   values.flags = JSON.stringify(values.flags);
   values.inventory = JSON.stringify(values.inventory);
@@ -263,14 +272,23 @@ room.prototype.hasExits = function(room) {
     }
   }
 
+/**
+ * Display room name property.
+ */
 room.prototype.displayRoomName = function(room) {
   return "\n%bold%%room.name%%bold%\n";
 }
 
+/**
+ * Display room description property.
+ */
 room.prototype.displayRoomDescription = function(room) {
   return room.description + "\n";
 }
 
+/**
+ * Render room exits for display.
+ */
 room.prototype.displayRoomExits = function(room) {
   var exits = room.exits;
   var exitKeys = Object.keys(exits);
@@ -296,6 +314,9 @@ room.prototype.displayRoomExits = function(room) {
   }
 }
 
+/**
+ * Display items in room.
+ */
 room.prototype.displayRoomInventory = function(room) {
   if (room.inventory.length > 0) {
     var display = Items.inventoryDisplay(room.inventory, true);
@@ -306,6 +327,9 @@ room.prototype.displayRoomInventory = function(room) {
   }
 }
 
+/**
+ * Display mobs in room.
+ */
 room.prototype.displayRoomMobiles = function(room) {
   var output = '';
   if (typeof room.mobiles !== 'undefined' && room.mobiles.length > 0) {
@@ -316,6 +340,9 @@ room.prototype.displayRoomMobiles = function(room) {
   return output;
 }
 
+/**
+ * Display players in room.
+ */
 room.prototype.displayRoomPlayers = function(roomId, characterName) {
   var output = '';
   var characterNames = Rooms.listPlayersInRoom(roomId);
@@ -334,6 +361,9 @@ room.prototype.displayRoomPlayers = function(roomId, characterName) {
   return output;
 }
 
+/**
+ * Render room display and send output to user session.
+ */
 room.prototype.displayRoom = function(session, roomId) {
   var currentRoom = Rooms.room[roomId];
   var output = this.displayRoomName(currentRoom);
@@ -342,26 +372,6 @@ room.prototype.displayRoom = function(session, roomId) {
   output += this.displayRoomInventory(currentRoom);
   output += this.displayRoomMobiles(currentRoom);
   output += this.displayRoomPlayers(roomId, session.character.name);
-  // display room title
-  /*
-  if (Characters.hasPerm(session, 'BUILDER')) {
-    output += "\n%bold%%room.name%%bold% %green%[%room.rid%]%green%\n";
-  }*/
-
-  // display mobiles
-  /*
-  if (typeof current_room.mobiles !== 'undefined' && current_room.mobiles.length > 0) {
-    current_room.mobiles.forEach(function(mobile) {
-      // TODO: implement module alteration of output so the following can move to the builder module
-      if (Characters.hasPerm(session, 'BUILDER')) {
-        output += Tokens.replace('%mobile.name%%yellow%[%mobile.miid%]%yellow%\n', {mobile:mobile});
-      }
-      else {
-        output += Tokens.replace(mobile.name + "\n", {mobile: mobile});
-      }
-    });
-  }*/
-
   session.write(Tokens.replace(output, {room:currentRoom}));
 }
 
