@@ -86,6 +86,7 @@ var characters = function(){
     session.character.equipment = JSON.parse(character.equipment);
     session.character.perms = JSON.parse(character.perms);
     session.character.inventory = JSON.parse(character.inventory);
+    session.character.position = 'standing';
 
     var values = {
       containerType: 'player_inventory',
